@@ -1,0 +1,8 @@
+namespace: development
+
+resources:
+  - ../../base
+
+patches:
+  - ./patches/replicas_count.yaml
+  - ./patches/resource_limits.yaml

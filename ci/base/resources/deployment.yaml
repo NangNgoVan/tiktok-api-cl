@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pav-api-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: pav-api
+          image: pav-api
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: pav-api-secret-volume
+              mountPath: "/app/.env"
+              readOnly: true
+              subPath: ".env"
+      volumes:
+        - name: pav-api-secret-volume
+          secret:
+            secretName: pav-api-secret

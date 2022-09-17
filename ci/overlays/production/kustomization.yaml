@@ -1,0 +1,8 @@
+namespace: production
+
+bases:
+  - ../../base
+
+patches:
+  - ./patches/replicas_count.yaml
+  - ./patches/resource_limits.yaml

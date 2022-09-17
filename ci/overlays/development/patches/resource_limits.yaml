@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pav-api-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: pav-api
+          command:
+            - node
+            - --max-old-space-size=128
+            - dist/main.js
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
