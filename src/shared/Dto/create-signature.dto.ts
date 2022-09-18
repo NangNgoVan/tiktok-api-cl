@@ -2,7 +2,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsString } from 'class-validator'
 
-export class VerifySignatureDto {
+export class CreateSignatureDto {
     @IsString()
     @ApiProperty({ 
         required: true, 

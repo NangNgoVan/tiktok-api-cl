@@ -6,19 +6,14 @@ import { Body, Controller,
      } from '@nestjs/common';
 import { IDataResponse, TokenDataResponse, NonceTokenDataResponse } from 'src/shared/Services/data-serializer.service';
 import { HttpStatusResult } from 'src/shared/Types/types';
-import { CredentialDto } from '../Dto/credential.dto';
 
-import { AuthService } from '../Service/auth.service';
+import { AuthService } from 'src/shared/Services/auth.service';
+import { CredentialDto } from 'src/shared/Dto/credential.dto';
 
 @Controller('api/authentication')
 export class AuthController {
     constructor (private readonly authService: AuthService) {
 
-    }
-
-    @Get('/nonce')
-    async getNonceToken() : Promise<NonceTokenDataResponse> {
-        return this.authService.createNonce();
     }
 
     @Post('/authentication-method/credential')
@@ -28,9 +23,6 @@ export class AuthController {
 
     @Post('/logout')
     async logOut(bearer: string) : Promise<HttpStatusResult> {
-        return {
-            statusCode: HttpStatus.OK,
-            message: "Logout ok!"
-        }
+        return this.authService.logOut();
     }
 }

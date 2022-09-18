@@ -1,19 +1,21 @@
 // Nest dependencies
 import { Injectable, 
-            BadRequestException, 
-            NotFoundException,
-         } from '@nestjs/common'
+    BadRequestException, 
+    NotFoundException,
+    HttpStatus,
+    UnauthorizedException,
+ } from '@nestjs/common'
 
 import { JwtService } from '@nestjs/jwt'
 import { configService } from 'src/shared/Services/config.service';
-import { TokenDataResponse, NonceTokenDataResponse } from 'src/shared/Services/data-serializer.service'
+import { dataSerialService, IDataResponse, TokenDataResponse, NonceTokenDataResponse } from 'src/shared/Services/data-serializer.service'
 
 import Web3 from 'web3'
 import * as crypto from 'crypto'
 
-
-import { VerifySignatureDto } from '../Dto/verify-signature.dto';
 import { CredentialDto } from '../Dto/credential.dto';
+import { CreateSignatureDto } from '../Dto/create-signature.dto';
+import { HttpStatusResult } from '../Types/types';
 
 
 @Injectable()
@@ -21,7 +23,7 @@ export class AuthService {
     constructor (private readonly jwtService : JwtService) {
 
     }
-
+    
     async createNonce() : Promise<NonceTokenDataResponse> {
         const nonceCreatedByCrypto = crypto.randomBytes(16).toString('base64')
         
@@ -32,19 +34,16 @@ export class AuthService {
         return dataResponse;
     }
 
-    async logInWithMetamask(dto : VerifySignatureDto) : Promise<TokenDataResponse> {
+    async logInWithMetamask(dto : CreateSignatureDto) : Promise<TokenDataResponse> {
         const { nonce, signature }  = dto
         const web3 = new Web3
         const token = web3.eth.accounts.recover(nonce, signature) 
-        // const dataResponse = {
-        //     access_token: addressVerify.trim().toLowerCase()
-        // }
+        
+        if (!token) throw new UnauthorizedException();
 
-        // return dataSerialService.serializeDataResponse('access_token', dataResponse)
         const dataResponse = {
             token: token
         };
-
         return dataResponse;
     }
 
@@ -55,7 +54,14 @@ export class AuthService {
         const dataResponse = {
             token: token
         };
-        
+
         return dataResponse;
+    }
+
+    async logOut() : Promise<HttpStatusResult> {
+        return {
+            statusCode: HttpStatus.OK,
+            message: "Logout ok!"
+        }
     }
 }
