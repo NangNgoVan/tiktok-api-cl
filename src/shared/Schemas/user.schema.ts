@@ -67,9 +67,9 @@ export class User {
     shouldShowAccountSetupFlow: boolean
     //interest
     @Prop({
-        
+
     })
     interests: [string]
 }
 
-export const CatSchema = SchemaFactory.createForClass(User);
+export const UserSchema = SchemaFactory.createForClass(User);

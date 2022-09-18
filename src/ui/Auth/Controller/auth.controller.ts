@@ -6,10 +6,9 @@ import { Body, Controller,
      } from '@nestjs/common';
 import { IDataResponse, TokenDataResponse, NonceTokenDataResponse } from 'src/shared/Services/data-serializer.service';
 import { HttpStatusResult } from 'src/shared/Types/types';
-import { CredentialDto } from '../Dto/credential.dto';
-import { VerifySignatureDto } from '../Dto/verify-signature.dto';
 
-import { AuthService } from '../Service/auth.service';
+import { AuthService } from 'src/shared/Services/auth.service';
+import { CreateSignatureDto } from 'src/shared/Dto/create-signature.dto';
 
 @Controller('api/authentication')
 export class AuthController {
@@ -23,15 +22,12 @@ export class AuthController {
     }
 
     @Post('/authentication-method/metamask')
-    async logInWithMetamask(@Body() dto: VerifySignatureDto) : Promise<TokenDataResponse> {
+    async logInWithMetamask(@Body() dto: CreateSignatureDto) : Promise<TokenDataResponse> {
         return this.authService.logInWithMetamask(dto);
     }
 
     @Post('/logout')
     async logOut(bearer: string) : Promise<HttpStatusResult> {
-        return {
-            statusCode: HttpStatus.OK,
-            message: "Logout ok!"
-        }
+        return this.authService.logOut();
     }
 }
