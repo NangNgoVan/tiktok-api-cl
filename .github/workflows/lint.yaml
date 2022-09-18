@@ -1,0 +1,52 @@
+name: Tiktok API Lint
+
+on:
+  push:
+    branches:
+      - '*'
+      - '*/*'
+  pull_request:
+    branches:
+      - '*'
+      - '*/*'
+  workflow_dispatch:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout new source code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.17.0'
+          cache: 'yarn'
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: |
+          echo "::set-output name=dir::$(yarn cache dir)"
+          echo "::set-output name=version::$(yarn -v)"
+      - uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: |
+            **/node_modules
+            **/.eslintcache
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install project dependencies
+        run: yarn --prefer-offline --frozen-lockfile
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+
+      # TODO: lint cache
+      - name: Run lint check
+        run: yarn lint
+
+# Temporarily disable this due to this period we don't have time to implement unit test
+#      - name: Run unit test
+#        run: yarn test:cov

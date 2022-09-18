@@ -1,0 +1,13 @@
+node_modules
+dist
+build
+.next
+.git
+.vscode
+.idea
+coverage
+.cache
+Dockerfile.prod
+Dockerfile.dev
+docker-compose.yaml
+README.md

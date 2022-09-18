@@ -1,0 +1,24 @@
+name: Github Activities Notification
+
+on: [push]
+jobs:
+
+  build:
+    name: Notify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send telegram message on push
+        uses: appleboy/telegram-action@master
+        with:
+          format: html
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ${{ github.actor }} created commit:
+            ${{ join(github.event.commits.*.message, '<br />') }}
+            
+            Branch: ${{ github.ref_name }}
+            
+            Repository: ${{ github.repository }}
+            
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
