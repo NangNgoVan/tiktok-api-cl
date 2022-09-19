@@ -1,35 +1,35 @@
+import * as _ from 'lodash'
+
 export declare interface IDataResponse {
-    type: string,
-    data: {
-        [key: string] : any
-    }
+  type: string
+  data: {
+    [key: string]: any
+  }
 }
 
 export class DataSerializerService {
+  public async selectProperties(
+    originData: object,
+    props: string[],
+  ): Promise<object> {
+    const result = _.pick(originData, props)
+    return result
+  }
 
-    public async selectProperties(originData: object, props: string[]) : Promise<object> {
-        var result : object = {};
-        for await (const prop of props) {
-            result[prop] = originData[prop];
-        }
-        return result;
+  public serializeDataResponse(type: string, result: object): IDataResponse {
+    return {
+      type: type,
+      data: result,
     }
-
-    public serializeDataResponse(type: string, result: object) : IDataResponse {
-        return {
-            type: type,
-            data: result
-        }
-    }
-
+  }
 }
 
-export const dataSerialService = new DataSerializerService();
+export const dataSerialService = new DataSerializerService()
 
 export class NonceTokenDataResponse {
-    nonce: string
+  nonce: string
 }
 
-export  class TokenDataResponse {
-    token: string
-} 
+export class TokenDataResponse {
+  token: string
+}

@@ -1,14 +1,18 @@
-import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder, SwaggerDocumentOptions } from '@nestjs/swagger';
+import { NestFactory } from '@nestjs/core'
+import {
+  SwaggerModule,
+  DocumentBuilder,
+  SwaggerDocumentOptions,
+} from '@nestjs/swagger'
 
-import { configService } from './shared/Services/config.service';
+import { configService } from './shared/Services/config.service'
 
-import { UIModule } from './ui/ui.module';
-import { CMSModule } from './cms/cms.module';
-import { AppModule } from './app.module';
+import { UIModule } from './ui/ui.module'
+import { CMSModule } from './cms/cms.module'
+import { AppModule } from './app.module'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule)
 
   // Swagger configuration
   const config = new DocumentBuilder()
@@ -16,25 +20,25 @@ async function bootstrap() {
     .setDescription('Tiktok APIs')
     .setVersion('2.0')
     // .addTag('')
-    .build();
+    .build()
 
   // Create Swagger doc for UI modules
   const uiApisDocOptions: SwaggerDocumentOptions = {
-      include: [ UIModule ],
-      deepScanRoutes: true
-  };
-  const cmsApisDoc = SwaggerModule.createDocument(app, config, uiApisDocOptions);
-  SwaggerModule.setup('swagger-ui', app, cmsApisDoc);
+    include: [UIModule],
+    deepScanRoutes: true,
+  }
+  const cmsApisDoc = SwaggerModule.createDocument(app, config, uiApisDocOptions)
+  SwaggerModule.setup('swagger-ui', app, cmsApisDoc)
 
   // Create Swagger doc for CMS modules
   const cmsApisDocOptions: SwaggerDocumentOptions = {
-    include: [ CMSModule ],
-    deepScanRoutes: true
-  };
-  const uiApisDoc = SwaggerModule.createDocument(app, config, cmsApisDocOptions);
-  SwaggerModule.setup('swagger-cms', app, uiApisDoc);
+    include: [CMSModule],
+    deepScanRoutes: true,
+  }
+  const uiApisDoc = SwaggerModule.createDocument(app, config, cmsApisDocOptions)
+  SwaggerModule.setup('swagger-cms', app, uiApisDoc)
 
   // Start application
-  await app.listen(configService.getHostPort());
+  await app.listen(configService.getHostPort())
 }
-bootstrap();
+bootstrap()
