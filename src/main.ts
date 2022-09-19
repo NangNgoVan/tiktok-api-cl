@@ -12,33 +12,27 @@ import { CMSModule } from './cms/cms.module'
 import { AppModule } from './app.module'
 import { WinstonModule } from 'nest-winston'
 import CloudWatchTransport from 'winston-cloudwatch'
-import * as winston from 'winston'
+import winston from 'winston'
 import moment from 'moment'
-import * as AWS from 'aws-sdk'
+import morgan from 'morgan'
 
-AWS.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: 'ap-southeast-1',
-})
-
-async function bootstrap() {
+const createLogger = (logGroupName: string) => {
     const transports: winston.transport[] = []
 
-    if (process.env.NODE_ENV !== 'local') {
+    if (process.env.NODE_ENV === 'local') {
+        transports.push(new winston.transports.Console())
+    } else {
         const cloudWatchTransport = new CloudWatchTransport({
-            logGroupName:
-                process.env.NODE_ENV === 'production'
-                    ? 'prod-pav-api-application-log'
-                    : 'dev-pav-api-application-log',
+            logGroupName,
             logStreamName: () => {
                 return moment().format('YYYY-MM-DD')
             },
+            awsRegion: 'ap-southeast-1',
+            awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
         })
 
         transports.push(cloudWatchTransport)
-    } else {
-        transports.push(new winston.transports.Console())
     }
 
     const logger = WinstonModule.createLogger({
@@ -49,8 +43,18 @@ async function bootstrap() {
         transports,
     })
 
+    return logger
+}
+
+async function bootstrap() {
+    const applicationLogger = createLogger(
+        process.env.NODE_ENV !== 'production'
+            ? 'dev-pav-api-application-log'
+            : 'prod-pav-api-application-log',
+    )
+
     const app = await NestFactory.create(AppModule, {
-        logger,
+        logger: applicationLogger,
     })
 
     // Swagger configuration
@@ -84,6 +88,25 @@ async function bootstrap() {
         cmsApisDocOptions,
     )
     SwaggerModule.setup('swagger-cms', app, uiApisDoc)
+
+    // Request logs
+    const accessLogger = createLogger(
+        process.env.NODE_ENV !== 'production'
+            ? 'dev-pav-api-access-log'
+            : 'prod-pav-api-access-log',
+    )
+    app.use(
+        morgan('combined', {
+            stream: {
+                write: function (message) {
+                    accessLogger.log(message)
+                },
+            },
+        }),
+    )
+
+    // Starts listening for shutdown hooks
+    app.enableShutdownHooks()
 
     // Start application
     await app.listen(configService.getHostPort())
