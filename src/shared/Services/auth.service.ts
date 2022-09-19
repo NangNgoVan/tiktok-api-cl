@@ -4,11 +4,15 @@ import { Injectable,
     NotFoundException,
     HttpStatus,
     UnauthorizedException,
+    Inject,
  } from '@nestjs/common'
 
 import { JwtService } from '@nestjs/jwt'
 import { configService } from 'src/shared/Services/config.service';
-import { dataSerialService, IDataResponse, TokenDataResponse, NonceTokenDataResponse } from 'src/shared/Services/data-serializer.service'
+import { dataSerialService, 
+    IDataResponse, 
+    TokenDataResponse, 
+    NonceTokenDataResponse } from 'src/shared/Services/data-serializer.service'
 
 import Web3 from 'web3'
 import * as crypto from 'crypto'
@@ -16,7 +20,7 @@ import * as crypto from 'crypto'
 import { CredentialDto } from '../Dto/credential.dto';
 import { CreateSignatureDto } from '../Dto/create-signature.dto';
 import { HttpStatusResult } from '../Types/types';
-
+import { RedisCacheService } from './redis-cache.service';
 
 @Injectable()
 export class AuthService {
@@ -59,6 +63,7 @@ export class AuthService {
     }
 
     async logOut() : Promise<HttpStatusResult> {
+        
         return {
             statusCode: HttpStatus.OK,
             message: "Logout ok!"
