@@ -1,18 +1,19 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common'
 
-import { MongooseModule } from '@nestjs/mongoose';
+import { MongooseModule } from '@nestjs/mongoose'
 
-import { UIModule } from './ui/ui.module';
-import { CMSModule } from './cms/cms.module';
+import { UIModule } from './ui/ui.module'
+import { CMSModule } from './cms/cms.module'
 
-import { configService } from './shared/Services/config.service';
+import { configService } from './shared/Services/config.service'
 
 @Module({
-  imports: [  UIModule, 
-              CMSModule,
-              MongooseModule.forRoot(configService.getDbConnStr())
-             ],
-  controllers: [],
-  providers: [],
+    imports: [
+        UIModule,
+        CMSModule,
+        MongooseModule.forRoot(configService.getDbConnStr()),
+    ],
+    controllers: [],
+    providers: [Logger],
 })
 export class AppModule {}
