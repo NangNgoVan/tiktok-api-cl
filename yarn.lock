@@ -3031,19 +3031,17 @@ clone@^1.0.2:
   resolved "https://registry.yarnpkg.com/clone/-/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
   integrity sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==
 
-<<<<<<< HEAD
-cluster-key-slot@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/cluster-key-slot/-/cluster-key-slot-1.1.0.tgz#30474b2a981fb12172695833052bc0d01336d10d"
-  integrity sha512-2Nii8p3RwAPiFwsnZvukotvow2rIHM+yQ6ZcBXGHdniadkYGZYiGmkHJIbZPIV9nfv7m/U1IPMVVcAhoWFeklw==
-=======
 cls-rtracer@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/cls-rtracer/-/cls-rtracer-2.6.2.tgz#249e53051a2356af8d80fd649d22ab7a8eafc339"
   integrity sha512-9TYlTXQkjaytD2oe+WCEAXArgqlrHzvVW5WnwpUgenuY8D3rMfJVgsCogY77YHM9R3dUOMv3XpKRRn+LQnrUEQ==
   dependencies:
     uuid "^8.3.2"
->>>>>>> 580b6ca37f44861e84b8680a204be3af394f81a4
+
+cluster-key-slot@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/cluster-key-slot/-/cluster-key-slot-1.1.0.tgz#30474b2a981fb12172695833052bc0d01336d10d"
+  integrity sha512-2Nii8p3RwAPiFwsnZvukotvow2rIHM+yQ6ZcBXGHdniadkYGZYiGmkHJIbZPIV9nfv7m/U1IPMVVcAhoWFeklw==
 
 co@^4.6.0:
   version "4.6.0"
