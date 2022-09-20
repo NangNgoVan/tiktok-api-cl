@@ -1,4 +1,10 @@
-import { Logger, Module } from '@nestjs/common'
+import {
+    Logger,
+    MiddlewareConsumer,
+    Module,
+    NestModule,
+    RequestMethod,
+} from '@nestjs/common'
 
 import { MongooseModule } from '@nestjs/mongoose'
 
@@ -9,6 +15,7 @@ import { configService } from './shared/Services/config.service'
 import { HealthController } from './shared/Controllers/health.controller'
 import { TerminusModule } from '@nestjs/terminus'
 import { IndexController } from './shared/Controllers/index.controller'
+import { AuthController } from './ui/Auth/Controller/auth.controller'
 
 @Module({
     imports: [

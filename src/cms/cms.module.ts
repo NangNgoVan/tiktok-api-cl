@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { AuthModule } from './Auth/auth.module';
+import { Module } from '@nestjs/common'
+import { AuthModule } from './Auth/auth.module'
 
 @Module({
-  imports: [ AuthModule ],
-  controllers: [],
-  providers: [],
+    imports: [AuthModule],
+    controllers: [],
+    providers: [],
 })
 export class CMSModule {}

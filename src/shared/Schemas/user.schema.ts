@@ -1,14 +1,14 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Document } from 'mongoose'
 
-import { UserGenderType as GenderType } from '../Types/types';
+import { UserGenderType as GenderType } from '../Types/types'
 
-export type UserDocument = User & Document;
+export type UserDocument = User & Document
 
 @Schema({
-    timestamps: { 
-        createdAt: 'created_at', 
-        updatedAt: 'updated_at' 
+    timestamps: {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
     },
     validateBeforeSave: true,
 })
@@ -33,18 +33,14 @@ export class User {
     email: string
     //number_of_follower
     @Prop({
-        default: 0
+        default: 0,
     })
     numberOfFollowers: number
     //birth_day
-    @Prop({
-        
-    })
+    @Prop({})
     birthDay: string
     //full_name
-    @Prop({
-
-    })
+    @Prop({})
     fullName: string
     //nick_name
     @Prop()
@@ -57,19 +53,17 @@ export class User {
     avatarUrl: string
     //should_show_tour_guild
     @Prop({
-        default: false
+        default: false,
     })
     shouldShowTourGuild: boolean
     //should_show_account_setup_flow
     @Prop({
-        default: false
+        default: false,
     })
     shouldShowAccountSetupFlow: boolean
     //interest
-    @Prop({
-        
-    })
+    @Prop({})
     interests: [string]
 }
 
-export const CatSchema = SchemaFactory.createForClass(User);
+export const UserSchema = SchemaFactory.createForClass(User)

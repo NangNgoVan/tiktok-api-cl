@@ -1,35 +1,37 @@
 export declare interface IDataResponse {
-    type: string,
+    type: string
     data: {
-        [key: string] : any
+        [key: string]: any
     }
 }
 
 export class DataSerializerService {
-
-    public async selectProperties(originData: object, props: string[]) : Promise<object> {
-        var result : object = {};
+    public async selectProperties(
+        originData: object,
+        props: string[],
+    ): Promise<object> {
+        const result: object = {}
         for await (const prop of props) {
-            result[prop] = originData[prop];
+            result[prop] = originData[prop]
         }
-        return result;
+        return result
     }
 
-    public serializeDataResponse(type: string, result: object) : IDataResponse {
+    public serializeDataResponse(type: string, result: object): IDataResponse {
         return {
             type: type,
-            data: result
+            data: result,
         }
     }
-
 }
 
-export const dataSerialService = new DataSerializerService();
+export const dataSerialService = new DataSerializerService()
 
 export class NonceTokenDataResponse {
     nonce: string
 }
 
-export  class TokenDataResponse {
+export class TokenDataResponse {
     token: string
-} 
+    refreshToken?: string
+}
