@@ -15,6 +15,7 @@ import CloudWatchTransport from 'winston-cloudwatch'
 import winston from 'winston'
 import moment from 'moment'
 import morgan from 'morgan'
+import rTracer from 'cls-rtracer'
 
 const createLogger = (logGroupName: string) => {
     const transports: winston.transport[] = []
@@ -30,20 +31,25 @@ const createLogger = (logGroupName: string) => {
             awsRegion: 'ap-southeast-1',
             awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
             awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
+            jsonMessage: true,
         })
 
         transports.push(cloudWatchTransport)
     }
 
-    const logger = WinstonModule.createLogger({
+    const requestIdFormatter = winston.format((info) => {
+        info.requestId = rTracer.id()
+        return info
+    })
+
+    return WinstonModule.createLogger({
         format: winston.format.combine(
+            requestIdFormatter(),
             winston.format.timestamp(),
             winston.format.json(),
         ),
         transports,
     })
-
-    return logger
 }
 
 async function bootstrap() {
@@ -104,6 +110,9 @@ async function bootstrap() {
             },
         }),
     )
+
+    // Tracer
+    app.use(rTracer.expressMiddleware())
 
     // Starts listening for shutdown hooks
     app.enableShutdownHooks()
