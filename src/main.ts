@@ -32,6 +32,7 @@ const createLogger = (logGroupName: string) => {
             awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
             awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
             jsonMessage: true,
+            uploadRate: 10 * 1000,
         })
 
         transports.push(cloudWatchTransport)
