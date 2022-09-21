@@ -1,4 +1,4 @@
-name: Github Activities Notification
+name: Notification
 
 on: [push]
 jobs:

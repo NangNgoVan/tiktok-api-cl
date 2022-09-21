@@ -1,4 +1,4 @@
-name: Tiktok API Deploy
+name: Deployment
 
 on:
   push:
@@ -88,10 +88,10 @@ jobs:
           
           # FIXME: also support deploy to production environment
           if [ "develop" == "$BRANCH_NAME" ]; then
-            cd ./ci/overlays/development && \
-              kustomize edit set image pav-api=${IMAGE_TO_DEPLOY} && \
-              kustomize build | kubectl apply -f -
-              kubectl wait --for=condition=available --timeout=60s deployment/pav-api-deployment -n development
+            cd ./ci/overlays/development
+            kustomize edit set image pav-api=${IMAGE_TO_DEPLOY}
+            kustomize build | kubectl apply -f -
+            kubectl wait --for=condition=available --timeout=60s deployment/pav-api-deployment -n development
           fi
       - name: Move cache
         run: |
