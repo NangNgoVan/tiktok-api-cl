@@ -22,6 +22,7 @@ import { AuthService } from 'src/shared/Services/auth.service'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiBearerAuth } from '@nestjs/swagger'
+import { configService } from 'src/shared/Services/config.service'
 
 @Controller('ui/authentication')
 export class AuthController {
@@ -47,8 +48,20 @@ export class AuthController {
             throw new UnauthorizedException()
         }
 
-        const tokenResponse = await this.authService.createJWTToken(60)
-        return tokenResponse
+        const verifiedToken = await this.authService.verifyJWTToken(
+            refreshToken,
+            configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
+        )
+
+        if (!verifiedToken) {
+            throw new UnauthorizedException()
+        }
+
+        const token = await this.authService.createJWTToken(60)
+        const dataResponse = {
+            token: token,
+        }
+        return dataResponse
     }
 
     @ApiBearerAuth()

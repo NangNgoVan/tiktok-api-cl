@@ -73,7 +73,6 @@ export class AuthService {
 
     async logInWithCredential(dto: CredentialDto): Promise<TokenDataResponse> {
         const token = 'token'
-
         const accessToken = this.jwtService.sign(
             {
                 data: 'data_to_generate_jwt_token',
@@ -102,7 +101,18 @@ export class AuthService {
         return dataResponse
     }
 
-    async createJWTToken(expiresIn: any): Promise<TokenDataResponse> {
+    async verifyJWTToken(token: any, secretKey: string): Promise<string> {
+        try {
+            const verifyToken = await this.jwtService.verify(token, {
+                secret: secretKey,
+            })
+            return verifyToken
+        } catch (error) {
+            return null
+        }
+    }
+
+    async createJWTToken(expiresIn: any): Promise<string> {
         const token = this.jwtService.sign(
             {
                 data: 'data_to_generate_jwt_token',
@@ -112,12 +122,7 @@ export class AuthService {
                 expiresIn: expiresIn,
             },
         )
-
-        const dataResponse = {
-            token: token,
-        }
-
-        return dataResponse
+        return token
     }
 
     async logOut(bearer: string): Promise<HttpStatusResult> {
