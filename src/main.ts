@@ -118,6 +118,19 @@ async function bootstrap() {
     // Starts listening for shutdown hooks
     app.enableShutdownHooks()
 
+    app.enableCors({
+        origin: [
+            'http://pavsocial.com',
+            'https://pavsocial.com',
+            'http://ui-dev.pavsocial.com',
+            'https://ui-dev.pavsocial.com',
+            'http://cms-dev.pavsocial.com',
+            'https://cms-dev.pavsocial.com',
+            'http://docs.pavsocial.com',
+            'https://docs.pavsocial.com',
+        ],
+    })
+
     // Start application
     await app.listen(configService.getHostPort())
 }
