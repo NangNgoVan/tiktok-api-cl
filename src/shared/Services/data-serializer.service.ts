@@ -35,3 +35,8 @@ export class TokenDataResponse {
     token: string
     refreshToken?: string
 }
+
+export class UserDataResponse {
+    id: string
+    name: string
+}

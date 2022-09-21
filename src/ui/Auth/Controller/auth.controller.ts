@@ -21,8 +21,9 @@ import { VerifySignatureDto } from 'src/shared/Dto/verify-signature.dto'
 import { AuthService } from 'src/shared/Services/auth.service'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { AuthGuard } from '@nestjs/passport'
-import { ApiBearerAuth } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 
+@ApiTags('Authentication for UI')
 @Controller('ui/authentication')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}

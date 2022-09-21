@@ -9,3 +9,8 @@ export interface HttpStatusResult {
     statusCode: any
     message: string
 }
+
+export enum UserReactionType {
+    LAUGH,
+    HEART,
+}

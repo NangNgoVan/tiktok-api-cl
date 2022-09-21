@@ -62,8 +62,17 @@ export class User {
     })
     shouldShowAccountSetupFlow: boolean
     //interest
-    @Prop({})
+    @Prop({
+        default: [],
+    })
     interests: [string]
+    @Prop({
+        default: null,
+    })
+    blockedAt?: string
+
+    @Prop()
+    deletedAt?: string
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

@@ -22,7 +22,7 @@ import { AuthController } from './ui/Auth/Controller/auth.controller'
         UIModule,
         CMSModule,
         TerminusModule,
-        // MongooseModule.forRoot(configService.getDbConnStr()),
+        MongooseModule.forRoot(configService.getDbConnStr()),
     ],
     controllers: [IndexController, HealthController],
     providers: [Logger],
