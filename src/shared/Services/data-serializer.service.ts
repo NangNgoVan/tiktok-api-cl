@@ -25,7 +25,7 @@ export class DataSerializerService {
     }
 }
 
-export const dataSerialService = new DataSerializerService()
+export const dataSerializerService = new DataSerializerService()
 
 export class NonceTokenDataResponse {
     nonce: string
@@ -34,4 +34,9 @@ export class NonceTokenDataResponse {
 export class TokenDataResponse {
     token: string
     refreshToken?: string
+}
+
+export class UserDataResponse {
+    id: string
+    name: string
 }

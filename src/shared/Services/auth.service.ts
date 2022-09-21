@@ -19,10 +19,16 @@ import * as crypto from 'crypto'
 import { VerifySignatureDto } from '../Dto/verify-signature.dto'
 import { CredentialDto } from '../Dto/credential.dto'
 import { HttpStatusResult } from '../Types/types'
+import { UsersService } from 'src/ui/Users/Service/users.service'
+
+import { dataSerializerService } from './data-serializer.service'
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly jwtService: JwtService) {}
+    constructor(
+        private readonly jwtService: JwtService,
+        private userService: UsersService,
+    ) {}
 
     async createNonce(): Promise<NonceTokenDataResponse> {
         const nonceCreatedByCrypto = crypto.randomBytes(16).toString('base64')
@@ -37,15 +43,29 @@ export class AuthService {
     async logInWithMetamask(
         dto: VerifySignatureDto,
     ): Promise<TokenDataResponse> {
-        const { nonce, signature } = dto
+        const { nonce, signature, address } = dto
         const web3 = new Web3()
-        const token = web3.eth.accounts.recover(nonce, signature)
 
-        if (!token) throw new UnauthorizedException()
+        const verifiedAdress = web3.eth.accounts.recover(nonce, signature)
+
+        if (!verifiedAdress) throw new UnauthorizedException()
+
+        //if (address != verifiedAdress) throw new UnauthorizedException()
+
+        // Find user by signature in DB
+        let user = await this.userService.findByAddress(verifiedAdress)
+        // If user not found, create new User
+        if (!user)
+            user = await this.userService.create({ address: verifiedAdress })
+
+        const serializeUser = await dataSerializerService.selectProperties(
+            user,
+            ['id'],
+        )
 
         const accessToken = this.jwtService.sign(
             {
-                signature,
+                userId: serializeUser['id'],
             },
             {
                 secret: configService.getEnv('JWT_SECRET'),
@@ -55,7 +75,7 @@ export class AuthService {
 
         const refreshToken = this.jwtService.sign(
             {
-                signature,
+                userId: serializeUser['id'],
             },
             {
                 secret: configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),

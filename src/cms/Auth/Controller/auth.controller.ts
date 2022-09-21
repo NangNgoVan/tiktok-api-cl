@@ -20,7 +20,7 @@ export class AuthController {
         return this.authService.logInWithCredential(dto)
     }
 
-    @Post('/logout')
+    @Get('/logout')
     async logOut(bearer: string): Promise<HttpStatusResult> {
         return {
             statusCode: HttpStatus.OK,

@@ -13,6 +13,10 @@ export type UserDocument = User & Document
     validateBeforeSave: true,
 })
 export class User {
+    //web3token
+    @Prop({ default: null })
+    token: string
+
     //gender
     @Prop({
         enum: Object.values(GenderType).concat([null]),
@@ -22,6 +26,7 @@ export class User {
         allowNull: true,
     })
     gender: GenderType
+
     //email
     @Prop({
         type: String,
@@ -35,35 +40,48 @@ export class User {
     @Prop({
         default: 0,
     })
-    numberOfFollowers: number
+    number_of_follower: number
     //birth_day
-    @Prop({})
-    birthDay: string
+    @Prop({
+        default: null,
+    })
+    birth_day: string
     //full_name
-    @Prop({})
-    fullName: string
+    @Prop({
+        default: null,
+    })
+    full_name: string
     //nick_name
     @Prop()
-    nickName: string
+    nick_name: string
     //adress
     @Prop()
     address: string
     //avatar_url
     @Prop()
-    avatarUrl: string
+    avatar_url: string
     //should_show_tour_guild
     @Prop({
-        default: false,
+        default: true,
     })
-    shouldShowTourGuild: boolean
+    should_show_account_setup_flow: boolean
     //should_show_account_setup_flow
     @Prop({
-        default: false,
+        default: true,
     })
-    shouldShowAccountSetupFlow: boolean
+    roles: boolean
     //interest
-    @Prop({})
+    @Prop({
+        default: [],
+    })
     interests: [string]
+    @Prop({
+        default: null,
+    })
+    blocked_at?: string
+
+    @Prop()
+    deleted_at: string
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
