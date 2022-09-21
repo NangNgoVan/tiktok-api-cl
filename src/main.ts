@@ -64,6 +64,30 @@ async function bootstrap() {
         logger: applicationLogger,
     })
 
+    app.enableCors({
+        origin: [
+            // FIXME: using regex instead
+            'http://pavsocial.com',
+            'https://pavsocial.com',
+            'http://ui-dev.pavsocial.com',
+            'https://ui-dev.pavsocial.com',
+            'http://ui-local.pavsocial.com',
+            'https://ui-local.pavsocial.com',
+            'http://cms-dev.pavsocial.com',
+            'https://cms-dev.pavsocial.com',
+            'http://cms-local.pavsocial.com',
+            'https://cms-local.pavsocial.com',
+            'http://doc-api-ui.pavsocial.com',
+            'https://doc-api-ui.pavsocial.com',
+            'http://doc-api-cms.pavsocial.com',
+            'https://doc-api-cms.pavsocial.com',
+        ],
+        methods: '*',
+        allowedHeaders: '*',
+        optionsSuccessStatus: 204,
+        preflightContinue: false,
+    })
+
     // Swagger configuration
     const config = new DocumentBuilder()
         .setTitle('Tiktok APIs')
@@ -117,19 +141,6 @@ async function bootstrap() {
 
     // Starts listening for shutdown hooks
     app.enableShutdownHooks()
-
-    app.enableCors({
-        origin: [
-            'http://pavsocial.com',
-            'https://pavsocial.com',
-            'http://ui-dev.pavsocial.com',
-            'https://ui-dev.pavsocial.com',
-            'http://cms-dev.pavsocial.com',
-            'https://cms-dev.pavsocial.com',
-            'http://docs.pavsocial.com',
-            'https://docs.pavsocial.com',
-        ],
-    })
 
     // Start application
     await app.listen(configService.getHostPort())
