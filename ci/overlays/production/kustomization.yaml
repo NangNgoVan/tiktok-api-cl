@@ -5,4 +5,5 @@ bases:
 
 patches:
   - ./patches/replicas_count.yaml
-  - ./patches/resource_limits.yaml
+  - ./patches/resource_limit.yaml
+  - ./patches/variable.yaml

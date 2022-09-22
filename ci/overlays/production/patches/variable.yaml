@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pav-api-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: pav-api
+          env:
+            - name: NODE_ENV
+              value: "production"
