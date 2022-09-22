@@ -46,17 +46,17 @@ export class AuthService {
         const { nonce, signature, address } = dto
         const web3 = new Web3()
 
-        const verifiedAdress = web3.eth.accounts.recover(nonce, signature)
+        const verifiedAddress = web3.eth.accounts.recover(nonce, signature)
 
-        if (!verifiedAdress) throw new UnauthorizedException()
+        if (!verifiedAddress) throw new UnauthorizedException()
 
-        //if (address != verifiedAdress) throw new UnauthorizedException()
+        //if (address !== verifiedAddress) throw new UnauthorizedException()
 
         // Find user by signature in DB
-        let user = await this.userService.findByAddress(verifiedAdress)
+        let user = await this.userService.findByAddress(verifiedAddress)
         // If user not found, create new User
         if (!user)
-            user = await this.userService.create({ address: verifiedAdress })
+            user = await this.userService.create({ address: verifiedAddress })
 
         const serializeUser = await dataSerializerService.selectProperties(
             user,
