@@ -78,7 +78,9 @@ export class AuthService {
                 userId: serializeUser['id'],
             },
             {
-                secret: configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
+                // FIXME: temporary fixed jwt refresh token, this should remove soon
+                secret:
+                    configService.getEnv('JWT_REFRESH_TOKEN_SECRET') || 'himom',
                 expiresIn: '7 days',
             },
         )
