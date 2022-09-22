@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger'
+
 export declare interface IDataResponse {
     type: string
     data: {
@@ -28,15 +30,25 @@ export class DataSerializerService {
 export const dataSerializerService = new DataSerializerService()
 
 export class NonceTokenDataResponse {
+    @ApiProperty({
+        name: 'nonce',
+        description: 'a random string',
+    })
     nonce: string
 }
 
 export class TokenDataResponse {
+    @ApiProperty()
     token: string
+
+    @ApiProperty()
     refreshToken?: string
 }
 
 export class UserDataResponse {
+    @ApiProperty()
     id: string
+
+    @ApiProperty()
     name: string
 }

@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 
 import { UserGenderType as GenderType } from '../Types/types'
+import { ApiProperty } from '@nestjs/swagger'
 
 export type UserDocument = User & Document
 
@@ -15,6 +16,7 @@ export type UserDocument = User & Document
 export class User {
     //web3token
     @Prop({ default: null })
+    @ApiProperty()
     token: string
 
     //gender
@@ -25,6 +27,7 @@ export class User {
         type: String,
         allowNull: true,
     })
+    @ApiProperty()
     gender: GenderType
 
     //email
@@ -35,52 +38,74 @@ export class User {
         trim: true,
         lowercase: true,
     })
+    @ApiProperty()
     email: string
+
     //number_of_follower
     @Prop({
         default: 0,
     })
+    @ApiProperty()
     number_of_follower: number
+
     //birth_day
     @Prop({
         default: null,
     })
+    @ApiProperty()
     birth_day: string
+
     //full_name
     @Prop({
         default: null,
     })
+    @ApiProperty()
     full_name: string
+
     //nick_name
     @Prop()
+    @ApiProperty()
     nick_name: string
-    //adress
+
+    //address
     @Prop()
+    @ApiProperty()
     address: string
+
     //avatar_url
     @Prop()
+    @ApiProperty()
     avatar_url: string
+
     //should_show_tour_guild
     @Prop({
         default: true,
     })
+    @ApiProperty()
     should_show_account_setup_flow: boolean
+
     //should_show_account_setup_flow
     @Prop({
         default: true,
     })
+    @ApiProperty()
     roles: boolean
+
     //interest
     @Prop({
         default: [],
     })
+    @ApiProperty()
     interests: [string]
+
     @Prop({
         default: null,
     })
+    @ApiProperty()
     blocked_at?: string
 
     @Prop()
+    @ApiProperty()
     deleted_at: string
 }
 
