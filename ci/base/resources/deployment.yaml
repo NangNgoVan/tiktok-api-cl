@@ -8,6 +8,7 @@ spec:
       containers:
         - name: pav-api
           image: pav-api
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           volumeMounts:
