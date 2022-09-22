@@ -38,9 +38,20 @@ export class UsersService {
         user.full_name = dto.full_name
         user.nick_name = dto.nick_name
         user.should_show_account_setup_flow = dto.should_show_account_setup_flow
-        user.roles = dto.roles
+        //user.roles = dto.roles
         user.interests = dto.interests
 
         return user.save()
+    }
+
+    async updateAvatar(id: string, avatarUrl: string) {
+        const user = await this.userModel.findById(id)
+        if (!user) return UserNotFoundException
+
+        user.avatar_url = avatarUrl
+
+        await user.save()
+
+        return user.avatar_url
     }
 }

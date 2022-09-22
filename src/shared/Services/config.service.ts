@@ -14,6 +14,13 @@ export class ConfigService {
     public getDbConnStr(): string {
         return this.getEnv('MONGO')
     }
+
+    public AWS3Configuration() {
+        return {
+            accessKeyId: this.getEnv('AWS_ACCESS_KEY_ID'),
+            secretAccessKey: this.getEnv('AWS_SECRET_ACCESS_KEY'),
+        }
+    }
 }
 
 export const configService = new ConfigService()
