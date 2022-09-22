@@ -79,7 +79,7 @@ export class AuthController {
         return tokenResponse
     }
 
-    @Get('/logout')
+    @Post('/logout')
     @ApiBearerAuth()
     @ApiOperation({ summary: 'logout' })
     @ApiOkResponse({

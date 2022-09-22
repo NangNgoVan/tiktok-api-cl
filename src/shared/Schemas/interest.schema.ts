@@ -1,4 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { ApiProperty } from '@nestjs/swagger'
+import { IsNumber, IsString } from 'class-validator'
 import { Document } from 'mongoose'
 
 export type InterestDocument = Interest & Document
@@ -12,10 +14,14 @@ export type InterestDocument = Interest & Document
 })
 export class Interest {
     @Prop()
+    @ApiProperty()
+    @IsString()
     name: string
 
     @Prop()
-    dispalyOrder: number
+    @ApiProperty()
+    @IsNumber()
+    display_order: number
 }
 
 export const InterestSchema = SchemaFactory.createForClass(Interest)
