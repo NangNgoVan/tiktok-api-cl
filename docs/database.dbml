@@ -1,0 +1,100 @@
+Project pav {}
+
+Table user_schema.interest {
+    id varchar [pk]
+    name varchar [not nulL]
+    dispaly_order int [default: 999]
+    created_at datetime [default: `now()`]
+    updated_at datetime [default: `now()`]
+}
+
+Table user_schema.user {
+  id varchar [pk]
+  gender varchar
+  number_of_followers int
+  birth_day varchar
+  full_name varchar
+  nick_name varchar
+  email varchar
+  address varchar
+  avatar varchar
+  should_show_tour_guild boolean [default: true]
+  should_show_account_setup_flow boolean [default: true]
+  roles varchar[] [ref: <> user_schema.role.name]
+  interests varchar[] [ref: <> user_schema.interest.id]
+  blocked_at datetime
+  deleted_at datetime
+  created_at datetime [default: `now()`]
+  updated_at datetime [default: `now()`]
+}
+
+Table user_schema.authentication_method {
+  name varchar [pk]
+  created_at datetime [default: `now()`]
+  updated_at datetime [default: `now()`]
+}
+
+Table user_schema.user_authentication_method {
+  id varchar [pk, ref: > user_schema.user.id]
+  user_id varchar
+  authentication_method varchar
+  data object
+  created_at varchar
+
+  indexes {
+    (user_id, authentication_method) [unique]
+  }
+}
+
+Table user_schema.role {
+  name string [pk]
+  created_by varchar
+  permissions varchar[] [ref: <> user_schema.action.name, ref: <> user_schema.subject.name]
+  created_at datetime [default: `now()`]
+  updated_at datetime [default: `now()`]
+}
+
+Table user_schema.action {
+  name varchar [pk]
+  created_by varchar
+  created_at datetime [default: `now()`]
+  updated_at datetime [default: `now()`]
+}
+
+Table user_schema.subject {
+  name varchar [pk]
+  created_by varchar
+  created_at datetime [default: `now()`]
+  updated_at datetime [default: `now()`]
+}
+
+enum feed_schema.feed_type {
+  image
+  video
+}
+
+Table feed_schema.feed {
+  id varchar [pk]
+  created_at datetime [default: `now()`]
+  updated_at datetime [default: `now()`]
+  deleted_at datetime [null, default: null]
+  type feed_schema.feed_type
+  number_of_view int [default: 0]
+  number_of_reaction int [default: 0]
+  number_of_bookmark int [default: 0]
+  created_by varchar
+  content varchar(255)
+  resources varchar[]
+  song varchar [null, default: null]
+  hashtags varchar[] [note: "exmaple: ['blacklivematter', 'raiseforuk', 'worldhello', 'helloworld']"]
+}
+
+Table feed_schema.feed_resource {
+  id varchar [pk]
+  path varchar
+  feed_id varchar [ref: > feed_schema.feed.id]
+  type feed_schema.feed_type
+  created_by varchar [ref: - user_schema.user.id]
+  created_at datetime [default: `now()`]
+  updated_at datetime [default: `now()`]
+}
