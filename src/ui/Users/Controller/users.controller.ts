@@ -56,6 +56,7 @@ export class UserController {
     @ApiOkResponse({
         description: '200',
     })
+    @ApiNotFoundResponse()
     async updateCurrentUser(
         @Req() req,
         @Body() dto: UpdateUserDto,
@@ -75,7 +76,7 @@ export class UserController {
     @Get('/:userId')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'update user by user id' })
+    @ApiOperation({ summary: 'get user by user id' })
     @ApiOkResponse({
         description: '200',
         type: User,
