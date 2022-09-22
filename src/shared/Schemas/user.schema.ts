@@ -82,14 +82,21 @@ export class User {
         default: true,
     })
     @ApiProperty()
-    should_show_account_setup_flow: boolean
+    should_show_tour_guild: boolean
 
     //should_show_account_setup_flow
     @Prop({
         default: true,
     })
     @ApiProperty()
-    roles: boolean
+    should_show_account_setup_flow: boolean
+
+    //interest
+    @Prop({
+        default: [],
+    })
+    @ApiProperty()
+    roles: [string]
 
     //interest
     @Prop({
