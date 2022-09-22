@@ -29,10 +29,9 @@ import { User } from '../../../shared/Schemas/user.schema'
 @Controller('ui/users')
 @ApiTags('User API')
 export class UserController {
-    constructor(
-        private readonly userService: UsersService,
-        private logger: Logger,
-    ) {}
+    private readonly logger: Logger = new Logger(UserController.name)
+
+    constructor(private readonly userService: UsersService) {}
 
     @Get('/current')
     @UseGuards(JwtAuthGuard)
