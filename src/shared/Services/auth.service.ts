@@ -140,7 +140,7 @@ export class AuthService {
         return dataResponse
     }
 
-    async logOut(bearer: string): Promise<HttpStatusResult> {
+    async logOut(refreshToken: string): Promise<HttpStatusResult> {
         return {
             statusCode: 200,
             message: 'Logged out success!',

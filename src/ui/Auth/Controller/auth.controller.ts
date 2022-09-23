@@ -80,14 +80,17 @@ export class AuthController {
     }
 
     @Post('/logout')
-    @ApiBearerAuth()
+    @ApiHeader({
+        name: 'refresh-token',
+        description: 'refresh token',
+        required: true,
+    })
     @ApiOperation({ summary: 'logout' })
     @ApiOkResponse({
         description: '200',
     })
-    async logOut(
-        @Headers('authorization') bearer: string,
-    ): Promise<HttpStatusResult> {
-        return this.authService.logOut(bearer)
+    async logOut(@Req() req): Promise<HttpStatusResult> {
+        const refreshToken = req.headers['refresh-token'] // read refresh-token from headers
+        return this.authService.logOut(refreshToken)
     }
 }
