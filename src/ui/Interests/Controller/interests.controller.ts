@@ -10,7 +10,7 @@ export class InterestsController {
     constructor(private readonly interestsService: InterestsService) {}
 
     @Get('/interests')
-    @UseGuards(JwtAuthGuard)
+    // @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Get interests list' })
     @ApiOkResponse({
         description: 'List of Interests',

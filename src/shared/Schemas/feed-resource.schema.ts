@@ -22,8 +22,6 @@ export class FeedResource {
     type: FeedType
     @Prop()
     created_by: string
-    @Prop()
-    updated_by: string
 }
 
 export const FeedResourceSchema = SchemaFactory.createForClass(FeedResource)

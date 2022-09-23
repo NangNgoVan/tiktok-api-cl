@@ -11,12 +11,12 @@ export interface HttpStatusResult {
 }
 
 export enum UserReactionType {
-    LAUGH,
-    HEART,
-    LIKE,
+    LAUGH = 'laugh',
+    HEART = 'heart',
+    LIKE = 'like',
 }
 
 export enum FeedType {
-    IMAGE,
-    VIDEO,
+    IMAGE = 'image',
+    VIDEO = 'video',
 }

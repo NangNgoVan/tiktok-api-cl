@@ -17,3 +17,9 @@ export class DatabaseUpdateFailException extends HttpException {
         super('Updating process to DB failed!', HttpStatus.BAD_REQUEST)
     }
 }
+
+export class RefreshTokenInvalidException extends HttpException {
+    constructor() {
+        super('Refresh token invalid', HttpStatus.BAD_REQUEST)
+    }
+}

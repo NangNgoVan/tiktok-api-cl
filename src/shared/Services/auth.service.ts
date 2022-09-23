@@ -122,6 +122,17 @@ export class AuthService {
         return dataResponse
     }
 
+    async verifyJWTToken(token: any, secretKey: string): Promise<string> {
+        try {
+            const verifyToken = await this.jwtService.verify(token, {
+                secret: secretKey,
+            })
+            return verifyToken
+        } catch (error) {
+            return null
+        }
+    }
+
     async createJWTToken(expiresIn: any): Promise<TokenDataResponse> {
         const token = this.jwtService.sign(
             {

@@ -5,5 +5,5 @@ export class GetInterestsDto {
     name: string
 
     @IsNumber()
-    display: number
+    display_order: number
 }

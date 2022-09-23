@@ -15,14 +15,13 @@ export class AWS3FileUploadService {
         name,
         mimeType,
         ownerId,
-        subfolderPath?,
+        subfolderPath,
     ) {
-        let userFolder = `${ownerId}`
-        if (subfolderPath) userFolder += `/${subfolderPath}`
-
+        const userFolder = `${subfolderPath}/${ownerId}`
+        const ext = name.split('.')[1]
         const uploadParams = {
             Bucket: bucket,
-            Key: `${userFolder}/${uuidv4()}`,
+            Key: `${userFolder}/${uuidv4()}.${ext}`,
             Body: file,
             ContentType: mimeType,
             ContentDisposition: 'inline',
@@ -35,7 +34,7 @@ export class AWS3FileUploadService {
             const uploadData = await this.s3().upload(uploadParams).promise()
             return uploadData
         } catch (e) {
-            throw new FileUploadFailException()
+            return null
         }
     }
 }

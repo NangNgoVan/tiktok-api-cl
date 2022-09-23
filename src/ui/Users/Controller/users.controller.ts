@@ -25,6 +25,7 @@ import {
 } from '@nestjs/swagger'
 import {
     DatabaseUpdateFailException,
+    FileUploadFailException,
     UserNotFoundException,
 } from 'src/shared/Exceptions/http.exceptions'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
@@ -61,7 +62,6 @@ export class UserController {
     async getCurrentUser(@Req() req): Promise<any> {
         const { userId } = req.user
         const user = await this.userService.findById(userId)
-        this.logger.log(user)
         return user
     }
 
@@ -139,7 +139,7 @@ export class UserController {
 
         const { originalname, /*encoding,*/ mimetype, buffer, size } = file
 
-        const path = 'avatar/' + moment().format('yyyy-MM-DD')
+        const path = 'avatars/' + moment().format('yyyy-MM-DD')
 
         const uploadedData =
             await this.aws3FileUploadService.uploadFileToS3Bucket(
@@ -150,6 +150,8 @@ export class UserController {
                 userId,
                 path,
             )
+
+        if (!uploadedData) throw new FileUploadFailException()
 
         const { /*ETag,*/ Location /*, Key, Bucket*/ } = uploadedData
 

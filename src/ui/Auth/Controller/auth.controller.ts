@@ -29,6 +29,8 @@ import {
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger'
+import { configService } from 'src/shared/Services/config.service'
+import { RefreshTokenInvalidException } from 'src/shared/Exceptions/http.exceptions'
 
 @ApiTags('Authentication for UI')
 @Controller('ui/authentication')
@@ -73,6 +75,15 @@ export class AuthController {
 
         if (!refreshToken /**or refresh token not in the blacklist */) {
             throw new UnauthorizedException()
+        }
+
+        if (
+            !(await this.authService.verifyJWTToken(
+                refreshToken,
+                configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
+            ))
+        ) {
+            throw new RefreshTokenInvalidException()
         }
 
         const tokenResponse = await this.authService.createJWTToken(60)
