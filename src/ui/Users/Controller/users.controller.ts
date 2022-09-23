@@ -4,10 +4,9 @@ import {
     Controller,
     Get,
     Logger,
-    NotFoundException,
     Param,
-    Patch,
     Post,
+    Put,
     Req,
     UploadedFile,
     UseGuards,
@@ -67,7 +66,7 @@ export class UserController {
 
     //Update current user
     @UseGuards(JwtAuthGuard)
-    @Patch('/current')
+    @Put('/current')
     @ApiBearerAuth()
     @ApiOperation({ summary: 'update user by `current` alias' })
     @ApiOkResponse({
