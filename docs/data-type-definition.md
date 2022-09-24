@@ -1,5 +1,4 @@
-### `Deprecated` this documentation permanent move to: [here](https://dbdocs.io/anhdiepmmk/pav?view=relationships)
-### In this issue we a going to define our data types which will follow some conditions.
+### In this issue we are going to define our data types which will follow some conditions.
 - Data type should be flattened (avoid create a data types which allow to create a nested data)
 - Easy to scale (it's allow 10, 100, 1000, 10 000, even 1000 000 end user interact with data without performance issue)
 
@@ -30,8 +29,10 @@ _the reason why we should split url  property from feed collection into this col
 - type (string, must be one of `image`, `video`)
 - created_at (string)
 - updated_at (string)
+- created_by (string)
+- updated_by (string)
 
-### Feed hash tag
+### Feed hashtag
 *Actually `hashtags` property in `feed` collection is enough but we are going to duplicate hashtag data to this collection for multi reason*
 - id (string)
 - feed_id (string)
@@ -51,6 +52,8 @@ _the reason why we should split url  property from feed collection into this col
 - id (string)
 - display_order (number, default: 999) //sort by display order, desc
 - number_of_use (number, default: 0)
+- number_of_bookmark (number, default: 0)
+- duration_in_second (number)
 - name (string, max 255)
 - path (string) //path to mp3 that store in s3
 - created_at (string)
@@ -104,7 +107,8 @@ _the reason why we should split url  property from feed collection into this col
 ### User
 - id (string)
 - gender (must be one of `male`, `female`)
-- number_of_followers (number, `default to: 0`)
+- number_of_follower (number, `default to: 0`)
+- number_of_following (number, `default to: 0`)
 - birth_day (string)
 - full_name (string, `max 50`)
 - nick_name (string, `max 50`)
@@ -197,14 +201,14 @@ example:
 ```
 
 Note: structure of the permission is `subject:action`
-- `subject` which is an objective that we are going to to some `action`
+- `subject` which is an objective that we are going to do some `action`
 - `action` is what we do on `subject`
 - `*` mean all
   1. `*:read` mean this role can read all subject
   2. `feeds:*` mean this role can do every thing on subject `feeds`
   3. `comments:read` mean this role can only do action `read` on subject `comment`
 
-Reference (we will using node acl to implement this):
+Reference (we will can using node acl to implement this):
 https://github.com/OptimalBits/node_acl
 
 ### Action
@@ -224,6 +228,6 @@ https://github.com/OptimalBits/node_acl
 ### Interest
 - id (string)
 - name (string)
-- dispaly_order (number)
+- display_order (number)
 - created_at (string)
 - updated_at (string)
