@@ -4,8 +4,9 @@ import { Model } from 'mongoose'
 import { DatabaseUpdateFailException } from 'src/shared/Exceptions/http.exceptions'
 import { Feed, FeedDocument } from 'src/shared/Schemas/feed.schema'
 import { FeedType } from 'src/shared/Types/types'
-import { AddFeedResourceDto } from '../Dto/add-feed-resource.dto'
+import { AddFeedResourceDto } from '../../Resources/Dto/add-feed-resource.dto'
 import { CreateFeedDto } from '../Dto/create-feed.dto'
+import { FeedDetailDto } from '../Dto/feed-detail.dto'
 
 @Injectable()
 export class FeedsService {
@@ -25,7 +26,7 @@ export class FeedsService {
         return createdFeed.save()
     }
 
-    async getNewestFeed() {
+    async getNewestFeed(): Promise<object> {
         return await this.feedModel.find({})
     }
 

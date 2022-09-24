@@ -18,7 +18,7 @@ export class AWS3FileUploadService {
         subfolderPath,
     ) {
         const userFolder = `${subfolderPath}/${ownerId}`
-        const ext = name.split('.')[1]
+        const ext = name.split('.').pop()
         const uploadParams = {
             Bucket: bucket,
             Key: `${userFolder}/${uuidv4()}.${ext}`,

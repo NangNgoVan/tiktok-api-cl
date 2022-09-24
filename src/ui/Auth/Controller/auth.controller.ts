@@ -71,21 +71,6 @@ export class AuthController {
         required: true,
     })
     async refreshToken(@Req() req): Promise<TokenDataResponse> {
-        const refreshToken = req.headers['refresh-token'] // read refresh-token from headers
-
-        if (!refreshToken /**or refresh token not in the blacklist */) {
-            throw new UnauthorizedException()
-        }
-
-        if (
-            !(await this.authService.verifyJWTToken(
-                refreshToken,
-                configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
-            ))
-        ) {
-            throw new RefreshTokenInvalidException()
-        }
-
         const tokenResponse = await this.authService.createJWTToken(60)
         return tokenResponse
     }

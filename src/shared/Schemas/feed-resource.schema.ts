@@ -12,6 +12,7 @@ export type FeedResourceDocument = FeedResource & Document
         /* deleted_at */
     },
     validateBeforeSave: true,
+    collection: 'feed_resources',
 })
 export class FeedResource {
     @Prop()

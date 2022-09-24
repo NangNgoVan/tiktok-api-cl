@@ -1,20 +1,12 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Prop } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEnum, IsNumber } from 'class-validator'
-import { Document } from 'mongoose'
-import { FeedType } from '../Types/types'
+import { IsEnum, IsNumber, IsObject } from 'class-validator'
+import { Feed } from 'src/shared/Schemas/feed.schema'
+import { FeedType } from 'src/shared/Types/types'
+import { FeedAuthorDto } from './feed-author.dto'
+import { FeedCurrentUserDto } from './feed-current-user.dto'
 
-export type FeedDocument = Feed & Document
-
-@Schema({
-    timestamps: {
-        createdAt: 'created_at',
-        updatedAt: 'updated_at',
-        /* deleted_at */
-    },
-    validateBeforeSave: true,
-})
-export class Feed {
+export class FeedDetailDto {
     @Prop()
     @ApiProperty()
     @IsEnum({
@@ -67,7 +59,13 @@ export class Feed {
     @Prop({
         default: 0,
     })
+    @ApiProperty()
+    @IsObject()
+    current_user: FeedCurrentUserDto
+
+    @ApiProperty()
+    @IsObject()
+    created_user: FeedAuthorDto
+
     primary_image_index?: number
 }
-
-export const FeedSchema = SchemaFactory.createForClass(Feed)
