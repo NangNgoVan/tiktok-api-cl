@@ -4,6 +4,7 @@ import {
     Get,
     NotFoundException,
     Post,
+    Query,
     Req,
     UploadedFile,
     UploadedFiles,
@@ -43,6 +44,7 @@ import { CreateFeedDto } from '../Dto/create-feed.dto'
 import { FeedResourcesService } from '../../Resources/Service/resources.service'
 import { FeedsService } from '../Service/feeds.service'
 import { FeedDetailDto } from '../Dto/feed-detail.dto'
+import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
 
 @Controller('ui/feeds')
 @ApiTags('Feed APIs')
@@ -160,10 +162,12 @@ export class FeedsController {
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Get newest feeds' })
     @ApiOkResponse({
-        type: [FeedDetailDto],
+        type: PaginateFeedResultsDto,
     })
-    async getNewestFeeds() {
-        const feeds = await this.feedsService.getNewestFeed()
+    async getNewestFeeds(@Query() query) {
+        let next = undefined
+        if (query) next = query['next']
+        const feeds = await this.feedsService.getNewestFeed(next)
         return feeds
     }
 
