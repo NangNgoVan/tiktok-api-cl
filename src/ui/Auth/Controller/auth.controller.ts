@@ -71,7 +71,16 @@ export class AuthController {
         required: true,
     })
     async refreshToken(@Req() req): Promise<TokenDataResponse> {
-        const tokenResponse = await this.authService.createJWTToken(60)
+        const userId = req.userId
+
+        const signedData = {
+            userId: userId,
+        }
+        const tokenResponse = await this.authService.createJWTToken(
+            signedData,
+            configService.getEnv('JWT_SECRET'),
+            60,
+        )
         return tokenResponse
     }
 

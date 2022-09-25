@@ -22,17 +22,20 @@ export class BlacklistMiddleware implements NestMiddleware {
         //check refresh token here
         const refreshToken = req.headers['refresh-token'] // read refresh-token from headers
 
+        const verifiedRefreshToken = await this.authService.verifyJWTToken(
+            refreshToken,
+            configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
+        )
+
         if (!refreshToken /**or refresh token not in the blacklist */) {
             throw new UnauthorizedException()
         }
 
-        if (
-            !(await this.authService.verifyJWTToken(
-                refreshToken,
-                configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
-            ))
-        ) {
+        if (!verifiedRefreshToken) {
             throw new RefreshTokenInvalidException()
+        } else {
+            const userId = verifiedRefreshToken['userId']
+            req['userId'] = userId
         }
         next()
     }
