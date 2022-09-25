@@ -13,58 +13,68 @@ import { UserGenderType } from 'src/shared/Types/types'
 export class UpdateUserDto {
     @IsEnum(UserGenderType)
     @IsOptional()
-    @ApiProperty()
+    @ApiProperty({
+        required: false,
+    })
     gender?: UserGenderType
 
     @IsString()
     @IsOptional()
     @ApiProperty({
         example: 'updated@demo.com',
+        required: false,
     })
     @Matches(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, {
         message: 'Email must be a type of email',
     })
     email?: string
 
-    @IsNumber()
-    @IsOptional()
-    @ApiProperty({
-        default: 0,
-    })
-    number_of_follower?: number
-
     @IsString({})
     @IsOptional()
-    @ApiProperty()
+    @ApiProperty({
+        required: false,
+    })
     birth_day?: string
 
     @IsString()
     @IsOptional()
-    @ApiProperty()
+    @ApiProperty({
+        required: false,
+    })
     full_name?: string
 
     @IsString()
     @IsOptional()
-    @ApiProperty()
+    @ApiProperty({
+        required: false,
+    })
     nick_name?: string
 
     @IsString()
     @IsOptional()
-    @ApiProperty()
+    @ApiProperty({
+        required: false,
+    })
     address?: string
 
     @IsBoolean()
     @IsOptional()
-    @ApiProperty()
+    @ApiProperty({
+        required: false,
+    })
     should_show_account_setup_flow?: boolean
 
     @IsBoolean()
     @IsOptional()
-    @ApiProperty()
+    @ApiProperty({
+        required: false,
+    })
     should_show_tour_guild?: boolean
 
     @IsArray()
     @IsOptional()
-    @ApiProperty()
+    @ApiProperty({
+        required: false,
+    })
     interests?: [string]
 }
