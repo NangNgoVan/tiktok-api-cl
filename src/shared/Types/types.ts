@@ -20,3 +20,8 @@ export enum FeedType {
     IMAGE = 'image',
     VIDEO = 'video',
 }
+
+export enum CommentLevelType {
+    LEVEL_ONE = 1,
+    LEVEL_TWO = 2,
+}

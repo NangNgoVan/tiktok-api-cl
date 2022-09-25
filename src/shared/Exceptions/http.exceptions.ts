@@ -23,3 +23,15 @@ export class RefreshTokenInvalidException extends HttpException {
         super('Refresh token invalid', HttpStatus.BAD_REQUEST)
     }
 }
+
+export class FeedNotFoundException extends HttpException {
+    constructor() {
+        super('Feed Not Found', HttpStatus.BAD_REQUEST)
+    }
+}
+
+export class CommentNotFoundException extends HttpException {
+    constructor() {
+        super('Comment Not Found', HttpStatus.BAD_REQUEST)
+    }
+}
