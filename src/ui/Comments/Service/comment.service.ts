@@ -28,8 +28,6 @@ export class CommentService {
         const createComment = await this.commentModel.create(payload)
         createComment.level = CommentLevelType.LEVEL_ONE
 
-        console.log('@@@@@@ createComment', createComment)
-
         return createComment.save()
     }
 
@@ -42,6 +40,7 @@ export class CommentService {
 
         const createComment = await this.commentModel.create(payload)
         createComment.level = CommentLevelType.LEVEL_TWO
+
         return createComment.save()
     }
 
