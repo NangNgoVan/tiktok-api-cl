@@ -23,6 +23,8 @@ import {
     ApiConsumes,
     ApiOkResponse,
     ApiOperation,
+    ApiParam,
+    ApiQuery,
     ApiTags,
 } from '@nestjs/swagger'
 import moment from 'moment'
@@ -159,6 +161,11 @@ export class FeedsController {
     }
     @Get('/newest')
     @UseGuards(JwtAuthGuard)
+    @ApiQuery({
+        name: 'next',
+        type: 'string',
+        required: false,
+    })
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Get newest feeds' })
     @ApiOkResponse({
