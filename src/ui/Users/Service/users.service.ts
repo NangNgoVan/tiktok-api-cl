@@ -32,7 +32,7 @@ export class UsersService {
     async updateUser(id: string, dto: UpdateUserDto) {
         const user = await this.userModel.findById(id)
 
-        if (!user) return UserNotFoundException
+        if (!user) throw new UserNotFoundException()
 
         const validUpdatedFields = _.omitBy(dto, _.isUndefined)
 
@@ -41,7 +41,7 @@ export class UsersService {
 
     async updateAvatar(id: string, avatarUrl: string) {
         const user = await this.userModel.findById(id)
-        if (!user) return UserNotFoundException
+        if (!user) throw new UserNotFoundException()
 
         user.avatar_url = avatarUrl
 
