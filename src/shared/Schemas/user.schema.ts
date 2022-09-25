@@ -14,11 +14,6 @@ export type UserDocument = User & Document
     validateBeforeSave: true,
 })
 export class User {
-    //web3token
-    @Prop({ default: null })
-    @ApiProperty()
-    token: string
-
     //gender
     @Prop({
         enum: Object.values(GenderType).concat([null]),
@@ -47,6 +42,13 @@ export class User {
     })
     @ApiProperty()
     number_of_follower: number
+
+    //number_of_following
+    @Prop({
+        default: 0,
+    })
+    @ApiProperty()
+    number_of_following: number
 
     //birth_day
     @Prop({

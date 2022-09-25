@@ -13,7 +13,7 @@ export type FeedHashTagDocument = HashTag & Document
 })
 export class HashTag {
     @Prop()
-    number_of_user: string
+    number_of_use: string
     @Prop()
     created_by: string
     @Prop({

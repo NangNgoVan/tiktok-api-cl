@@ -53,7 +53,7 @@ export class Feed {
 
     @ApiProperty()
     @Prop()
-    resource_id: string[]
+    resource_ids: string[]
 
     @ApiProperty()
     @Prop()
