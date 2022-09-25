@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsEnum, IsString } from 'class-validator'
+import { IsArray, IsEnum, IsNumber, IsString } from 'class-validator'
 import { FeedType } from 'src/shared/Types/types'
 
 export class CreateFeedDto {
@@ -24,11 +24,14 @@ export class CreateFeedDto {
     @ApiProperty()
     song_id?: string
 
-    @IsArray()
-    @ApiProperty()
+    // @IsArray()
+    // @ApiProperty()
     hashtags?: string[]
 
     // @ApiProperty()
-    @IsString()
+    // @IsString()
     created_by?: string
+    @IsNumber()
+    @ApiProperty()
+    primary_image_index?: number
 }

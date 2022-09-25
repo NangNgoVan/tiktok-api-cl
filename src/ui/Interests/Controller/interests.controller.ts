@@ -9,9 +9,9 @@ import { InterestsService } from '../Service/interests.service'
 export class InterestsController {
     constructor(private readonly interestsService: InterestsService) {}
 
-    @Get('/interests')
-    // @UseGuards(JwtAuthGuard)
-    @ApiOperation({ summary: 'Get interests list' })
+    @Get('/interests/all')
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({ summary: 'Get all interests by alias `all`' })
     @ApiOkResponse({
         description: 'List of Interests',
         type: [Interest],

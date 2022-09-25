@@ -1,10 +1,13 @@
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module } from '@nestjs/common'
 import { AuthModule } from './Auth/auth.module'
 import { UsersModule } from './Users/users.module'
 import { InterestsModule } from './Interests/interests.module'
 import { FeedsModule } from './Feeds/feeds.module'
 import { CommentModule } from './Comments/comments.module'
-
+import { BlacklistMiddleware } from 'src/shared/Middlewares/blacklist.middleware'
+import { RedisService } from 'src/shared/Services/redis.service'
+import { AuthService } from 'src/shared/Services/auth.service'
+import { JwtService } from '@nestjs/jwt'
 @Module({
     imports: [
         AuthModule,
@@ -14,6 +17,12 @@ import { CommentModule } from './Comments/comments.module'
         CommentModule,
     ],
     controllers: [],
-    providers: [],
+    providers: [RedisService, AuthService, JwtService],
 })
-export class UIModule {}
+export class UIModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(BlacklistMiddleware)
+            .forRoutes('ui/authentication/token', 'ui/authentication/logout')
+    }
+}

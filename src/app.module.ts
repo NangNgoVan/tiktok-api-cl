@@ -16,13 +16,22 @@ import { HealthController } from './shared/Controllers/health.controller'
 import { TerminusModule } from '@nestjs/terminus'
 import { IndexController } from './shared/Controllers/index.controller'
 import { AuthController } from './ui/Auth/Controller/auth.controller'
+import MongoPaging from 'mongo-cursor-pagination'
 
 @Module({
     imports: [
         UIModule,
         CMSModule,
         TerminusModule,
-        MongooseModule.forRoot(configService.getDbConnStr()),
+        MongooseModule.forRoot(configService.getDbConnStr(), {
+            connectionFactory: (connection) => {
+                //const MongoPaging = require('mongo-cursor-pagination')
+                connection.plugin(MongoPaging.mongoosePlugin, {
+                    name: 'paginate',
+                })
+                return connection
+            },
+        }),
     ],
     controllers: [IndexController, HealthController],
     providers: [Logger],

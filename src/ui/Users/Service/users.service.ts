@@ -5,6 +5,7 @@ import { Model } from 'mongoose'
 import { CreateUserDto } from '../Dto/create-user.dto'
 import { UpdateUserDto } from '../Dto/update-user.dto'
 import { UserNotFoundException } from 'src/shared/Exceptions/http.exceptions'
+import _ from 'lodash'
 
 @Injectable()
 export class UsersService {
@@ -30,23 +31,17 @@ export class UsersService {
 
     async updateUser(id: string, dto: UpdateUserDto) {
         const user = await this.userModel.findById(id)
-        if (!user) return UserNotFoundException
 
-        user.email = dto.email
-        user.address = dto.address
-        user.birth_day = dto.birth_day
-        user.full_name = dto.full_name
-        user.nick_name = dto.nick_name
-        user.should_show_account_setup_flow = dto.should_show_account_setup_flow
-        //user.roles = dto.roles
-        user.interests = dto.interests
+        if (!user) throw new UserNotFoundException()
 
-        return user.save()
+        const validUpdatedFields = _.omitBy(dto, _.isUndefined)
+
+        return user.update(validUpdatedFields)
     }
 
     async updateAvatar(id: string, avatarUrl: string) {
         const user = await this.userModel.findById(id)
-        if (!user) return UserNotFoundException
+        if (!user) throw new UserNotFoundException()
 
         user.avatar_url = avatarUrl
 

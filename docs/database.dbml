@@ -1,9 +1,11 @@
-Project pav {}
+Project pav {
+  note: 'https://dbdocs.io/anhdiepmmk/pav?view=relationships'
+}
 
 Table user_schema.interest {
     id varchar [pk]
     name varchar [not nulL]
-    dispaly_order int [default: 999]
+    display_order int [default: 999]
     created_at datetime [default: `now()`]
     updated_at datetime [default: `now()`]
 }

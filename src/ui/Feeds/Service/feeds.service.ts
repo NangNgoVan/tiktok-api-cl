@@ -4,14 +4,16 @@ import { Model } from 'mongoose'
 import { DatabaseUpdateFailException } from 'src/shared/Exceptions/http.exceptions'
 import { Feed, FeedDocument } from 'src/shared/Schemas/feed.schema'
 import { FeedType } from 'src/shared/Types/types'
-import { AddFeedResourceDto } from '../Dto/add-feed-resource.dto'
+import { AddFeedResourceDto } from '../../Resources/Dto/add-feed-resource.dto'
 import { CreateFeedDto } from '../Dto/create-feed.dto'
+import { FeedDetailDto } from '../Dto/feed-detail.dto'
+import { MongoPaging } from 'mongo-cursor-pagination'
 
 @Injectable()
 export class FeedsService {
     constructor(
         @InjectModel(Feed.name)
-        private feedModel: Model<FeedDocument>,
+        private feedModel: MongoPaging<FeedDocument>,
     ) {}
 
     async createFeed(
@@ -25,8 +27,25 @@ export class FeedsService {
         return createdFeed.save()
     }
 
-    async getNewestFeed() {
-        return await this.feedModel.find({})
+    async getNewestFeed(next?: string, rowsPerpage?: number): Promise<object> {
+        try {
+            if (!rowsPerpage) rowsPerpage = 5
+            if (!next) {
+                return await this.feedModel.paginate({
+                    limit: rowsPerpage,
+                    paginatedField: 'created_at',
+                })
+            } else {
+                return await this.feedModel.paginate({
+                    limit: rowsPerpage,
+                    next: next,
+                    paginatedField: 'created_at',
+                })
+            }
+        } catch {
+            //throw or return empty
+            return []
+        }
     }
 
     async getFeedDetail(feedId: string) {

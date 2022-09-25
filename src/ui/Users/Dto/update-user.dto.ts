@@ -4,6 +4,7 @@ import {
     IsBoolean,
     IsEnum,
     IsNumber,
+    IsOptional,
     IsString,
     Matches,
 } from 'class-validator'
@@ -11,42 +12,69 @@ import { UserGenderType } from 'src/shared/Types/types'
 
 export class UpdateUserDto {
     @IsEnum(UserGenderType)
-    @ApiProperty()
-    gender: UserGenderType
-    @IsString()
+    @IsOptional()
     @ApiProperty({
-        required: true,
+        required: false,
+    })
+    gender?: UserGenderType
+
+    @IsString()
+    @IsOptional()
+    @ApiProperty({
         example: 'updated@demo.com',
+        required: false,
     })
     @Matches(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, {
         message: 'Email must be a type of email',
     })
-    email: string
-    @IsNumber()
-    @ApiProperty({
-        default: 0,
-    })
-    number_of_follower: number
+    email?: string
+
     @IsString({})
-    @ApiProperty()
-    birth_day: string
+    @IsOptional()
+    @ApiProperty({
+        required: false,
+    })
+    birth_day?: string
+
     @IsString()
-    @ApiProperty()
-    full_name: string
+    @IsOptional()
+    @ApiProperty({
+        required: false,
+    })
+    full_name?: string
+
     @IsString()
-    @ApiProperty()
-    nick_name: string
+    @IsOptional()
+    @ApiProperty({
+        required: false,
+    })
+    nick_name?: string
+
     @IsString()
-    @ApiProperty()
-    address: string
+    @IsOptional()
+    @ApiProperty({
+        required: false,
+    })
+    address?: string
+
     @IsBoolean()
-    @ApiProperty()
-    should_show_account_setup_flow: boolean
+    @IsOptional()
+    @ApiProperty({
+        required: false,
+    })
+    should_show_account_setup_flow?: boolean
+
     @IsBoolean()
-    @ApiProperty()
-    roles: boolean
+    @IsOptional()
+    @ApiProperty({
+        required: false,
+    })
+    should_show_tour_guild?: boolean
+
     @IsArray()
-    @ApiProperty()
-    interests: [string]
-    blocked_at?: string
+    @IsOptional()
+    @ApiProperty({
+        required: false,
+    })
+    interests?: [string]
 }

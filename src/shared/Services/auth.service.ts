@@ -133,16 +133,15 @@ export class AuthService {
         }
     }
 
-    async createJWTToken(expiresIn: any): Promise<TokenDataResponse> {
-        const token = this.jwtService.sign(
-            {
-                data: 'data_to_generate_jwt_token',
-            },
-            {
-                secret: configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
-                expiresIn: expiresIn,
-            },
-        )
+    async createJWTToken(
+        data: object,
+        secretKey: string,
+        expiresIn: any,
+    ): Promise<TokenDataResponse> {
+        const token = this.jwtService.sign(data, {
+            secret: secretKey,
+            expiresIn: expiresIn,
+        })
 
         const dataResponse = {
             token: token,
