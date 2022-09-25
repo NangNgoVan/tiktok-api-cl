@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Post, Req, UseGuards } from '@nestjs/common'
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Post,
+    Req,
+    UseGuards,
+} from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { CommentLevelType } from 'src/shared/Types/types'
@@ -73,5 +81,27 @@ export class CommentController {
         const feedId = req.params.id
         const commentId = req.params.commentId
         return this.CommentService.deleteComment(feedId, commentId)
+    }
+
+    @Get('/:id/comments')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'get comment by feed id' })
+    async getCommentByFeedId(@Req() req): Promise<any> {
+        const feedId = req.params.id
+        return this.CommentService.getCommentByFeedId(feedId)
+    }
+
+    @Get('/:id/comments/:commentId/replies')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'get comment by feed id and comment id' })
+    async getCommentByFeedIdAndCommentId(@Req() req): Promise<any> {
+        const feedId = req.params.id
+        const commentId = req.params.commentId
+        return this.CommentService.getCommentByFeedIdAndCommentId(
+            feedId,
+            commentId,
+        )
     }
 }
