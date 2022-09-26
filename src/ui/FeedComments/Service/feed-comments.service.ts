@@ -8,20 +8,20 @@ import {
 } from 'src/shared/Exceptions/http.exceptions'
 import {
     FeedComment,
-    CommentDocument,
+    FeedCommentDocument,
 } from 'src/shared/Schemas/feed-comment.schema'
 import { Feed, FeedDocument } from 'src/shared/Schemas/feed.schema'
 import { User, UserDocument } from 'src/shared/Schemas/user.schema'
-import { CommentLevelType } from 'src/shared/Types/types'
-import { CreateCommentDto } from '../Dto/create-comment.dto'
+import { FeedCommentLevel } from 'src/shared/Types/types'
+import { CreateFeedCommentDto } from '../Dto/create-feed-comment.dto'
 import { MongoPaging } from 'mongo-cursor-pagination'
 import _ from 'lodash'
 
 @Injectable()
-export class CommentService {
+export class FeedCommentsService {
     constructor(
         @InjectModel(FeedComment.name)
-        private commentModel: MongoPaging<CommentDocument>,
+        private commentModel: MongoPaging<FeedCommentDocument>,
 
         @InjectModel(Feed.name)
         private feedModel: Model<FeedDocument>,
@@ -30,17 +30,17 @@ export class CommentService {
         private userModel: Model<UserDocument>,
     ) {}
 
-    async createFeedComment(payload: CreateCommentDto) {
+    async createFeedComment(payload: CreateFeedCommentDto) {
         const feed = await this.feedModel.findById(payload.feed_id)
         if (!feed) throw new FeedNotFoundException()
 
         const createComment = await this.commentModel.create(payload)
-        createComment.level = CommentLevelType.LEVEL_ONE
+        createComment.level = FeedCommentLevel.LEVEL_ONE
 
         return createComment.save()
     }
 
-    async createReplyComment(payload: CreateCommentDto) {
+    async createReplyComment(payload: CreateFeedCommentDto) {
         const feed = await this.feedModel.findById(payload.feed_id)
         if (!feed) throw new FeedNotFoundException()
 
@@ -48,7 +48,7 @@ export class CommentService {
         if (!comment) throw new CommentNotFoundException()
 
         const createComment = await this.commentModel.create(payload)
-        createComment.level = CommentLevelType.LEVEL_TWO
+        createComment.level = FeedCommentLevel.LEVEL_TWO
 
         return createComment.save()
     }
@@ -60,7 +60,7 @@ export class CommentService {
         const comment = await this.commentModel.findById(replyTo)
         if (!comment) throw new CommentNotFoundException()
 
-        if (comment.level === CommentLevelType.LEVEL_TWO) {
+        if (comment.level === FeedCommentLevel.LEVEL_TWO) {
             return this.commentModel.deleteOne({ reply_to: replyTo })
         }
 

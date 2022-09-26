@@ -2,22 +2,22 @@ import { Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import {
     FeedComment,
-    CommentSchema,
+    FeedCommentSchema,
 } from 'src/shared/Schemas/feed-comment.schema'
 import { User, UserSchema } from 'src/shared/Schemas/user.schema'
 import { Feed, FeedSchema } from 'src/shared/Schemas/feed.schema'
-import { CommentController } from './Controller/comments.controller'
-import { CommentService } from './Service/comment.service'
+import { FeedCommentsController } from './Controller/feed-comments.controller'
+import { FeedCommentsService } from './Service/feed-comments.service'
 
 @Module({
     imports: [
         MongooseModule.forFeature([
-            { name: FeedComment.name, schema: CommentSchema },
+            { name: FeedComment.name, schema: FeedCommentSchema },
             { name: Feed.name, schema: FeedSchema },
             { name: User.name, schema: UserSchema },
         ]),
     ],
-    controllers: [CommentController],
-    providers: [CommentService],
+    controllers: [FeedCommentsController],
+    providers: [FeedCommentsService],
 })
-export class CommentModule {}
+export class FeedCommentsModule {}

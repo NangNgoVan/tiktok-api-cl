@@ -21,7 +21,7 @@ export enum FeedType {
     VIDEO = 'video',
 }
 
-export enum CommentLevelType {
+export enum FeedCommentLevel {
     LEVEL_ONE = 1,
     LEVEL_TWO = 2,
 }

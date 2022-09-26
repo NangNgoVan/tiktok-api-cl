@@ -2,9 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsEnum, IsNumber } from 'class-validator'
 import { Document } from 'mongoose'
-import { CommentLevelType, FeedType } from '../Types/types'
+import { FeedCommentLevel, FeedType } from '../Types/types'
 
-export type CommentDocument = Comment & Document
+export type FeedCommentDocument = Comment & Document
 
 @Schema({
     timestamps: {
@@ -25,9 +25,9 @@ export class FeedComment {
     @Prop()
     @ApiProperty()
     @IsEnum({
-        enum: CommentLevelType,
+        enum: FeedCommentLevel,
     })
-    level: CommentLevelType
+    level: FeedCommentLevel
 
     @ApiProperty()
     @IsNumber()
@@ -53,4 +53,4 @@ export class FeedComment {
     number_of_reply: number
 }
 
-export const CommentSchema = SchemaFactory.createForClass(FeedComment)
+export const FeedCommentSchema = SchemaFactory.createForClass(FeedComment)

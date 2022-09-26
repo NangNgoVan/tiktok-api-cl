@@ -9,14 +9,14 @@ import {
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
-import { CommentLevelType } from 'src/shared/Types/types'
-import { CreateCommentDto } from '../Dto/create-comment.dto'
-import { CommentService } from '../Service/comment.service'
+import { FeedCommentLevel } from 'src/shared/Types/types'
+import { CreateFeedCommentDto } from '../Dto/create-feed-comment.dto'
+import { FeedCommentsService } from '../Service/feed-comments.service'
 
 @Controller('ui/feeds')
 @ApiTags('Comment APIs')
-export class CommentController {
-    constructor(private readonly CommentService: CommentService) {}
+export class FeedCommentsController {
+    constructor(private readonly CommentService: FeedCommentsService) {}
 
     @Post('/:id/comments')
     @UseGuards(JwtAuthGuard)
@@ -34,13 +34,13 @@ export class CommentController {
     })
     async createFeedComment(
         @Req() req,
-        @Body() createCommentPayload: CreateCommentDto,
+        @Body() createCommentPayload: CreateFeedCommentDto,
     ): Promise<any> {
         const commentPayload = {
             feed_id: req.params.id,
             created_by: req.user.userId,
             content: createCommentPayload.content,
-        } as CreateCommentDto
+        } as CreateFeedCommentDto
 
         return this.CommentService.createFeedComment(commentPayload)
     }
@@ -61,14 +61,14 @@ export class CommentController {
     })
     async createReplyComment(
         @Req() req,
-        @Body() createCommentPayload: CreateCommentDto,
+        @Body() createCommentPayload: CreateFeedCommentDto,
     ): Promise<any> {
         const commentPayload = {
             feed_id: req.params.id,
             created_by: req.user.userId,
             content: createCommentPayload.content,
             reply_to: req.params.commentId,
-        } as CreateCommentDto
+        } as CreateFeedCommentDto
 
         return this.CommentService.createReplyComment(commentPayload)
     }
