@@ -4,8 +4,14 @@ import {
     UserAuthenticationMethod,
     UserAuthenticationMethodSchema,
 } from 'src/shared/Schemas/user-authentication-method.schema'
+import {
+    UserFollow,
+    UserFollowSchema,
+} from 'src/shared/Schemas/user-follow.schema'
 import { User, UserSchema } from 'src/shared/Schemas/user.schema'
 import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
+import { FollowsModule } from '../Follows/follows.module'
+import { UserFollowsService } from '../Follows/Service/user-follows.service'
 import { UserController } from './Controller/users.controller'
 import { UserAuthenticationMethodsService } from './Service/user-authentication-methods.service'
 import { UsersService } from './Service/users.service'
@@ -19,6 +25,7 @@ import { UsersService } from './Service/users.service'
                 schema: UserAuthenticationMethodSchema,
             },
         ]),
+        FollowsModule,
     ],
     controllers: [UserController],
     providers: [

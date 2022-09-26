@@ -2,7 +2,9 @@ import {
     BadRequestException,
     Body,
     Controller,
+    Delete,
     Get,
+    HttpStatus,
     Logger,
     Param,
     Patch,
@@ -39,6 +41,8 @@ import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
 import { configService } from 'src/shared/Services/config.service'
 import { UploadMetaDataDto } from '../Dto/upload-metadata.dto'
 import moment from 'moment'
+import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
+import { GetUserFollowDto } from 'src/ui/Follows/Dto/get-user-follow.dto'
 
 @Controller('ui/users')
 @ApiTags('User API')
@@ -48,6 +52,7 @@ export class UserController {
     constructor(
         private readonly userService: UsersService,
         private readonly aws3FileUploadService: AWS3FileUploadService,
+        private readonly userFollowsService: UserFollowsService,
     ) {}
 
     @Get('/current')
@@ -164,5 +169,161 @@ export class UserController {
         }
 
         return responseData
+    }
+
+    @Post('/current/followings/:userId')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Follow an user' })
+    @ApiOkResponse({
+        description: '200',
+        schema: {
+            properties: {
+                statusCode: {
+                    type: 'number',
+                },
+                message: {
+                    type: 'string',
+                },
+            },
+        },
+    })
+    async followingUser(@Req() req): Promise<HttpStatusResult> {
+        const followingUserId = req.params.userId
+        const followingUser = await this.userService.findById(followingUserId)
+        if (!followingUser) throw new UserNotFoundException()
+
+        const { userId } = req.user
+        const followerUser = await this.userService.findById(userId)
+        if (!followerUser) throw new UserNotFoundException()
+
+        const followed = await this.userFollowsService.addFollowerForUser(
+            followingUserId,
+            userId,
+        )
+
+        if (!followed) throw new DatabaseUpdateFailException()
+
+        await this.userService.updateUser(followingUserId, {
+            number_of_follower: followingUser.number_of_follower + 1,
+        } as UpdateUserDto)
+
+        await this.userService.updateUser(userId, {
+            number_of_following: followerUser.number_of_following + 1,
+        } as UpdateUserDto)
+
+        const responseData = {
+            statusCode: HttpStatus.OK,
+            message: 'Success!',
+        }
+        return responseData
+    }
+
+    @Delete('/current/followings/:userId')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Unfollow an user' })
+    @ApiOkResponse({
+        description: '200',
+        schema: {
+            properties: {
+                statusCode: {
+                    type: 'number',
+                },
+                message: {
+                    type: 'string',
+                },
+            },
+        },
+    })
+    async unFollowingUser(@Req() req): Promise<HttpStatusResult> {
+        const followingUserId = req.params.userId
+        const followingUser = await this.userService.findById(followingUserId)
+        if (!followingUser) throw new UserNotFoundException()
+
+        const { userId } = req.user
+        const followerUser = await this.userService.findById(userId)
+        if (!followerUser) throw new UserNotFoundException()
+
+        const unFollowed = await this.userFollowsService.removeFollowerFromUser(
+            followingUserId,
+            userId,
+        )
+
+        if (!unFollowed) throw new DatabaseUpdateFailException()
+
+        let numberOfFollower = followingUser.number_of_follower - 1
+        if (numberOfFollower < 0) numberOfFollower = 0
+        await this.userService.updateUser(followingUserId, {
+            number_of_follower: numberOfFollower,
+        } as UpdateUserDto)
+
+        let numberOfFollowing = followerUser.number_of_following - 1
+        if (numberOfFollowing < 0) numberOfFollowing = 0
+        await this.userService.updateUser(userId, {
+            number_of_following: followerUser.number_of_following - 1,
+        } as UpdateUserDto)
+
+        const responseData = {
+            statusCode: HttpStatus.OK,
+            message: 'Success!',
+        }
+        return responseData
+    }
+
+    @Get('/current/followings')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({
+        summary: 'Get list of followings',
+    })
+    @ApiOkResponse({
+        type: [GetUserFollowDto],
+    })
+    async getFollowings(@Req() req): Promise<GetUserFollowDto[]> {
+        const { userId } = req.user
+        return await this.userFollowsService.getAllFollowingsForUser(userId)
+    }
+
+    @Get('/current/followers')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({
+        summary: 'Get list of followers',
+    })
+    @ApiOkResponse({
+        type: [GetUserFollowDto],
+    })
+    async getFollowersByUserId(@Req() req): Promise<GetUserFollowDto[]> {
+        const { userId } = req.user
+        return await this.userFollowsService.getAllFollowersForUser(userId)
+    }
+
+    @Get('/:userId/followings')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({
+        summary: 'Get list of followings by user id',
+    })
+    @ApiOkResponse({
+        type: [GetUserFollowDto],
+    })
+    async getFollowingsByUserId(@Req() req): Promise<GetUserFollowDto[]> {
+        const userId = req.params.userId
+        return await this.userFollowsService.getAllFollowingsForUser(userId)
+    }
+
+    @Get('/:userId/followers')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({
+        summary: 'Get list of followers by user id',
+    })
+    @ApiOkResponse({
+        type: [GetUserFollowDto],
+    })
+    async getFollowers(@Req() req): Promise<GetUserFollowDto[]> {
+        const userId = req.params.userId
+        return await this.userFollowsService.getAllFollowersForUser(userId)
     }
 }

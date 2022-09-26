@@ -19,6 +19,7 @@ export class GetUserDto {
     @IsNumber()
     @ApiProperty()
     number_of_follower: number
+    number_of_following: number
     birth_day: string
     full_name: string
     nick_name: string

@@ -12,6 +12,9 @@ import { UsersModule } from '../Users/users.module'
 import { FeedsController } from './Controller/feeds.controller'
 import { FeedResourcesService } from '../Resources/Service/resources.service'
 import { FeedsService } from './Service/feeds.service'
+import { FeedHashTagsService } from '../Hashtags/Service/feed-hashtags.service'
+import { HashTagService } from '../Hashtags/Service/hashtags.service'
+import { HashTagsModule } from '../Hashtags/hashtags.module'
 
 @Module({
     imports: [
@@ -20,6 +23,7 @@ import { FeedsService } from './Service/feeds.service'
             { name: FeedResource.name, schema: FeedResourceSchema },
         ]),
         UsersModule,
+        HashTagsModule,
     ],
     controllers: [FeedsController],
     providers: [

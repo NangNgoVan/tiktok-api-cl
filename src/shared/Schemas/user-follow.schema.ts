@@ -9,6 +9,7 @@ export type UserFollowDocument = UserFollow & Document
         updatedAt: 'updated_at',
     },
     validateBeforeSave: true,
+    collection: 'user_follows',
 })
 export class UserFollow {
     @Prop()
