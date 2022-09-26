@@ -53,4 +53,4 @@ export class FeedComment {
     number_of_reply: number
 }
 
-export const CommentSchema = SchemaFactory.createForClass(Comment)
+export const CommentSchema = SchemaFactory.createForClass(FeedComment)
