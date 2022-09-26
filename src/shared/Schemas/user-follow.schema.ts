@@ -14,6 +14,7 @@ export type UserFollowDocument = UserFollow & Document
 export class UserFollow {
     @Prop()
     user_id: string
+
     @Prop()
     created_by: string
 }

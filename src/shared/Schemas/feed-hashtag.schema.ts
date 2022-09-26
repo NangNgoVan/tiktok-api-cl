@@ -14,7 +14,7 @@ export type FeedHashTagDocument = FeedHashTag & Document
 export class FeedHashTag {
     @Prop()
     feed_id: string
-    @Prop({})
+    @Prop()
     tag: string
     @Prop()
     created_by: string
