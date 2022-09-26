@@ -6,18 +6,22 @@ import {
     DatabaseUpdateFailException,
     FeedNotFoundException,
 } from 'src/shared/Exceptions/http.exceptions'
-import { Comment, CommentDocument } from 'src/shared/Schemas/comment.schema'
+import {
+    FeedComment,
+    CommentDocument,
+} from 'src/shared/Schemas/feed-comment.schema'
 import { Feed, FeedDocument } from 'src/shared/Schemas/feed.schema'
 import { User, UserDocument } from 'src/shared/Schemas/user.schema'
 import { CommentLevelType } from 'src/shared/Types/types'
 import { CreateCommentDto } from '../Dto/create-comment.dto'
+import { MongoPaging } from 'mongo-cursor-pagination'
 import _ from 'lodash'
 
 @Injectable()
 export class CommentService {
     constructor(
-        @InjectModel(Comment.name)
-        private commentModel: Model<CommentDocument>,
+        @InjectModel(FeedComment.name)
+        private commentModel: MongoPaging<CommentDocument>,
 
         @InjectModel(Feed.name)
         private feedModel: Model<FeedDocument>,
