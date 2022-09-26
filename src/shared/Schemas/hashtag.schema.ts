@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { plainToInstance } from 'class-transformer'
 import { Document } from 'mongoose'
 
-export type FeedHashTagDocument = HashTag & Document
+export type HashTagDocument = HashTag & Document
 
 @Schema({
     timestamps: {
@@ -12,8 +12,10 @@ export type FeedHashTagDocument = HashTag & Document
     validateBeforeSave: true,
 })
 export class HashTag {
-    @Prop()
-    number_of_user: string
+    @Prop({
+        default: 1,
+    })
+    number_of_use: number
     @Prop()
     created_by: string
     @Prop({

@@ -118,7 +118,6 @@ export class FeedsController {
                         aws3FeedResourcePath,
                     )
                 if (!uploadedData) return null
-                console.log(uploadedData)
                 const { /*ETag,*/ /*Location ,*/ Key /*Bucket*/ } = uploadedData
                 return Key
             }),
@@ -188,7 +187,6 @@ export class FeedsController {
     })
     async getFeedDetail(@Req() req): Promise<any> {
         const feedId = req.params.id
-        console.log(feedId)
         const feed = await this.feedsService.getFeedDetail(feedId)
         if (!feed) throw new NotFoundException()
         return feed

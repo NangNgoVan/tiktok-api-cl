@@ -8,12 +8,16 @@ import { AddFeedResourceDto } from '../../Resources/Dto/add-feed-resource.dto'
 import { CreateFeedDto } from '../Dto/create-feed.dto'
 import { FeedDetailDto } from '../Dto/feed-detail.dto'
 import { MongoPaging } from 'mongo-cursor-pagination'
+import { FeedHashTagsService } from 'src/ui/Hashtags/Service/feed-hashtags.service'
+import { HashTagService } from 'src/ui/Hashtags/Service/hashtags.service'
 
 @Injectable()
 export class FeedsService {
     constructor(
         @InjectModel(Feed.name)
-        private feedModel: MongoPaging<FeedDocument>,
+        private readonly feedModel: MongoPaging<FeedDocument>,
+        private readonly feedHashTagService: FeedHashTagsService,
+        private readonly hashTagService: HashTagService,
     ) {}
 
     async createFeed(
@@ -24,6 +28,17 @@ export class FeedsService {
         const createdFeed = await this.feedModel.create(createFeedDto)
         createdFeed.resource_id = resource_ids
         createdFeed.type = feedType
+
+        /**await */ this.feedHashTagService.addFeedHashTag(
+            createdFeed.id,
+            createdFeed.created_by,
+            createdFeed.hashtags,
+        )
+        /**await */ this.hashTagService.addHashTag(
+            createdFeed.created_by,
+            createdFeed.hashtags,
+        )
+
         return createdFeed.save()
     }
 
