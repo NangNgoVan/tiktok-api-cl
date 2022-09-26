@@ -1,6 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 import * as mongoose from 'mongoose'
+import { AuthenticationMethod, UserReactionType } from '../Types/types'
+import { IsEnum } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
 
 export type UserAuthenticationMethodDocument = UserAuthenticationMethod &
     Document
@@ -14,12 +17,18 @@ export type UserAuthenticationMethodDocument = UserAuthenticationMethod &
     collection: 'user_authentication_methods',
 })
 export class UserAuthenticationMethod {
+    @ApiProperty()
     @Prop()
     user_id: string
 
+    @ApiProperty()
     @Prop()
-    authentication_method: string
+    @IsEnum({
+        enum: AuthenticationMethod,
+    })
+    authentication_method: AuthenticationMethod
 
+    @ApiProperty()
     @Prop({ type: mongoose.Schema.Types.Mixed })
     data:
         | {
@@ -31,6 +40,13 @@ export class UserAuthenticationMethod {
           }
 }
 
-export const UserAuthenticationMethodSchema = SchemaFactory.createForClass(
+const UserAuthenticationMethodSchema = SchemaFactory.createForClass(
     UserAuthenticationMethod,
 )
+
+UserAuthenticationMethodSchema.index(
+    { user_id: 1, authentication_method: 1 },
+    { unique: true },
+)
+
+export { UserAuthenticationMethodSchema }

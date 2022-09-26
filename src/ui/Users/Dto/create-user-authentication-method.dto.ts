@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString } from 'class-validator'
+import { IsEnum, IsString } from 'class-validator'
+import { AuthenticationMethod } from '../../../shared/Types/types'
 
 export class CreateUserAuthenticationMethodDto {
     @ApiProperty()
@@ -17,6 +18,8 @@ export class CreateUserAuthenticationMethodDto {
     user_id: string
 
     @ApiProperty()
-    @IsString()
-    authentication_method: 'metamask' | 'credential'
+    @IsEnum({
+        enum: AuthenticationMethod,
+    })
+    authentication_method: AuthenticationMethod
 }

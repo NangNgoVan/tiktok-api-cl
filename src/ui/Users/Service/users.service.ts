@@ -29,7 +29,10 @@ export class UsersService {
 
         if (!user) throw new UserNotFoundException()
 
-        const validUpdatedFields = _.omitBy(dto, _.isUndefined)
+        const validUpdatedFields = _.omitBy(
+            dto,
+            (value) => _.isNil(value) || value === '',
+        )
 
         return user.update(validUpdatedFields)
     }

@@ -9,13 +9,13 @@ import {
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
-import { CommentLevelType } from 'src/shared/Types/types'
-import { CreateFeedCommentDto } from '../Dto/create-comment.dto'
+import { FeedCommentLevel } from 'src/shared/Types/types'
+import { CreateFeedCommentDto } from '../Dto/create-feed-comment.dto'
 import { FeedCommentService } from '../Service/feed-comments.service'
 
 @Controller('ui/feeds')
 @ApiTags('Comment APIs')
-export class FeedCommentController {
+export class FeedCommentsController {
     constructor(private readonly FeedCommentService: FeedCommentService) {}
 
     @Post('/:id/comments')
@@ -38,7 +38,7 @@ export class FeedCommentController {
     ): Promise<any> {
         const commentPayload = {
             feed_id: req.params.id,
-            created_by: '6331c5e2d233e236a09ac28b',
+            created_by: req.user.userId,
             content: createCommentPayload.content,
         } as CreateFeedCommentDto
 

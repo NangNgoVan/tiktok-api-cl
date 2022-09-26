@@ -8,12 +8,12 @@ import {
 } from 'src/shared/Exceptions/http.exceptions'
 import {
     FeedComment,
-    CommentDocument,
+    FeedCommentDocument,
 } from 'src/shared/Schemas/feed-comment.schema'
 import { Feed, FeedDocument } from 'src/shared/Schemas/feed.schema'
 import { User, UserDocument } from 'src/shared/Schemas/user.schema'
-import { CommentLevelType } from 'src/shared/Types/types'
-import { CreateFeedCommentDto } from '../Dto/create-comment.dto'
+import { FeedCommentLevel } from 'src/shared/Types/types'
+import { CreateFeedCommentDto } from '../Dto/create-feed-comment.dto'
 import { MongoPaging } from 'mongo-cursor-pagination'
 import _ from 'lodash'
 
@@ -21,7 +21,7 @@ import _ from 'lodash'
 export class FeedCommentService {
     constructor(
         @InjectModel(FeedComment.name)
-        private commentModel: MongoPaging<CommentDocument>,
+        private commentModel: MongoPaging<FeedCommentDocument>,
 
         @InjectModel(Feed.name)
         private feedModel: Model<FeedDocument>,
@@ -35,7 +35,7 @@ export class FeedCommentService {
         if (!feed) throw new FeedNotFoundException()
 
         const createComment = await this.commentModel.create(payload)
-        createComment.level = CommentLevelType.LEVEL_ONE
+        createComment.level = FeedCommentLevel.LEVEL_ONE
 
         await this.feedModel.findOneAndUpdate(
             { _id: payload.feed_id },
@@ -56,7 +56,7 @@ export class FeedCommentService {
         if (!comment) throw new CommentNotFoundException()
 
         const createComment = await this.commentModel.create(payload)
-        createComment.level = CommentLevelType.LEVEL_TWO
+        createComment.level = FeedCommentLevel.LEVEL_TWO
 
         return createComment.save()
     }
@@ -68,7 +68,7 @@ export class FeedCommentService {
         const comment = await this.commentModel.findById(replyTo)
         if (!comment) throw new CommentNotFoundException()
 
-        if (comment.level === CommentLevelType.LEVEL_TWO) {
+        if (comment.level === FeedCommentLevel.LEVEL_TWO) {
             return this.commentModel.deleteOne({ reply_to: replyTo })
         }
 
@@ -84,7 +84,7 @@ export class FeedCommentService {
 
         const comment = await this.commentModel.find({
             feed_id: feedId,
-            level: CommentLevelType.LEVEL_ONE,
+            level: FeedCommentLevel.LEVEL_ONE,
         })
 
         if (!comment) throw new CommentNotFoundException()

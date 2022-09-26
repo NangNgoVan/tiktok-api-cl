@@ -19,7 +19,7 @@ import * as crypto from 'crypto'
 
 import { VerifySignatureDto } from '../Dto/verify-signature.dto'
 import { CredentialDto } from '../Dto/credential.dto'
-import { HttpStatusResult } from '../Types/types'
+import { AuthenticationMethod, HttpStatusResult } from '../Types/types'
 import { UsersService } from 'src/ui/Users/Service/users.service'
 
 import { dataSerializerService } from './data-serializer.service'
@@ -74,7 +74,7 @@ export class AuthService {
             await this.userAuthenticationMethodsService.create({
                 user_id: user.id,
                 data: { address: verifiedAddress },
-                authentication_method: 'metamask',
+                authentication_method: AuthenticationMethod.METAMASK,
             })
         } else {
             user = await this.userService.findById(

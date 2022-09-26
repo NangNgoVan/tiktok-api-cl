@@ -6,6 +6,7 @@ import {
     UserAuthenticationMethodDocument,
 } from 'src/shared/Schemas/user-authentication-method.schema'
 import { CreateUserAuthenticationMethodDto } from '../Dto/create-user-authentication-method.dto'
+import { AuthenticationMethod } from '../../../shared/Types/types'
 
 @Injectable()
 export class UserAuthenticationMethodsService {
@@ -30,6 +31,7 @@ export class UserAuthenticationMethodsService {
     ): Promise<UserAuthenticationMethodDocument> {
         const foundedUserAuthenticationMethod =
             this.userAuthenticationMethodModel.findOne({
+                authentication_method: AuthenticationMethod.METAMASK,
                 data: {
                     address,
                 },

@@ -21,7 +21,12 @@ export enum FeedType {
     VIDEO = 'video',
 }
 
-export enum CommentLevelType {
+export enum AuthenticationMethod {
+    METAMASK = 'metamask',
+    CREDENTIAL = 'credential',
+}
+
+export enum FeedCommentLevel {
     LEVEL_ONE = 1,
     LEVEL_TWO = 2,
 }
