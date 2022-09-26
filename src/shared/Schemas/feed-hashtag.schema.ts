@@ -12,7 +12,11 @@ export type FeedHashTagDocument = FeedHashTag & Document
 })
 export class FeedHashTag {
     @Prop()
-    number_of_user: string
+    feed_id: string
+
+    @Prop()
+    tag: string
+
     @Prop()
     created_by: string
 }

@@ -40,13 +40,17 @@ export class FeedComment {
 
     @ApiProperty()
     @IsNumber()
-    @Prop({})
-    number_of_reaction?: number
+    @Prop({
+        default: 0,
+    })
+    number_of_reaction: number
 
     @ApiProperty()
     @IsNumber()
-    @Prop({})
-    number_of_reply?: number
+    @Prop({
+        default: 0,
+    })
+    number_of_reply: number
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment)

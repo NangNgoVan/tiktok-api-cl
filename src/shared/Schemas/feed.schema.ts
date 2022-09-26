@@ -44,6 +44,13 @@ export class Feed {
     number_of_bookmark: number
 
     @ApiProperty()
+    @IsNumber()
+    @Prop({
+        default: 0,
+    })
+    number_of_comment: number
+
+    @ApiProperty()
     @Prop({})
     created_by: string
 
@@ -53,7 +60,7 @@ export class Feed {
 
     @ApiProperty()
     @Prop()
-    resource_id: string[]
+    resource_ids: string[]
 
     @ApiProperty()
     @Prop()

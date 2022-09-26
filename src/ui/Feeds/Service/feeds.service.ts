@@ -22,7 +22,7 @@ export class FeedsService {
         resource_ids?: string[],
     ) {
         const createdFeed = await this.feedModel.create(createFeedDto)
-        createdFeed.resource_id = resource_ids
+        createdFeed.resource_ids = resource_ids
         createdFeed.type = feedType
         return createdFeed.save()
     }

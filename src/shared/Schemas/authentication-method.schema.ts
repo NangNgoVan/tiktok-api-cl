@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 
-export type AuthMethodDocument = AuthMethod & Document
+export type AuthenticationMethodDocument = AuthenticationMethod & Document
 
 @Schema({
     timestamps: {
@@ -10,11 +10,12 @@ export type AuthMethodDocument = AuthMethod & Document
     },
     validateBeforeSave: true,
 })
-export class AuthMethod {
+export class AuthenticationMethod {
     @Prop({
         unique: true,
     })
     name: string
 }
 
-export const AuthMethodSchema = SchemaFactory.createForClass(AuthMethod)
+export const AuthenticationMethodSchema =
+    SchemaFactory.createForClass(AuthenticationMethod)
