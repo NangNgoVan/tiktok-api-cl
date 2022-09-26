@@ -15,4 +15,8 @@ export class CreateUserAuthenticationMethodDto {
     @ApiProperty()
     @IsString()
     user_id: string
+
+    @ApiProperty()
+    @IsString()
+    authentication_method: 'metamask' | 'credential'
 }

@@ -3,7 +3,6 @@ import {
     IsArray,
     IsBoolean,
     IsEnum,
-    IsNumber,
     IsOptional,
     IsString,
     Matches,
@@ -49,6 +48,13 @@ export class UpdateUserDto {
         required: false,
     })
     nick_name?: string
+
+    @IsString()
+    @IsOptional()
+    @ApiProperty({
+        required: false,
+    })
+    bio?: string
 
     @IsString()
     @IsOptional()

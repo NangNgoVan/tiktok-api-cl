@@ -74,6 +74,7 @@ export class AuthService {
             await this.userAuthenticationMethodsService.create({
                 user_id: user.id,
                 data: { address: verifiedAddress },
+                authentication_method: 'metamask',
             })
         } else {
             user = await this.userService.findById(

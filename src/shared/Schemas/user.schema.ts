@@ -69,6 +69,11 @@ export class User {
     @ApiProperty()
     nick_name: string
 
+    //bio
+    @Prop()
+    @ApiProperty()
+    bio: string
+
     //address
     @Prop()
     @ApiProperty()
