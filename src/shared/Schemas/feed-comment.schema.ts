@@ -4,7 +4,7 @@ import { IsEnum, IsNumber } from 'class-validator'
 import { Document } from 'mongoose'
 import { CommentLevelType, FeedType } from '../Types/types'
 
-export type CommentDocument = Comment & Document
+export type CommentDocument = FeedComment & Document
 
 @Schema({
     timestamps: {
@@ -12,6 +12,7 @@ export type CommentDocument = Comment & Document
         updatedAt: 'updated_at',
     },
     validateBeforeSave: true,
+    collection: 'feed_comments',
 })
 export class FeedComment {
     @ApiProperty()

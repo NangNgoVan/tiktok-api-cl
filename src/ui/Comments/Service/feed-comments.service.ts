@@ -13,12 +13,12 @@ import {
 import { Feed, FeedDocument } from 'src/shared/Schemas/feed.schema'
 import { User, UserDocument } from 'src/shared/Schemas/user.schema'
 import { CommentLevelType } from 'src/shared/Types/types'
-import { CreateCommentDto } from '../Dto/create-comment.dto'
+import { CreateFeedCommentDto } from '../Dto/create-comment.dto'
 import { MongoPaging } from 'mongo-cursor-pagination'
 import _ from 'lodash'
 
 @Injectable()
-export class CommentService {
+export class FeedCommentService {
     constructor(
         @InjectModel(FeedComment.name)
         private commentModel: MongoPaging<CommentDocument>,
@@ -30,21 +30,29 @@ export class CommentService {
         private userModel: Model<UserDocument>,
     ) {}
 
-    async createFeedComment(payload: CreateCommentDto) {
+    async createFeedComment(payload: CreateFeedCommentDto) {
         const feed = await this.feedModel.findById(payload.feed_id)
         if (!feed) throw new FeedNotFoundException()
 
         const createComment = await this.commentModel.create(payload)
         createComment.level = CommentLevelType.LEVEL_ONE
 
+        await this.feedModel.findOneAndUpdate(
+            { _id: payload.feed_id },
+            { $inc: { number_of_comment: 1 } },
+        )
+
         return createComment.save()
     }
 
-    async createReplyComment(payload: CreateCommentDto) {
+    async createReplyComment(payload: CreateFeedCommentDto) {
         const feed = await this.feedModel.findById(payload.feed_id)
         if (!feed) throw new FeedNotFoundException()
 
-        const comment = await this.commentModel.findById(payload.reply_to)
+        const comment = await this.commentModel.findOneAndUpdate(
+            { _id: payload.reply_to },
+            { $inc: { number_of_comment: 1 } },
+        )
         if (!comment) throw new CommentNotFoundException()
 
         const createComment = await this.commentModel.create(payload)
@@ -74,11 +82,15 @@ export class CommentService {
         const feed = await this.feedModel.findById(feedId)
         if (!feed) throw new FeedNotFoundException()
 
-        const comment = await this.commentModel.find({ feed_id: feedId })
+        const comment = await this.commentModel.find({
+            feed_id: feedId,
+            level: CommentLevelType.LEVEL_ONE,
+        })
+
         if (!comment) throw new CommentNotFoundException()
 
         const listUserInfo = await this.userModel.find({
-            _id: comment.map((it) => it.created_by),
+            _id: _.uniq(_.map(comment, (it) => it.created_by)),
         })
 
         return comment.map((cmt) => {
@@ -114,7 +126,7 @@ export class CommentService {
         const comment = await this.commentModel.find({ reply_to: commentId })
 
         const listUserInfo = await this.userModel.find({
-            _id: comment.map((it) => it.created_by),
+            _id: _.chain(comment).map('created_by').uniq().compact().value(),
         })
 
         return comment.map((cmt) => {

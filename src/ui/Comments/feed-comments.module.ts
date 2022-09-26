@@ -6,8 +6,8 @@ import {
 } from 'src/shared/Schemas/feed-comment.schema'
 import { User, UserSchema } from 'src/shared/Schemas/user.schema'
 import { Feed, FeedSchema } from 'src/shared/Schemas/feed.schema'
-import { CommentController } from './Controller/comments.controller'
-import { CommentService } from './Service/comment.service'
+import { FeedCommentController } from './Controller/feed-comments.controller'
+import { FeedCommentService } from './Service/feed-comments.service'
 
 @Module({
     imports: [
@@ -17,7 +17,7 @@ import { CommentService } from './Service/comment.service'
             { name: User.name, schema: UserSchema },
         ]),
     ],
-    controllers: [CommentController],
-    providers: [CommentService],
+    controllers: [FeedCommentController],
+    providers: [FeedCommentService],
 })
-export class CommentModule {}
+export class FeedCommentModule {}

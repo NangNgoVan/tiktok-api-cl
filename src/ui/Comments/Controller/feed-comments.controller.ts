@@ -10,13 +10,13 @@ import {
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { CommentLevelType } from 'src/shared/Types/types'
-import { CreateCommentDto } from '../Dto/create-comment.dto'
-import { CommentService } from '../Service/comment.service'
+import { CreateFeedCommentDto } from '../Dto/create-comment.dto'
+import { FeedCommentService } from '../Service/feed-comments.service'
 
 @Controller('ui/feeds')
 @ApiTags('Comment APIs')
-export class CommentController {
-    constructor(private readonly CommentService: CommentService) {}
+export class FeedCommentController {
+    constructor(private readonly FeedCommentService: FeedCommentService) {}
 
     @Post('/:id/comments')
     @UseGuards(JwtAuthGuard)
@@ -34,15 +34,15 @@ export class CommentController {
     })
     async createFeedComment(
         @Req() req,
-        @Body() createCommentPayload: CreateCommentDto,
+        @Body() createCommentPayload: CreateFeedCommentDto,
     ): Promise<any> {
         const commentPayload = {
             feed_id: req.params.id,
-            created_by: req.user.userId,
+            created_by: '6331c5e2d233e236a09ac28b',
             content: createCommentPayload.content,
-        } as CreateCommentDto
+        } as CreateFeedCommentDto
 
-        return this.CommentService.createFeedComment(commentPayload)
+        return this.FeedCommentService.createFeedComment(commentPayload)
     }
 
     @Post('/:id/comments/:commentId/replies')
@@ -61,16 +61,16 @@ export class CommentController {
     })
     async createReplyComment(
         @Req() req,
-        @Body() createCommentPayload: CreateCommentDto,
+        @Body() createCommentPayload: CreateFeedCommentDto,
     ): Promise<any> {
         const commentPayload = {
             feed_id: req.params.id,
-            created_by: req.user.userId,
+            created_by: '6331c5e2d233e236a09ac28b',
             content: createCommentPayload.content,
             reply_to: req.params.commentId,
-        } as CreateCommentDto
+        } as CreateFeedCommentDto
 
-        return this.CommentService.createReplyComment(commentPayload)
+        return this.FeedCommentService.createReplyComment(commentPayload)
     }
 
     @Delete('/:id/comments/:commentId')
@@ -80,7 +80,7 @@ export class CommentController {
     async deleteComment(@Req() req): Promise<any> {
         const feedId = req.params.id
         const commentId = req.params.commentId
-        return this.CommentService.deleteComment(feedId, commentId)
+        return this.FeedCommentService.deleteComment(feedId, commentId)
     }
 
     @Get('/:id/comments')
@@ -89,7 +89,7 @@ export class CommentController {
     @ApiOperation({ summary: 'get comment by feed id' })
     async getCommentByFeedId(@Req() req): Promise<any> {
         const feedId = req.params.id
-        return this.CommentService.getCommentByFeedId(feedId)
+        return this.FeedCommentService.getCommentByFeedId(feedId)
     }
 
     @Get('/:id/comments/:commentId/replies')
@@ -99,7 +99,7 @@ export class CommentController {
     async getCommentByFeedIdAndCommentId(@Req() req): Promise<any> {
         const feedId = req.params.id
         const commentId = req.params.commentId
-        return this.CommentService.getCommentByFeedIdAndCommentId(
+        return this.FeedCommentService.getCommentByFeedIdAndCommentId(
             feedId,
             commentId,
         )
