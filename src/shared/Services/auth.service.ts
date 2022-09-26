@@ -22,12 +22,14 @@ import { HttpStatusResult } from '../Types/types'
 import { UsersService } from 'src/ui/Users/Service/users.service'
 
 import { dataSerializerService } from './data-serializer.service'
+import { UserAuthenticationMethodsService } from 'src/ui/Users/Service/user-authentication-methods.service'
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
         private userService: UsersService,
+        private userAuthenticationMethodsService: UserAuthenticationMethodsService,
     ) {}
 
     async createNonce(): Promise<NonceTokenDataResponse> {
@@ -50,7 +52,24 @@ export class AuthService {
 
         if (!verifiedAddress) throw new UnauthorizedException()
 
-        //if (address !== verifiedAddress) throw new UnauthorizedException()
+        if (address !== verifiedAddress) throw new UnauthorizedException()
+
+        const userAuthenticationMethod =
+            await this.userAuthenticationMethodsService.findByAddress(
+                verifiedAddress,
+            )
+
+        if (!userAuthenticationMethod) {
+            // create a new empty user
+            const user = await this.userService.create({})
+
+            // create a new authentication method with address
+            const userAuthenticationMethod =
+                await this.userAuthenticationMethodsService.create({
+                    user_id: 'user._id',
+                    data: { address: verifiedAddress },
+                })
+        }
 
         // Find user by signature in DB
         let user = await this.userService.findByAddress(verifiedAddress)
