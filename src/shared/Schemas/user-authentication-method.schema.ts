@@ -11,6 +11,7 @@ export type UserAuthenticationMethodDocument = UserAuthenticationMethod &
         updatedAt: 'updated_at',
     },
     validateBeforeSave: true,
+    collection: 'user_authentication_methods',
 })
 export class UserAuthenticationMethod {
     @Prop()
