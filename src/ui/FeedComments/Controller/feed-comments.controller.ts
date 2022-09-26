@@ -65,7 +65,7 @@ export class FeedCommentsController {
     ): Promise<any> {
         const commentPayload = {
             feed_id: req.params.id,
-            created_by: '6331c5e2d233e236a09ac28b',
+            created_by: req.user.userId,
             content: createCommentPayload.content,
             reply_to: req.params.commentId,
         } as CreateFeedCommentDto
@@ -80,7 +80,12 @@ export class FeedCommentsController {
     async deleteComment(@Req() req): Promise<any> {
         const feedId = req.params.id
         const commentId = req.params.commentId
-        return this.FeedCommentService.deleteComment(feedId, commentId)
+        const currentUserId = req.user.userId
+        return this.FeedCommentService.deleteComment(
+            feedId,
+            commentId,
+            currentUserId,
+        )
     }
 
     @Get('/:id/comments')

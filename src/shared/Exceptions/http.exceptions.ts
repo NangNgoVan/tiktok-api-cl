@@ -35,3 +35,9 @@ export class CommentNotFoundException extends HttpException {
         super('Comment Not Found', HttpStatus.BAD_REQUEST)
     }
 }
+
+export class ForbidenException extends HttpException {
+    constructor() {
+        super('Forbidden', HttpStatus.FORBIDDEN)
+    }
+}

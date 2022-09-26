@@ -5,6 +5,7 @@ import {
     CommentNotFoundException,
     DatabaseUpdateFailException,
     FeedNotFoundException,
+    ForbidenException,
 } from 'src/shared/Exceptions/http.exceptions'
 import {
     FeedComment,
@@ -61,20 +62,28 @@ export class FeedCommentService {
         return createComment.save()
     }
 
-    async deleteComment(feedId: string, replyTo: string) {
+    async deleteComment(
+        feedId: string,
+        commentId: string,
+        currentUserId: string,
+    ) {
         const feed = await this.feedModel.findById(feedId)
         if (!feed) throw new FeedNotFoundException()
 
-        const comment = await this.commentModel.findById(replyTo)
+        const comment = await this.commentModel.findById(commentId)
         if (!comment) throw new CommentNotFoundException()
 
+        if (comment.created_by !== currentUserId) {
+            throw new ForbidenException()
+        }
+
         if (comment.level === FeedCommentLevel.LEVEL_TWO) {
-            return this.commentModel.deleteOne({ reply_to: replyTo })
+            return this.commentModel.deleteOne({ reply_to: commentId })
         }
 
         return this.commentModel.deleteMany({
             feed_id: feedId,
-            reply_to: replyTo,
+            reply_to: commentId,
         })
     }
 
