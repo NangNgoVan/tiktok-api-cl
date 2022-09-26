@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
-import { type } from 'os'
+import * as mongoose from 'mongoose'
 
 export type UserAuthenticationMethodDocument = UserAuthenticationMethod &
     Document
@@ -19,7 +19,7 @@ export class UserAuthenticationMethod {
     @Prop()
     authentication_method: string
 
-    @Prop()
+    @Prop({ type: mongoose.Schema.Types.Mixed })
     data:
         | {
               address: string

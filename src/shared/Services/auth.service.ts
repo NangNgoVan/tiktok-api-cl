@@ -1,4 +1,5 @@
 // Nest dependencies
+import { v4 as uuidv4 } from 'uuid'
 import {
     Injectable,
     BadRequestException,
@@ -23,6 +24,8 @@ import { UsersService } from 'src/ui/Users/Service/users.service'
 
 import { dataSerializerService } from './data-serializer.service'
 import { UserAuthenticationMethodsService } from 'src/ui/Users/Service/user-authentication-methods.service'
+import { UserDocument } from '../Schemas/user.schema'
+import { UserNotFoundException } from '../Exceptions/http.exceptions'
 
 @Injectable()
 export class AuthService {
@@ -59,23 +62,28 @@ export class AuthService {
                 verifiedAddress,
             )
 
-        if (!userAuthenticationMethod) {
-            // create a new empty user
-            const user = await this.userService.create({})
+        let user: UserDocument
 
-            // create a new authentication method with address
-            const userAuthenticationMethod =
-                await this.userAuthenticationMethodsService.create({
-                    user_id: 'user._id',
-                    data: { address: verifiedAddress },
-                })
+        if (!userAuthenticationMethod) {
+            const uuid = uuidv4()
+            user = await this.userService.create({
+                full_name: `user ${uuid}`,
+                nick_name: `user-${uuid}`,
+            })
+
+            await this.userAuthenticationMethodsService.create({
+                user_id: user.id,
+                data: { address: verifiedAddress },
+            })
+        } else {
+            user = await this.userService.findById(
+                userAuthenticationMethod.user_id,
+            )
         }
 
-        // Find user by signature in DB
-        let user = await this.userService.findByAddress(verifiedAddress)
-        // If user not found, create new User
-        if (!user)
-            user = await this.userService.create({ address: verifiedAddress })
+        if (!user) {
+            throw new UserNotFoundException()
+        }
 
         const serializeUser = await dataSerializerService.selectProperties(
             user,

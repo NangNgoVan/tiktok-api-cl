@@ -25,12 +25,15 @@ export class UserAuthenticationMethodsService {
         return createdUserAuthenticationMethod.save()
     }
 
-    async findByAddress(address: string): Promise<UserAuthenticationMethod> {
-        const foundedUser = this.userAuthenticationMethodModel.findOne({
-            data: {
-                address,
-            },
-        })
-        return foundedUser
+    async findByAddress(
+        address: string,
+    ): Promise<UserAuthenticationMethodDocument> {
+        const foundedUserAuthenticationMethod =
+            this.userAuthenticationMethodModel.findOne({
+                data: {
+                    address,
+                },
+            })
+        return foundedUserAuthenticationMethod
     }
 }
