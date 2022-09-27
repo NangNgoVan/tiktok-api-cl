@@ -28,9 +28,7 @@ export class UserAuthenticationMethodsService {
     ): Promise<UserAuthenticationMethodDocument> {
         return this.userAuthenticationMethodModel.findOne({
             authentication_method: AuthenticationMethod.METAMASK,
-            data: {
-                address,
-            },
+            'data.address': address,
         })
     }
 
@@ -39,9 +37,7 @@ export class UserAuthenticationMethodsService {
     ): Promise<UserAuthenticationMethodDocument> {
         return this.userAuthenticationMethodModel.findOne({
             authentication_method: AuthenticationMethod.CREDENTIAL,
-            data: {
-                username,
-            },
+            'data.username': username,
         })
     }
 }
