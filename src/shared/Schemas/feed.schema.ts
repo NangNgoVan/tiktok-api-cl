@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEnum, IsNumber } from 'class-validator'
+import { IsBoolean, IsEnum, IsNumber } from 'class-validator'
 import { Document } from 'mongoose'
 import { FeedType } from '../Types/types'
 
@@ -49,6 +49,20 @@ export class Feed {
         default: 0,
     })
     number_of_comment: number
+
+    @ApiProperty()
+    @IsNumber()
+    @Prop({
+        default: 0,
+    })
+    number_of_report: number
+
+    @ApiProperty()
+    @IsBoolean()
+    @Prop({
+        default: true,
+    })
+    allowed_comment: boolean
 
     @ApiProperty()
     @Prop({})

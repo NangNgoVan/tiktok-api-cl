@@ -62,6 +62,13 @@ export class User {
     @ApiProperty()
     number_of_following: number
 
+    //number_of_post
+    @Prop({
+        default: 0,
+    })
+    @ApiProperty()
+    number_of_post: number
+
     //birth_day
     @Prop({
         default: null,
