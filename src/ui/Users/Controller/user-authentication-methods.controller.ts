@@ -13,16 +13,16 @@ import {
     ApiOperation,
     ApiTags,
 } from '@nestjs/swagger'
-import { UserAuthenticationMethodsService } from '../../Users/Service/user-authentication-methods.service'
+import { UserAuthenticationMethodsService } from '../Service/user-authentication-methods.service'
 import { AuthenticationMethod } from '../../../shared/Types/types'
 import { UserAuthenticationMethod } from '../../../shared/Schemas/user-authentication-method.schema'
 import { JwtAuthGuard } from '../../../shared/Guards/jwt.auth.guard'
-import { CreateUserAuthenticationMethodCredentialDto } from '../Dto/create-user-authentication-method-credential.dto'
+import { CreateUserAuthenticationMethodCredentialDto } from '../../Auth/Dto/create-user-authentication-method-credential.dto'
 import bcrypt from 'bcrypt'
 
-@ApiTags('Authentication Methods')
-@Controller('ui/authentication-methods')
-export class AuthenticationMethodsController {
+@ApiTags('User Authentication Methods')
+@Controller('ui/users/current/authentication-methods')
+export class UserAuthenticationMethodsController {
     constructor(
         private readonly authenticationMethodsService: UserAuthenticationMethodsService,
     ) {}
@@ -30,7 +30,9 @@ export class AuthenticationMethodsController {
     @Post('login')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'Create authentication method login' })
+    @ApiOperation({
+        summary: 'Create authentication method login by `current` alias',
+    })
     @ApiOkResponse({
         description: '200',
     })
