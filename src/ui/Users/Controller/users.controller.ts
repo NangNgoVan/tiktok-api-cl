@@ -174,7 +174,7 @@ export class UserController {
     @Post('/current/followings/:userId')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'Current user follow an user by id' })
+    @ApiOperation({ summary: 'Follow user by `current` alias and user id' })
     @ApiOkResponse({
         description: '200',
         schema: {
@@ -222,7 +222,7 @@ export class UserController {
     @Delete('/current/followings/:userId')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'Current user unfollow a user by id' })
+    @ApiOperation({ summary: 'Unfollow user by `current` alias and user id' })
     @ApiOkResponse({
         description: '200',
         schema: {
@@ -275,7 +275,7 @@ export class UserController {
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({
-        summary: 'Get current user followings',
+        summary: 'Get followings by `current` alias',
     })
     @ApiOkResponse({
         type: [GetUserFollowDto],
@@ -289,7 +289,7 @@ export class UserController {
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({
-        summary: 'Get current user followers',
+        summary: 'Get followers by `current` alias',
     })
     @ApiOkResponse({
         type: [GetUserFollowDto],

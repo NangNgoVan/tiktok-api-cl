@@ -38,7 +38,7 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @Get('/login/authentication-method/metamask')
-    @ApiOperation({ summary: 'nonce' })
+    @ApiOperation({ summary: 'Nonce' })
     @ApiOkResponse({
         description: '200',
         type: NonceTokenDataResponse,
@@ -48,7 +48,7 @@ export class AuthController {
     }
 
     @Post('/login/authentication-method/metamask')
-    @ApiOperation({ summary: 'verify' })
+    @ApiOperation({ summary: 'Verify' })
     @ApiOkResponse({
         description: '200',
         type: TokenDataResponse,
@@ -60,7 +60,7 @@ export class AuthController {
     }
 
     @Post('/token')
-    @ApiOperation({ summary: 'refresh token' })
+    @ApiOperation({ summary: 'Refresh token' })
     @ApiOkResponse({
         description: '200',
         type: TokenDataResponse,
@@ -90,7 +90,7 @@ export class AuthController {
         description: 'refresh token',
         required: true,
     })
-    @ApiOperation({ summary: 'logout' })
+    @ApiOperation({ summary: 'Logout' })
     @ApiOkResponse({
         description: '200',
     })
