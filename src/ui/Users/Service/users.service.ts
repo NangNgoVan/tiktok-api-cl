@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { User, UserDocument } from 'src/shared/Schemas/user.schema'
 import { Model } from 'mongoose'
@@ -34,6 +34,30 @@ export class UsersService {
             (value) => _.isUndefined(value) || value === '',
         )
 
+        if (validUpdatedFields.email) {
+            if (
+                await this.userModel.exists({
+                    email: validUpdatedFields.email,
+                })
+            ) {
+                throw new BadRequestException(
+                    `Email ${validUpdatedFields.email} already exists`,
+                )
+            }
+        }
+
+        if (validUpdatedFields.nick_name) {
+            if (
+                await this.userModel.exists({
+                    nick_name: validUpdatedFields.nick_name,
+                })
+            ) {
+                throw new BadRequestException(
+                    `Nickname ${validUpdatedFields.nick_name} already exists`,
+                )
+            }
+        }
+
         return user.update(validUpdatedFields)
     }
 
@@ -41,6 +65,7 @@ export class UsersService {
         const user = await this.userModel.findById(id)
         if (!user) throw new UserNotFoundException()
 
+        // FIXME: should delete old avatar before save new avatar
         user.avatar = avatar
 
         await user.save()
