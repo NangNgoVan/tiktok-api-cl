@@ -17,7 +17,7 @@ export class UserAuthenticationMethodsService {
 
     async createAuthenticationMethod(
         createUserAuthenticationMethodDto: CreateUserAuthenticationMethodDto,
-    ): Promise<UserAuthenticationMethod> {
+    ): Promise<UserAuthenticationMethodDocument> {
         return this.userAuthenticationMethodModel.create(
             createUserAuthenticationMethodDto,
         )

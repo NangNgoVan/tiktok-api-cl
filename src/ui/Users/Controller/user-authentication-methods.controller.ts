@@ -17,10 +17,10 @@ import {
 } from '@nestjs/swagger'
 import { UserAuthenticationMethodsService } from '../Service/user-authentication-methods.service'
 import { AuthenticationMethod } from '../../../shared/Types/types'
-import { UserAuthenticationMethod } from '../../../shared/Schemas/user-authentication-method.schema'
 import { JwtAuthGuard } from '../../../shared/Guards/jwt.auth.guard'
 import { CreateUserAuthenticationMethodCredentialDto } from '../../Auth/Dto/create-user-authentication-method-credential.dto'
 import bcrypt from 'bcrypt'
+import _ from 'lodash'
 
 @ApiTags('User APIs')
 @Controller('ui/users/current/authentication-methods')
@@ -39,11 +39,11 @@ export class UserAuthenticationMethodsController {
     @ApiOkResponse({
         description: '200',
     })
-    async createAuthenticationMethodLogin(
+    async createAuthenticationMethodCredential(
         @Req() req,
         @Body()
         createUserAuthenticationMethodCredentialDto: CreateUserAuthenticationMethodCredentialDto,
-    ): Promise<Omit<UserAuthenticationMethod, 'data'>> {
+    ) {
         const userId = req.user.userId
 
         const { username, password, password_confirmation } =
@@ -67,13 +67,16 @@ export class UserAuthenticationMethodsController {
         const salt = await bcrypt.genSalt(10)
         const hashed = await bcrypt.hash(password, salt)
 
-        return this.authenticationMethodsService.createAuthenticationMethod({
-            authentication_method: AuthenticationMethod.CREDENTIAL,
-            data: {
-                username,
-                password: hashed,
-            },
-            user_id: userId,
-        })
+        const createdUserAuthenticationMethod =
+            await this.authenticationMethodsService.createAuthenticationMethod({
+                authentication_method: AuthenticationMethod.CREDENTIAL,
+                data: {
+                    username,
+                    password: hashed,
+                },
+                user_id: userId,
+            })
+
+        return _.omit(createdUserAuthenticationMethod.toObject(), ['data'])
     }
 }
