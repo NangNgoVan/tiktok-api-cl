@@ -13,7 +13,7 @@ export class GetUserFollowDto {
     nick_name: string
     @ApiProperty()
     @IsString()
-    avatar: string
+    avatar?: string
     // @ApiProperty()
     // @IsNumber()
     // number_of_follower?: number

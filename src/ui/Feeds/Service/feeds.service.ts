@@ -10,6 +10,9 @@ import { FeedDetailDto } from '../Dto/feed-detail.dto'
 import { MongoPaging } from 'mongo-cursor-pagination'
 import { FeedHashTagsService } from 'src/ui/Hashtags/Service/feed-hashtags.service'
 import { HashTagService } from 'src/ui/Hashtags/Service/hashtags.service'
+import { UsersService } from 'src/ui/Users/Service/users.service'
+import { CreatedUserDto } from '../../../shared/Dto/created-user.dto'
+import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 
 @Injectable()
 export class FeedsService {
@@ -18,6 +21,8 @@ export class FeedsService {
         private readonly feedModel: MongoPaging<FeedDocument>,
         private readonly feedHashTagService: FeedHashTagsService,
         private readonly hashTagService: HashTagService,
+        private readonly userService: UsersService,
+        private readonly userfollowsService: UserFollowsService,
     ) {}
 
     async createFeed(
@@ -42,21 +47,53 @@ export class FeedsService {
         return createdFeed.save()
     }
 
-    async getNewestFeed(next?: string, rowsPerpage?: number): Promise<object> {
+    async getNewestFeed(
+        userId: string,
+        next?: string,
+        rowsPerpage?: number,
+    ): Promise<object> {
         try {
             if (!rowsPerpage) rowsPerpage = 5
+            let feeds = undefined
             if (!next) {
-                return await this.feedModel.paginate({
+                feeds = await this.feedModel.paginate({
                     limit: rowsPerpage,
                     paginatedField: 'created_at',
                 })
             } else {
-                return await this.feedModel.paginate({
+                feeds = await this.feedModel.paginate({
                     limit: rowsPerpage,
                     next: next,
                     paginatedField: 'created_at',
                 })
             }
+            const feedWithAuthors = await Promise.all(
+                feeds.results.map(async (feed) => {
+                    const user = await this.userService.findById(
+                        feed.created_by,
+                    )
+                    if (user) {
+                        const feedAuthor = {
+                            id: user.id,
+                            full_name: user.full_name,
+                            nick_name: user.nick_name,
+                            avatar: user.avatar,
+                        } as CreatedUserDto
+
+                        feedAuthor.current_user = {
+                            is_followed:
+                                await this.userfollowsService.checkFollowRelationshipBetween(
+                                    userId,
+                                    user.id,
+                                ),
+                        }
+
+                        feed['created_user'] = feedAuthor
+                    }
+                    return feed
+                }),
+            )
+            return feedWithAuthors
         } catch {
             //throw or return empty
             return []

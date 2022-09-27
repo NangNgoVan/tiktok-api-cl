@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsEnum, IsNumber, IsString } from 'class-validator'
+import { IsArray, IsBoolean, IsEnum, IsNumber, IsString } from 'class-validator'
 import { FeedType } from 'src/shared/Types/types'
 
 export class CreateFeedDto {
@@ -34,4 +34,8 @@ export class CreateFeedDto {
     @IsNumber()
     @ApiProperty()
     primary_image_index?: number
+
+    @IsBoolean()
+    @ApiProperty()
+    allow_comment: boolean
 }

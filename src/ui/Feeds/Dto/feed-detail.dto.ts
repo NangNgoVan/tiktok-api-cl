@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { IsEnum, IsNumber, IsObject } from 'class-validator'
 import { Feed } from 'src/shared/Schemas/feed.schema'
 import { FeedType } from 'src/shared/Types/types'
-import { FeedAuthorDto } from './feed-author.dto'
+import { CreatedUserDto } from '../../../shared/Dto/created-user.dto'
 import { FeedCurrentUserDto } from './feed-current-user.dto'
 
 export class FeedDetailDto {
@@ -65,7 +65,7 @@ export class FeedDetailDto {
 
     @ApiProperty()
     @IsObject()
-    created_user: FeedAuthorDto
+    created_user: CreatedUserDto
 
     primary_image_index?: number
 }

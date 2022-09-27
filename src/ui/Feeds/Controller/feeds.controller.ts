@@ -40,7 +40,8 @@ import { FeedDetailDto } from '../Dto/feed-detail.dto'
 import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 import { FeedCurrentUserDto } from '../Dto/feed-current-user.dto'
-import { FeedAuthorDto } from '../Dto/feed-author.dto'
+import { CreatedUserDto } from '../../../shared/Dto/created-user.dto'
+import _ from 'lodash'
 
 @Controller('ui/feeds')
 @ApiTags('Feed APIs')
@@ -123,7 +124,15 @@ export class FeedsController {
             data = JSON.parse(formData['data'])
         }
 
-        const dto = data as CreateFeedDto
+        let dto = data as CreateFeedDto
+        dto = _.pick(dto, [
+            'content',
+            'song_id',
+            'hashtags',
+            'created_by',
+            'primary_image_index',
+            'allow_comment',
+        ])
         dto.hashtags = this.utilsService.splitHashtagFromString(dto.content)
 
         dto.created_by = userId
@@ -170,10 +179,11 @@ export class FeedsController {
         name: 'next',
         type: String,
     })
-    async getNewestFeeds(@Query() query) {
+    async getNewestFeeds(@Query() query, @Req() req) {
         let next = undefined
         if (query) next = query['next']
-        const feeds = await this.feedsService.getNewestFeed(next)
+        const { userId } = req.user
+        const feeds = await this.feedsService.getNewestFeed(userId, next)
         return feeds
     }
 
