@@ -171,7 +171,6 @@ export class FeedsController {
         name: 'next',
         type: String,
     })
-    @ApiExtraModels(FeedCurrentUserDto, FeedAuthorDto)
     async getNewestFeeds(@Query() query) {
         let next = undefined
         if (query) next = query['next']
@@ -187,7 +186,6 @@ export class FeedsController {
         description: 'OK',
         type: FeedDetailDto,
     })
-    @ApiExtraModels(FeedCurrentUserDto, FeedAuthorDto)
     async getFeedDetail(@Req() req): Promise<any> {
         const feedId = req.params.id
         const feed = await this.feedsService.getFeedDetail(feedId)
