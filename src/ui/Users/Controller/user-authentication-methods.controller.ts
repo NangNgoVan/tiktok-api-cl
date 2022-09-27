@@ -44,7 +44,7 @@ export class UserAuthenticationMethodsController {
         @Body()
         createUserAuthenticationMethodCredentialDto: CreateUserAuthenticationMethodCredentialDto,
     ): Promise<Omit<UserAuthenticationMethod, 'data'>> {
-        const userId = req.userId
+        const userId = req.user.userId
 
         const { username, password, password_confirmation } =
             createUserAuthenticationMethodCredentialDto
