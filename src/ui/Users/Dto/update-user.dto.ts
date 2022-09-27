@@ -61,6 +61,27 @@ export class UpdateUserDto {
     @ApiProperty({
         required: false,
     })
+    facebook?: string
+
+    @IsString()
+    @IsOptional()
+    @ApiProperty({
+        required: false,
+    })
+    twitter?: string
+
+    @IsString()
+    @IsOptional()
+    @ApiProperty({
+        required: false,
+    })
+    instagram?: string
+
+    @IsString()
+    @IsOptional()
+    @ApiProperty({
+        required: false,
+    })
     address?: string
 
     @IsBoolean()

@@ -31,20 +31,20 @@ export class UsersService {
 
         const validUpdatedFields = _.omitBy(
             dto,
-            (value) => _.isNil(value) || value === '',
+            (value) => _.isUndefined(value) || value === '',
         )
 
         return user.update(validUpdatedFields)
     }
 
-    async updateAvatar(id: string, avatarUrl: string) {
+    async updateAvatar(id: string, avatar: string) {
         const user = await this.userModel.findById(id)
         if (!user) throw new UserNotFoundException()
 
-        user.avatar_url = avatarUrl
+        user.avatar = avatar
 
         await user.save()
 
-        return user.avatar_url
+        return user.avatar
     }
 }

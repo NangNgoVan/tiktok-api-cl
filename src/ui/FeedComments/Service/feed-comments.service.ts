@@ -23,10 +23,8 @@ export class FeedCommentService {
     constructor(
         @InjectModel(FeedComment.name)
         private commentModel: MongoPaging<FeedCommentDocument>,
-
         @InjectModel(Feed.name)
         private feedModel: Model<FeedDocument>,
-
         @InjectModel(User.name)
         private userModel: Model<UserDocument>,
     ) {}
@@ -113,11 +111,7 @@ export class FeedCommentService {
                     'number_of_reaction',
                     'number_of_reply',
                 ]),
-                created_user: _.pick(userInfo, [
-                    '_id',
-                    'full_name',
-                    'avatar_url',
-                ]),
+                created_user: _.pick(userInfo, ['_id', 'full_name', 'avatar']),
             }
         })
     }
@@ -149,11 +143,7 @@ export class FeedCommentService {
                     'number_of_reaction',
                     'number_of_reply',
                 ]),
-                created_user: _.pick(userInfo, [
-                    '_id',
-                    'full_name',
-                    'avatar_url',
-                ]),
+                created_user: _.pick(userInfo, ['_id', 'full_name', 'avatar']),
             }
         })
     }

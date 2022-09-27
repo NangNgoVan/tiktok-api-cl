@@ -62,7 +62,7 @@ export class UserFollowsService {
                 const user = await this.userModel.findById(id)
                 return {
                     user_id: id,
-                    avatar_url: user.avatar_url,
+                    avatar: user.avatar,
                     nick_name: user.nick_name,
                     full_name: user.full_name,
                 } as GetUserFollowDto
@@ -84,7 +84,7 @@ export class UserFollowsService {
                 const user = await this.userModel.findById(id)
                 return {
                     user_id: id,
-                    avatar_url: user.avatar_url,
+                    avatar: user.avatar,
                     nick_name: user.nick_name,
                     full_name: user.full_name,
                 } as GetUserFollowDto

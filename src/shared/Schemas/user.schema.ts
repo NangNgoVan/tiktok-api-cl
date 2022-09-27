@@ -37,6 +37,18 @@ export class User {
     @ApiProperty()
     email: string
 
+    @Prop()
+    @ApiProperty()
+    facebook: string
+
+    @Prop()
+    @ApiProperty()
+    twitter: string
+
+    @Prop()
+    @ApiProperty()
+    instagram: string
+
     //number_of_follower
     @Prop({
         default: 0,
@@ -80,10 +92,10 @@ export class User {
     @ApiProperty()
     address: string
 
-    //avatar_url
+    //avatar
     @Prop()
     @ApiProperty()
-    avatar_url: string
+    avatar: string
 
     //should_show_tour_guild
     @Prop({

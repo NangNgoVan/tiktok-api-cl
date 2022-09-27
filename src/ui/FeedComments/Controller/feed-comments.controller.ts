@@ -21,7 +21,7 @@ export class FeedCommentsController {
     @Post('/:id/comments')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'create new comment' })
+    @ApiOperation({ summary: 'Create a new comment by feed id (level 1)' })
     @ApiBody({
         schema: {
             type: 'object',
@@ -48,7 +48,7 @@ export class FeedCommentsController {
     @Post('/:id/comments/:commentId/replies')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'create new reply comment' })
+    @ApiOperation({ summary: 'Reply to a comment (level 2)' })
     @ApiBody({
         schema: {
             type: 'object',
@@ -76,7 +76,7 @@ export class FeedCommentsController {
     @Delete('/:id/comments/:commentId')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'delete comment' })
+    @ApiOperation({ summary: 'Delete a comment' })
     async deleteComment(@Req() req): Promise<any> {
         const feedId = req.params.id
         const commentId = req.params.commentId
@@ -91,7 +91,7 @@ export class FeedCommentsController {
     @Get('/:id/comments')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'get comment by feed id' })
+    @ApiOperation({ summary: 'Get comments by feed id (level 1)' })
     async getCommentByFeedId(@Req() req): Promise<any> {
         const feedId = req.params.id
         return this.FeedCommentService.getCommentByFeedId(feedId)
@@ -100,7 +100,7 @@ export class FeedCommentsController {
     @Get('/:id/comments/:commentId/replies')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'get comment by feed id and comment id' })
+    @ApiOperation({ summary: 'Get replies comments (level 2)' })
     async getCommentByFeedIdAndCommentId(@Req() req): Promise<any> {
         const feedId = req.params.id
         const commentId = req.params.commentId

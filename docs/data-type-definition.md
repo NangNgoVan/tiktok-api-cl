@@ -114,7 +114,7 @@ _the reason why we should split url  property from feed collection into this col
 - nick_name (string, `max 50`)
 - email (string, `max 50`)
 - address (string, `max 50`)
-- avatar_url (string)
+- avatar (string)
 - should_show_tour_guild (boolean)
 - should_show_account_setup_flow (boolean)
 - roles (string[]) // this only for cms
