@@ -20,18 +20,18 @@ import { JwtAuthGuard } from '../../../shared/Guards/jwt.auth.guard'
 import { CreateUserAuthenticationMethodCredentialDto } from '../../Auth/Dto/create-user-authentication-method-credential.dto'
 import bcrypt from 'bcrypt'
 
-@ApiTags('User Authentication Methods')
+@ApiTags('User APIs')
 @Controller('ui/users/current/authentication-methods')
 export class UserAuthenticationMethodsController {
     constructor(
         private readonly authenticationMethodsService: UserAuthenticationMethodsService,
     ) {}
 
-    @Post('login')
+    @Post('credential')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({
-        summary: 'Create authentication method login by `current` alias',
+        summary: 'Create authentication method credential by `current` alias',
     })
     @ApiOkResponse({
         description: '200',
