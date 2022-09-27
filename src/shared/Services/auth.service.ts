@@ -65,10 +65,10 @@ export class AuthService {
         let user: UserDocument
 
         if (!userAuthenticationMethod) {
-            const uuid = uuidv4()
+            const uuidNoHyphens = uuidv4().replace(/-/g, '')
             user = await this.userService.create({
-                full_name: `user ${uuid}`,
-                nick_name: `user-${uuid}`,
+                full_name: `user ${uuidNoHyphens}`,
+                nick_name: `user${uuidNoHyphens}`,
             })
 
             await this.userAuthenticationMethodsService.create({
