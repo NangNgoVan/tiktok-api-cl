@@ -48,7 +48,7 @@ import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-q
 import { PaginateUserFollowsDto } from 'src/ui/Follows/Dto/paginate-user-follows.dto'
 
 @Controller('ui/users')
-@ApiTags('User API')
+@ApiTags('User APIs')
 export class UserController {
     private readonly logger: Logger = new Logger(UserController.name)
 

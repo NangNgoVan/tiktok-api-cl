@@ -1,17 +1,5 @@
+import { Body, Controller, Get, Post, Req } from '@nestjs/common'
 import {
-    Body,
-    Controller,
-    Get,
-    HttpStatus,
-    Post,
-    Req,
-    Res,
-    Headers,
-    UseGuards,
-    UnauthorizedException,
-} from '@nestjs/common'
-import {
-    IDataResponse,
     TokenDataResponse,
     NonceTokenDataResponse,
 } from 'src/shared/Services/data-serializer.service'
@@ -19,18 +7,13 @@ import { HttpStatusResult } from 'src/shared/Types/types'
 import { VerifySignatureDto } from 'src/shared/Dto/verify-signature.dto'
 
 import { AuthService } from 'src/shared/Services/auth.service'
-import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
-import { AuthGuard } from '@nestjs/passport'
 import {
-    ApiBearerAuth,
     ApiHeader,
     ApiOkResponse,
     ApiOperation,
-    ApiResponse,
     ApiTags,
 } from '@nestjs/swagger'
-import { configService } from 'src/shared/Services/config.service'
-import { RefreshTokenInvalidException } from 'src/shared/Exceptions/http.exceptions'
+import { CredentialDto } from '../../../shared/Dto/credential.dto'
 
 @ApiTags('Authentication for UI')
 @Controller('ui/authentication')
@@ -48,7 +31,7 @@ export class AuthController {
     }
 
     @Post('/login/authentication-method/metamask')
-    @ApiOperation({ summary: 'Verify' })
+    @ApiOperation({ summary: 'Login with metamask' })
     @ApiOkResponse({
         description: '200',
         type: TokenDataResponse,
@@ -57,6 +40,18 @@ export class AuthController {
         @Body() dto: VerifySignatureDto,
     ): Promise<TokenDataResponse> {
         return this.authService.logInWithMetamask(dto)
+    }
+
+    @Post('/login/authentication-method/credential')
+    @ApiOperation({ summary: 'Login with credential' })
+    @ApiOkResponse({
+        description: '200',
+        type: TokenDataResponse,
+    })
+    async logInWithCredential(
+        @Body() dto: CredentialDto,
+    ): Promise<TokenDataResponse> {
+        return this.authService.logInWithCredential(dto)
     }
 
     @Post('/token')
@@ -71,17 +66,7 @@ export class AuthController {
         required: true,
     })
     async refreshToken(@Req() req): Promise<TokenDataResponse> {
-        const userId = req.userId
-
-        const signedData = {
-            userId: userId,
-        }
-        const tokenResponse = await this.authService.createJWTToken(
-            signedData,
-            configService.getEnv('JWT_SECRET'),
-            60,
-        )
-        return tokenResponse
+        return this.authService.refreshAccessToken(req.userId)
     }
 
     @Post('/logout')

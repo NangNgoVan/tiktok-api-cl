@@ -24,7 +24,7 @@ import { FeedCommentService } from '../Service/feed-comments.service'
 @Controller('ui/feeds')
 @ApiTags('Comment APIs')
 export class FeedCommentsController {
-    constructor(private readonly FeedCommentService: FeedCommentService) {}
+    constructor(private readonly feedCommentService: FeedCommentService) {}
     @Post('/:id/comments')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
@@ -53,7 +53,7 @@ export class FeedCommentsController {
             content: createCommentPayload.content,
         } as CreateFeedCommentDto
 
-        return this.FeedCommentService.createFeedComment(commentPayload)
+        return this.feedCommentService.createFeedComment(commentPayload)
     }
 
     @Post('/:id/comments/:commentId/replies')
@@ -85,7 +85,7 @@ export class FeedCommentsController {
             reply_to: req.params.commentId,
         } as CreateFeedCommentDto
 
-        return this.FeedCommentService.createReplyComment(commentPayload)
+        return this.feedCommentService.createReplyComment(commentPayload)
     }
 
     @Delete('/:id/comments/:commentId')
@@ -99,7 +99,7 @@ export class FeedCommentsController {
         const feedId = req.params.id
         const commentId = req.params.commentId
         const currentUserId = req.user.userId
-        return this.FeedCommentService.deleteComment(
+        return this.feedCommentService.deleteComment(
             feedId,
             commentId,
             currentUserId,
@@ -123,7 +123,7 @@ export class FeedCommentsController {
         let next = undefined
         if (req.query) next = req.query['next']
         const feedId = req.params.id
-        return this.FeedCommentService.getCommentByFeedId(feedId, next)
+        return this.feedCommentService.getCommentByFeedId(feedId, next)
     }
 
     @Get('/:id/comments/:commentId/replies')
@@ -145,7 +145,7 @@ export class FeedCommentsController {
 
         const feedId = req.params.id
         const commentId = req.params.commentId
-        return this.FeedCommentService.getCommentByFeedIdAndCommentId(
+        return this.feedCommentService.getCommentByFeedIdAndCommentId(
             feedId,
             commentId,
             next,
