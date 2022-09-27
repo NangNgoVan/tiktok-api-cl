@@ -142,7 +142,7 @@ export class AuthService {
     generateAccessToken(payload: { userId: string }): string {
         return this.jwtService.sign(payload, {
             secret: configService.getEnv('JWT_SECRET'),
-            expiresIn: 60,
+            expiresIn: '4h',
         })
     }
 
