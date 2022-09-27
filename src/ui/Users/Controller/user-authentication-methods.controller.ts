@@ -5,6 +5,8 @@ import {
     Post,
     Req,
     UseGuards,
+    UsePipes,
+    ValidationPipe,
 } from '@nestjs/common'
 
 import {
@@ -28,6 +30,7 @@ export class UserAuthenticationMethodsController {
     ) {}
 
     @Post('credential')
+    @UsePipes(new ValidationPipe())
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({
