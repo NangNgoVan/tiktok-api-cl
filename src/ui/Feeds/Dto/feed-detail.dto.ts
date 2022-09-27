@@ -45,7 +45,7 @@ export class FeedDetailDto {
 
     @ApiProperty()
     @Prop()
-    resource_id: string[]
+    resource_ids: string[]
 
     @ApiProperty()
     @Prop()

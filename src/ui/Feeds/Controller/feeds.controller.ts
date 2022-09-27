@@ -15,6 +15,7 @@ import {
     ApiBearerAuth,
     ApiBody,
     ApiConsumes,
+    ApiExtraModels,
     ApiOkResponse,
     ApiOperation,
     ApiQuery,
@@ -39,6 +40,8 @@ import { FeedsService } from '../Service/feeds.service'
 import { FeedDetailDto } from '../Dto/feed-detail.dto'
 import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
+import { FeedCurrentUserDto } from '../Dto/feed-current-user.dto'
+import { FeedAuthorDto } from '../Dto/feed-author.dto'
 
 @Controller('ui/feeds')
 @ApiTags('Feed APIs')
@@ -145,7 +148,7 @@ export class FeedsController {
         )
         if (!addedResources) return DatabaseUpdateFailException
 
-        createdFeed.resource_id = addedResources
+        createdFeed.resource_ids = addedResources
         await createdFeed.save()
 
         return createdFeed
@@ -168,6 +171,7 @@ export class FeedsController {
         name: 'next',
         type: String,
     })
+    @ApiExtraModels(FeedCurrentUserDto, FeedAuthorDto)
     async getNewestFeeds(@Query() query) {
         let next = undefined
         if (query) next = query['next']
@@ -183,6 +187,7 @@ export class FeedsController {
         description: 'OK',
         type: FeedDetailDto,
     })
+    @ApiExtraModels(FeedCurrentUserDto, FeedAuthorDto)
     async getFeedDetail(@Req() req): Promise<any> {
         const feedId = req.params.id
         const feed = await this.feedsService.getFeedDetail(feedId)
