@@ -13,6 +13,7 @@ import {
     ApiOperation,
     ApiTags,
 } from '@nestjs/swagger'
+import { CredentialDto } from '../../../shared/Dto/credential.dto'
 
 @ApiTags('Authentication for UI')
 @Controller('ui/authentication')
@@ -30,7 +31,7 @@ export class AuthController {
     }
 
     @Post('/login/authentication-method/metamask')
-    @ApiOperation({ summary: 'Verify' })
+    @ApiOperation({ summary: 'Login with metamask' })
     @ApiOkResponse({
         description: '200',
         type: TokenDataResponse,
@@ -39,6 +40,18 @@ export class AuthController {
         @Body() dto: VerifySignatureDto,
     ): Promise<TokenDataResponse> {
         return this.authService.logInWithMetamask(dto)
+    }
+
+    @Post('/login/authentication-method/credential')
+    @ApiOperation({ summary: 'Login with credential' })
+    @ApiOkResponse({
+        description: '200',
+        type: TokenDataResponse,
+    })
+    async logInWithCredential(
+        @Body() dto: CredentialDto,
+    ): Promise<TokenDataResponse> {
+        return this.authService.logInWithCredential(dto)
     }
 
     @Post('/token')
