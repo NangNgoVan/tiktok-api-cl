@@ -32,7 +32,6 @@ export class User {
         default: null,
         trim: true,
         lowercase: true,
-        unique: true,
     })
     @ApiProperty()
     email: string
