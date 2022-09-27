@@ -9,14 +9,13 @@ import {
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
-import { FeedCommentLevel } from 'src/shared/Types/types'
 import { CreateFeedCommentDto } from '../Dto/create-feed-comment.dto'
 import { FeedCommentService } from '../Service/feed-comments.service'
 
 @Controller('ui/feeds')
 @ApiTags('Comment APIs')
 export class FeedCommentsController {
-    constructor(private readonly FeedCommentService: FeedCommentService) {}
+    constructor(private readonly feedCommentService: FeedCommentService) {}
 
     @Post('/:id/comments')
     @UseGuards(JwtAuthGuard)
@@ -42,7 +41,7 @@ export class FeedCommentsController {
             content: createCommentPayload.content,
         } as CreateFeedCommentDto
 
-        return this.FeedCommentService.createFeedComment(commentPayload)
+        return this.feedCommentService.createFeedComment(commentPayload)
     }
 
     @Post('/:id/comments/:commentId/replies')
@@ -70,7 +69,7 @@ export class FeedCommentsController {
             reply_to: req.params.commentId,
         } as CreateFeedCommentDto
 
-        return this.FeedCommentService.createReplyComment(commentPayload)
+        return this.feedCommentService.createReplyComment(commentPayload)
     }
 
     @Delete('/:id/comments/:commentId')
@@ -81,7 +80,7 @@ export class FeedCommentsController {
         const feedId = req.params.id
         const commentId = req.params.commentId
         const currentUserId = req.user.userId
-        return this.FeedCommentService.deleteComment(
+        return this.feedCommentService.deleteComment(
             feedId,
             commentId,
             currentUserId,
@@ -94,7 +93,7 @@ export class FeedCommentsController {
     @ApiOperation({ summary: 'Get comments by feed id (level 1)' })
     async getCommentByFeedId(@Req() req): Promise<any> {
         const feedId = req.params.id
-        return this.FeedCommentService.getCommentByFeedId(feedId)
+        return this.feedCommentService.getCommentByFeedId(feedId)
     }
 
     @Get('/:id/comments/:commentId/replies')
@@ -104,7 +103,7 @@ export class FeedCommentsController {
     async getCommentByFeedIdAndCommentId(@Req() req): Promise<any> {
         const feedId = req.params.id
         const commentId = req.params.commentId
-        return this.FeedCommentService.getCommentByFeedIdAndCommentId(
+        return this.feedCommentService.getCommentByFeedIdAndCommentId(
             feedId,
             commentId,
         )

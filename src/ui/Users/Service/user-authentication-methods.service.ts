@@ -1,3 +1,4 @@
+// FIXME: move this class to auth module
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
@@ -5,8 +6,8 @@ import {
     UserAuthenticationMethod,
     UserAuthenticationMethodDocument,
 } from 'src/shared/Schemas/user-authentication-method.schema'
-import { CreateUserAuthenticationMethodDto } from '../Dto/create-user-authentication-method.dto'
 import { AuthenticationMethod } from '../../../shared/Types/types'
+import { CreateUserAuthenticationMethodDto } from '../Dto/create-user-authentication-method.dto'
 
 @Injectable()
 export class UserAuthenticationMethodsService {
@@ -15,27 +16,33 @@ export class UserAuthenticationMethodsService {
         private userAuthenticationMethodModel: Model<UserAuthenticationMethodDocument>,
     ) {}
 
-    async create(
+    async createAuthenticationMethod(
         createUserAuthenticationMethodDto: CreateUserAuthenticationMethodDto,
     ): Promise<UserAuthenticationMethod> {
-        const createdUserAuthenticationMethod =
-            new this.userAuthenticationMethodModel(
-                createUserAuthenticationMethodDto,
-            )
-
-        return createdUserAuthenticationMethod.save()
+        return this.userAuthenticationMethodModel.create({
+            createUserAuthenticationMethodDto,
+        })
     }
 
     async findByAddress(
         address: string,
     ): Promise<UserAuthenticationMethodDocument> {
-        const foundedUserAuthenticationMethod =
-            this.userAuthenticationMethodModel.findOne({
-                authentication_method: AuthenticationMethod.METAMASK,
-                data: {
-                    address,
-                },
-            })
-        return foundedUserAuthenticationMethod
+        return this.userAuthenticationMethodModel.findOne({
+            authentication_method: AuthenticationMethod.METAMASK,
+            data: {
+                address,
+            },
+        })
+    }
+
+    async findByUsername(
+        username: string,
+    ): Promise<UserAuthenticationMethodDocument> {
+        return this.userAuthenticationMethodModel.findOne({
+            authentication_method: AuthenticationMethod.CREDENTIAL,
+            data: {
+                username,
+            },
+        })
     }
 }
