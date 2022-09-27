@@ -18,9 +18,13 @@ export class UserAuthenticationMethodsService {
     async createAuthenticationMethod(
         createUserAuthenticationMethodDto: CreateUserAuthenticationMethodDto,
     ): Promise<UserAuthenticationMethod> {
-        return this.userAuthenticationMethodModel.create({
-            createUserAuthenticationMethodDto,
-        })
+        const userAuthenticationMethod = new this.userAuthenticationMethodModel(
+            {
+                createUserAuthenticationMethodDto,
+            },
+        )
+
+        return userAuthenticationMethod.save()
     }
 
     async findByAddress(
