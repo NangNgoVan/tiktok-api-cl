@@ -85,22 +85,36 @@ export class FeedCommentService {
         })
     }
 
-    async getCommentByFeedId(feedId: string) {
+    async getCommentByFeedId(
+        feedId: string,
+        next?: string,
+        rowsPerpage?: number,
+    ) {
         const feed = await this.feedModel.findById(feedId)
         if (!feed) throw new FeedNotFoundException()
 
-        const comment = await this.commentModel.find({
-            feed_id: feedId,
-            level: FeedCommentLevel.LEVEL_ONE,
-        })
+        if (!rowsPerpage) rowsPerpage = 5
+        let feedComments = undefined
+        if (!next) {
+            feedComments = await this.commentModel.paginate({
+                query: { reply_to: feedId, level: FeedCommentLevel.LEVEL_ONE },
+                limit: rowsPerpage,
+            })
+        } else {
+            feedComments = await this.commentModel.paginate({
+                query: { reply_to: feedId, level: FeedCommentLevel.LEVEL_ONE },
+                limit: rowsPerpage,
+                next: next,
+            })
+        }
 
-        if (!comment) throw new CommentNotFoundException()
+        if (!feedComments) throw new CommentNotFoundException()
 
         const listUserInfo = await this.userModel.find({
-            _id: _.uniq(_.map(comment, (it) => it.created_by)),
+            _id: _.uniq(_.map(feedComments, (it) => it.created_by)),
         })
 
-        return comment.map((cmt) => {
+        return feedComments.map((cmt) => {
             const userInfo = listUserInfo.find((u) => cmt.created_by === u.id)
             return {
                 ..._.pick(cmt, [
@@ -116,7 +130,12 @@ export class FeedCommentService {
         })
     }
 
-    async getCommentByFeedIdAndCommentId(feedId: string, commentId: string) {
+    async getCommentByFeedIdAndCommentId(
+        feedId: string,
+        commentId: string,
+        next?: string,
+        rowsPerpage?: number,
+    ) {
         const feed = await this.feedModel.findById(feedId)
         if (!feed) throw new FeedNotFoundException()
 
@@ -126,13 +145,30 @@ export class FeedCommentService {
         })
         if (!currentComment) throw new CommentNotFoundException()
 
-        const comment = await this.commentModel.find({ reply_to: commentId })
+        if (!rowsPerpage) rowsPerpage = 5
+        let feedComments = undefined
+        if (!next) {
+            feedComments = await this.commentModel.paginate({
+                query: { reply_to: commentId },
+                limit: rowsPerpage,
+            })
+        } else {
+            feedComments = await this.commentModel.paginate({
+                query: { reply_to: commentId },
+                limit: rowsPerpage,
+                next: next,
+            })
+        }
 
         const listUserInfo = await this.userModel.find({
-            _id: _.chain(comment).map('created_by').uniq().compact().value(),
+            _id: _.chain(feedComments)
+                .map('created_by')
+                .uniq()
+                .compact()
+                .value(),
         })
 
-        return comment.map((cmt) => {
+        return feedComments.map((cmt) => {
             const userInfo = listUserInfo.find((u) => cmt.created_by === u.id)
             return {
                 ..._.pick(cmt, [
