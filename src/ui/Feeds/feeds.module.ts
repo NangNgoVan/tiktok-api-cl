@@ -15,6 +15,7 @@ import { FeedsService } from './Service/feeds.service'
 import { FeedHashTagsService } from '../Hashtags/Service/feed-hashtags.service'
 import { HashTagService } from '../Hashtags/Service/hashtags.service'
 import { HashTagsModule } from '../Hashtags/hashtags.module'
+import { FollowsModule } from '../Follows/follows.module'
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { HashTagsModule } from '../Hashtags/hashtags.module'
         ]),
         UsersModule,
         HashTagsModule,
+        FollowsModule,
     ],
     controllers: [FeedsController],
     providers: [

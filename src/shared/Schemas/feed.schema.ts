@@ -75,6 +75,12 @@ export class Feed {
         default: 0,
     })
     primary_image_index?: number
+
+    @ApiProperty()
+    @Prop({
+        default: true,
+    })
+    allow_comment: boolean
 }
 
 export const FeedSchema = SchemaFactory.createForClass(Feed)

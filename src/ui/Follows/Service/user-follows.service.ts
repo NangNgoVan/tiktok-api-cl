@@ -50,47 +50,101 @@ export class UserFollowsService {
         return unfollowedData
     }
 
-    async getAllFollowersForUser(userId: string): Promise<GetUserFollowDto[]> {
-        const followerIds = (
-            await this.userFollowModel.find({
-                user_id: userId,
-            })
-        ).map((item) => item.created_by)
+    async getAllFollowersForUser(
+        userId: string,
+        next?: string,
+        rowsPerpage?: number,
+    ): Promise<GetUserFollowDto[]> {
+        try {
+            if (!rowsPerpage) rowsPerpage = 5
+            let followers = undefined
+            if (!next) {
+                const followers = await this.userFollowModel.paginate({
+                    query: { user_id: userId },
+                    limit: rowsPerpage,
+                })
+            } else {
+                followers = await this.userFollowModel.paginate({
+                    query: { user_id: userId },
+                    limit: rowsPerpage,
+                    next: next,
+                })
+            }
 
-        const followers = await Promise.all(
-            followerIds.map(async (id) => {
-                const user = await this.userModel.findById(id)
-                return {
-                    user_id: id,
-                    avatar: user.avatar,
-                    nick_name: user.nick_name,
-                    full_name: user.full_name,
-                } as GetUserFollowDto
-            }),
-        )
+            const followerDetails = await Promise.all(
+                followers.map(async (id) => {
+                    const user = await this.userModel.findById(id)
+                    return {
+                        user_id: id,
+                        avatar: user.avatar,
+                        nick_name: user.nick_name,
+                        full_name: user.full_name,
+                    } as GetUserFollowDto
+                }),
+            )
+            followers.results = followerDetails
 
-        return followers
+            return followers
+        } catch {
+            return []
+        }
     }
 
-    async getAllFollowingsForUser(userId: string): Promise<GetUserFollowDto[]> {
-        const followingIds = (
-            await this.userFollowModel.find({
-                created_by: userId,
+    async getAllFollowingsForUser(
+        userId: string,
+        next?: string,
+        rowsPerpage?: number,
+    ): Promise<GetUserFollowDto[]> {
+        try {
+            if (!rowsPerpage) rowsPerpage = 5
+            let followings = undefined
+            if (!next) {
+                followings = await this.userFollowModel.paginate({
+                    query: { created_by: userId },
+                    limit: rowsPerpage,
+                })
+            } else {
+                followings = await this.userFollowModel.paginate({
+                    query: { created_by: userId },
+                    limit: rowsPerpage,
+                    next: next,
+                })
+            }
+
+            const followingDetails = await Promise.all(
+                followings.results.map(async (followData) => {
+                    const user = await this.userModel.findById(
+                        followData.user_id,
+                    )
+                    return {
+                        user_id: user.id,
+                        avatar: user.avatar,
+                        nick_name: user.nick_name,
+                        full_name: user.full_name,
+                    } as GetUserFollowDto
+                }),
+            )
+
+            followings.results = followingDetails
+
+            return followings
+        } catch {
+            return []
+        }
+    }
+
+    async checkFollowRelationshipBetween(
+        followerId: string,
+        followingId: string,
+    ): Promise<boolean> {
+        if (
+            await this.userFollowModel.findOne({
+                created_by: followerId,
+                user_id: followingId,
             })
-        ).map((item) => item.user_id)
-
-        const followers = await Promise.all(
-            followingIds.map(async (id) => {
-                const user = await this.userModel.findById(id)
-                return {
-                    user_id: id,
-                    avatar: user.avatar,
-                    nick_name: user.nick_name,
-                    full_name: user.full_name,
-                } as GetUserFollowDto
-            }),
-        )
-
-        return followers
+        ) {
+            return true
+        }
+        return false
     }
 }

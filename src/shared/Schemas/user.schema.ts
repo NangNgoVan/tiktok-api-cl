@@ -94,7 +94,7 @@ export class User {
     //avatar
     @Prop()
     @ApiProperty()
-    avatar: string
+    avatar?: string
 
     //should_show_tour_guild
     @Prop({

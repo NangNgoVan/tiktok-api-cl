@@ -22,6 +22,7 @@ import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
+    ApiQuery,
     ApiTags,
 } from '@nestjs/swagger'
 import {
@@ -43,6 +44,8 @@ import { UploadMetaDataDto } from '../Dto/upload-metadata.dto'
 import moment from 'moment'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { GetUserFollowDto } from 'src/ui/Follows/Dto/get-user-follow.dto'
+import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
+import { PaginateUserFollowsDto } from 'src/ui/Follows/Dto/paginate-user-follows.dto'
 
 @Controller('ui/users')
 @ApiTags('User API')
@@ -277,12 +280,22 @@ export class UserController {
     @ApiOperation({
         summary: 'Get followings by `current` alias',
     })
+    @ApiImplicitQuery({
+        name: 'next',
+        type: 'string',
+        required: false,
+    })
     @ApiOkResponse({
-        type: [GetUserFollowDto],
+        type: PaginateUserFollowsDto,
     })
     async getFollowings(@Req() req): Promise<GetUserFollowDto[]> {
         const { userId } = req.user
-        return await this.userFollowsService.getAllFollowingsForUser(userId)
+        let next = undefined
+        if (req.query) next = req.query['next']
+        return await this.userFollowsService.getAllFollowingsForUser(
+            userId,
+            next,
+        )
     }
 
     @Get('/current/followers')
@@ -291,12 +304,22 @@ export class UserController {
     @ApiOperation({
         summary: 'Get followers by `current` alias',
     })
+    @ApiImplicitQuery({
+        name: 'next',
+        type: 'string',
+        required: false,
+    })
     @ApiOkResponse({
-        type: [GetUserFollowDto],
+        type: PaginateUserFollowsDto,
     })
     async getFollowersByUserId(@Req() req): Promise<GetUserFollowDto[]> {
         const { userId } = req.user
-        return await this.userFollowsService.getAllFollowersForUser(userId)
+        let next = undefined
+        if (req.query) next = req.query['next']
+        return await this.userFollowsService.getAllFollowersForUser(
+            userId,
+            next,
+        )
     }
 
     @Get('/:userId/followings')
@@ -305,12 +328,22 @@ export class UserController {
     @ApiOperation({
         summary: 'Get followings by user id',
     })
+    @ApiImplicitQuery({
+        name: 'next',
+        type: 'string',
+        required: false,
+    })
     @ApiOkResponse({
-        type: [GetUserFollowDto],
+        type: PaginateUserFollowsDto,
     })
     async getFollowingsByUserId(@Req() req): Promise<GetUserFollowDto[]> {
         const userId = req.params.userId
-        return await this.userFollowsService.getAllFollowingsForUser(userId)
+        let next = undefined
+        if (req.query) next = req.query['next']
+        return await this.userFollowsService.getAllFollowingsForUser(
+            userId,
+            next,
+        )
     }
 
     @Get('/:userId/followers')
@@ -319,11 +352,21 @@ export class UserController {
     @ApiOperation({
         summary: 'Get followers by user id',
     })
+    @ApiImplicitQuery({
+        name: 'next',
+        type: 'string',
+        required: false,
+    })
     @ApiOkResponse({
-        type: [GetUserFollowDto],
+        type: PaginateUserFollowsDto,
     })
     async getFollowers(@Req() req): Promise<GetUserFollowDto[]> {
         const userId = req.params.userId
-        return await this.userFollowsService.getAllFollowersForUser(userId)
+        let next = undefined
+        if (req.query) next = req.query['next']
+        return await this.userFollowsService.getAllFollowersForUser(
+            userId,
+            next,
+        )
     }
 }

@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsBoolean, IsObject, IsString } from 'class-validator'
 
-class CurrentUserFollowFeedAuthor {
+export class CurrentFollowedUser {
     @ApiProperty()
     @IsBoolean()
     is_followed: boolean
 }
 
-export class FeedAuthorDto {
+export class CreatedUserDto {
     @ApiProperty()
     @IsString()
     id: string
@@ -22,5 +22,5 @@ export class FeedAuthorDto {
     avatar: string
     @ApiProperty()
     @IsObject()
-    current_user: CurrentUserFollowFeedAuthor
+    current_user: CurrentFollowedUser
 }
