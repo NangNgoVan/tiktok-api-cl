@@ -6,47 +6,39 @@ import {
     Post,
     Query,
     Req,
-    UploadedFile,
     UploadedFiles,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common'
-import {
-    ExpressAdapter,
-    FileFieldsInterceptor,
-    FileInterceptor,
-    FilesInterceptor,
-} from '@nestjs/platform-express'
+import { FileFieldsInterceptor } from '@nestjs/platform-express'
 import {
     ApiBearerAuth,
     ApiBody,
     ApiConsumes,
     ApiOkResponse,
     ApiOperation,
-    ApiParam,
     ApiQuery,
     ApiTags,
 } from '@nestjs/swagger'
 import moment from 'moment'
-import { dematerialize } from 'rxjs'
 import {
     DatabaseUpdateFailException,
     UserNotFoundException,
 } from 'src/shared/Exceptions/http.exceptions'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
-import { Feed, FeedDocument } from 'src/shared/Schemas/feed.schema'
+import { Feed } from 'src/shared/Schemas/feed.schema'
 import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
 import { configService } from 'src/shared/Services/config.service'
 import { UtilsService } from 'src/shared/Services/utils.service'
 import { FeedType } from 'src/shared/Types/types'
 import { UsersService } from 'src/ui/Users/Service/users.service'
-import { Logger } from 'winston'
 import { AddFeedResourceDto } from '../../Resources/Dto/add-feed-resource.dto'
 import { CreateFeedDto } from '../Dto/create-feed.dto'
 import { FeedResourcesService } from '../../Resources/Service/resources.service'
 import { FeedsService } from '../Service/feeds.service'
 import { FeedDetailDto } from '../Dto/feed-detail.dto'
 import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
+import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 
 @Controller('ui/feeds')
 @ApiTags('Feed APIs')
@@ -62,7 +54,7 @@ export class FeedsController {
     @Post('/by-type/image')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
-    @ApiOperation({ summary: 'Create new image feed by current user' })
+    @ApiOperation({ summary: 'Create image feed' })
     @UseInterceptors(FileFieldsInterceptor([{ name: 'resources' }]))
     @ApiOkResponse({
         description: 'OK',
@@ -158,6 +150,7 @@ export class FeedsController {
 
         return createdFeed
     }
+
     @Get('/newest')
     @UseGuards(JwtAuthGuard)
     @ApiQuery({
@@ -169,6 +162,11 @@ export class FeedsController {
     @ApiOperation({ summary: 'Get newest feeds' })
     @ApiOkResponse({
         type: PaginateFeedResultsDto,
+    })
+    @ApiImplicitQuery({
+        required: false,
+        name: 'next',
+        type: String,
     })
     async getNewestFeeds(@Query() query) {
         let next = undefined
