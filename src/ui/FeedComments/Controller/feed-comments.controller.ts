@@ -22,7 +22,7 @@ import { PaginateFeedCommentResultsDto } from '../Dto/paginate-feed-commentresul
 import { FeedCommentService } from '../Service/feed-comments.service'
 
 @Controller('ui/feeds')
-@ApiTags('Comment APIs')
+@ApiTags('Feed Comment APIs')
 export class FeedCommentsController {
     constructor(private readonly feedCommentService: FeedCommentService) {}
     @Post('/:id/comments')

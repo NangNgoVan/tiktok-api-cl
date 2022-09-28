@@ -15,7 +15,7 @@ import {
 } from '@nestjs/swagger'
 import { CredentialDto } from '../../../shared/Dto/credential.dto'
 
-@ApiTags('Authentication for UI')
+@ApiTags('Authentication APIs')
 @Controller('ui/authentication')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}

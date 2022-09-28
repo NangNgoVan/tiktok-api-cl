@@ -23,7 +23,7 @@ import { CreateUserAuthenticationMethodCredentialDto } from '../../Auth/Dto/crea
 import bcrypt from 'bcrypt'
 import _ from 'lodash'
 
-@ApiTags('User APIs')
+@ApiTags('User Authentication Method APIs')
 @Controller('ui/users/current/authentication-methods')
 export class UserAuthenticationMethodsController {
     constructor(
