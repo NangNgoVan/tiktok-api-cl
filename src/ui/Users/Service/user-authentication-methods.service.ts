@@ -40,4 +40,14 @@ export class UserAuthenticationMethodsService {
             'data.username': username,
         })
     }
+
+    async deleteByUserIdAndMethod(
+        userId: string,
+        method: AuthenticationMethod,
+    ): Promise<void> {
+        await this.userAuthenticationMethodModel.deleteOne({
+            authentication_method: method,
+            user_id: userId,
+        })
+    }
 }

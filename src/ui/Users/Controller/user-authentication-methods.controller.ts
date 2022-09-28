@@ -2,6 +2,7 @@ import {
     BadRequestException,
     Body,
     Controller,
+    Delete,
     Post,
     Req,
     UseGuards,
@@ -78,5 +79,22 @@ export class UserAuthenticationMethodsController {
             })
 
         return _.omit(createdUserAuthenticationMethod.toObject(), ['data'])
+    }
+
+    @Delete('metamask')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({
+        summary: 'Delete authentication method metamask by `current` alias',
+    })
+    @ApiOkResponse({
+        description: '200',
+    })
+    async deleteAuthenticationMethodMetamask(@Req() req) {
+        const userId = req.user.userId
+        await this.authenticationMethodsService.deleteByUserIdAndMethod(
+            userId,
+            AuthenticationMethod.METAMASK,
+        )
     }
 }
