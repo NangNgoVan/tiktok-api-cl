@@ -37,9 +37,7 @@ export class UserAuthenticationMethodsController {
     @ApiOperation({
         summary: 'Create authentication method credential by `current` alias',
     })
-    @ApiOkResponse({
-        description: '200',
-    })
+    @ApiOkResponse()
     async createAuthenticationMethodCredential(
         @Req() req,
         @Body()
@@ -87,9 +85,7 @@ export class UserAuthenticationMethodsController {
     @ApiOperation({
         summary: 'Delete authentication method metamask by `current` alias',
     })
-    @ApiOkResponse({
-        description: '200',
-    })
+    @ApiOkResponse()
     async deleteAuthenticationMethodMetamask(@Req() req) {
         const userId = req.user.userId
         await this.authenticationMethodsService.deleteByUserIdAndMethod(
