@@ -5,6 +5,13 @@ import { Feed } from 'src/shared/Schemas/feed.schema'
 import { FeedDetailDto } from 'src/ui/Feeds/Dto/feed-detail.dto'
 
 export class PaginateFeedResultsDto {
+    constructor() {
+        this.results = []
+        this.previous = ''
+        this.hasPrevious = false
+        this.hasNext = true
+        this.next = ''
+    }
     @ApiProperty({
         type: [FeedDetailDto],
     })
@@ -17,7 +24,7 @@ export class PaginateFeedResultsDto {
     hasPrevious: boolean
     @ApiProperty()
     @IsString()
-    next: string
+    next?: string
     @ApiProperty()
     @IsBoolean()
     hasNext: boolean

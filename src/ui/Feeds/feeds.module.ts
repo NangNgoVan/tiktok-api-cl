@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { forwardRef, Module } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
 
 import {
@@ -23,7 +23,7 @@ import { FollowsModule } from '../Follows/follows.module'
             { name: Feed.name, schema: FeedSchema },
             { name: FeedResource.name, schema: FeedResourceSchema },
         ]),
-        UsersModule,
+        forwardRef(() => UsersModule),
         HashTagsModule,
         FollowsModule,
     ],
@@ -34,5 +34,6 @@ import { FollowsModule } from '../Follows/follows.module'
         AWS3FileUploadService,
         UtilsService,
     ],
+    exports: [FeedsService],
 })
 export class FeedsModule {}

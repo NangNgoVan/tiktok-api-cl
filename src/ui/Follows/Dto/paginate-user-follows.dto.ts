@@ -4,6 +4,13 @@ import { IsArray, IsBoolean, IsString } from 'class-validator'
 import { GetUserFollowDto } from './get-user-follow.dto'
 
 export class PaginateUserFollowsDto {
+    constructor() {
+        this.results = []
+        this.previous = ''
+        this.hasPrevious = false
+        this.hasNext = false
+        this.next = ''
+    }
     @ApiProperty({
         type: [GetUserFollowDto],
     })
@@ -16,7 +23,7 @@ export class PaginateUserFollowsDto {
     hasPrevious: boolean
     @ApiProperty()
     @IsString()
-    next: string
+    next?: string
     @ApiProperty()
     @IsBoolean()
     hasNext: boolean

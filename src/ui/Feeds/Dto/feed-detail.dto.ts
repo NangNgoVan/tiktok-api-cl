@@ -1,8 +1,9 @@
 import { Prop } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEnum, IsNumber, IsObject } from 'class-validator'
+import { IsArray, IsEnum, IsNumber, IsObject } from 'class-validator'
 import { Feed } from 'src/shared/Schemas/feed.schema'
 import { FeedType } from 'src/shared/Types/types'
+import { GetFeedResourceDto } from 'src/ui/Resources/Dto/get-feed-resource.dto'
 import { CreatedUserDto } from '../../../shared/Dto/created-user.dto'
 import { FeedCurrentUserDto } from './feed-current-user.dto'
 

@@ -6,11 +6,14 @@ import { CreateUserDto } from '../Dto/create-user.dto'
 import { UpdateUserDto } from '../Dto/update-user.dto'
 import { UserNotFoundException } from 'src/shared/Exceptions/http.exceptions'
 import _ from 'lodash'
+import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
+import { GetUserDto } from '../Dto/get-user.dto'
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectModel(User.name) private userModel: Model<UserDocument>,
+        private readonly userFollowsService: UserFollowsService,
     ) {}
 
     async create(createUserDto: CreateUserDto): Promise<UserDocument> {
@@ -20,8 +23,12 @@ export class UsersService {
     }
 
     async findById(id: string): Promise<UserDocument> {
-        const foundedUser = this.userModel.findById(id)
-        return foundedUser
+        try {
+            const foundedUser = await this.userModel.findById(id)
+            return foundedUser
+        } catch {
+            return null
+        }
     }
 
     async updateUser(id: string, dto: UpdateUserDto) {

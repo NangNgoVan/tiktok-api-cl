@@ -46,6 +46,8 @@ import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { GetUserFollowDto } from 'src/ui/Follows/Dto/get-user-follow.dto'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 import { PaginateUserFollowsDto } from 'src/ui/Follows/Dto/paginate-user-follows.dto'
+import { PaginateFeedResultsDto } from 'src/ui/Feeds/Dto/paginate-feed-results.dto'
+import { FeedsService } from 'src/ui/Feeds/Service/feeds.service'
 
 @Controller('ui/users')
 @ApiTags('User API')
@@ -56,6 +58,7 @@ export class UserController {
         private readonly userService: UsersService,
         private readonly aws3FileUploadService: AWS3FileUploadService,
         private readonly userFollowsService: UserFollowsService,
+        private readonly feedsService: FeedsService,
     ) {}
 
     @Get('/current')
@@ -66,7 +69,7 @@ export class UserController {
         description: '200',
         type: User,
     })
-    async getCurrentUser(@Req() req): Promise<any> {
+    async getCurrentUser(@Req() req): Promise<User> {
         const { userId } = req.user
         const user = await this.userService.findById(userId)
         return user
@@ -103,15 +106,35 @@ export class UserController {
     @ApiOperation({ summary: 'Get user by user id' })
     @ApiOkResponse({
         description: '200',
-        type: User,
+        type: GetUserDto,
     })
     @ApiNotFoundResponse()
-    async getUserById(@Param() params): Promise<object> {
+    async getUserById(@Param() params, @Req() req): Promise<any> {
         const id = params.userId
+        const { userId } = req.user
         const user = await this.userService.findById(id)
         if (!user) throw new UserNotFoundException()
+
+        if (id === userId) return user
         //
-        return user
+        const followed =
+            await this.userFollowsService.checkFollowRelationshipBetween(
+                userId,
+                id,
+            )
+
+        const getUserDto = new GetUserDto()
+        getUserDto._id = user.id
+        getUserDto.gender = user.gender
+        getUserDto.number_of_follower = user.number_of_follower
+        getUserDto.number_of_following = user.number_of_following
+        getUserDto.full_name = getUserDto.full_name
+        getUserDto.nick_name = user.nick_name
+        getUserDto.email = user.email
+        getUserDto.current_user = {
+            is_followed: followed,
+        }
+        return getUserDto
     }
 
     // Upload avatar image
@@ -288,7 +311,7 @@ export class UserController {
     @ApiOkResponse({
         type: PaginateUserFollowsDto,
     })
-    async getFollowings(@Req() req): Promise<GetUserFollowDto[]> {
+    async getFollowings(@Req() req): Promise<PaginateUserFollowsDto> {
         const { userId } = req.user
         let next = undefined
         if (req.query) next = req.query['next']
@@ -312,7 +335,7 @@ export class UserController {
     @ApiOkResponse({
         type: PaginateUserFollowsDto,
     })
-    async getFollowersByUserId(@Req() req): Promise<GetUserFollowDto[]> {
+    async getFollowersByUserId(@Req() req): Promise<PaginateUserFollowsDto> {
         const { userId } = req.user
         let next = undefined
         if (req.query) next = req.query['next']
@@ -336,7 +359,7 @@ export class UserController {
     @ApiOkResponse({
         type: PaginateUserFollowsDto,
     })
-    async getFollowingsByUserId(@Req() req): Promise<GetUserFollowDto[]> {
+    async getFollowingsByUserId(@Req() req): Promise<PaginateUserFollowsDto> {
         const userId = req.params.userId
         let next = undefined
         if (req.query) next = req.query['next']
@@ -360,7 +383,7 @@ export class UserController {
     @ApiOkResponse({
         type: PaginateUserFollowsDto,
     })
-    async getFollowers(@Req() req): Promise<GetUserFollowDto[]> {
+    async getFollowers(@Req() req): Promise<PaginateUserFollowsDto> {
         const userId = req.params.userId
         let next = undefined
         if (req.query) next = req.query['next']
@@ -368,5 +391,49 @@ export class UserController {
             userId,
             next,
         )
+    }
+
+    @Get('/current/feeds')
+    @ApiImplicitQuery({
+        name: 'next',
+        type: 'string',
+        required: false,
+    })
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({
+        summary: 'Get feeds posted by current user',
+    })
+    @ApiOkResponse({
+        type: PaginateFeedResultsDto,
+    })
+    async getFeedsPostedByCurrentUser(
+        @Req() req,
+    ): Promise<PaginateFeedResultsDto> {
+        const { userId } = req.user
+        let next = undefined
+        if (req.query) next = req.query['next']
+
+        return await this.feedsService.getFeedsPostedByUser(userId, next)
+    }
+
+    @Get('/:userId/feeds')
+    @ApiImplicitQuery({
+        name: 'next',
+        type: 'string',
+        required: false,
+    })
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({
+        summary: 'Get feeds posted by user id',
+    })
+    @ApiOkResponse({
+        type: PaginateFeedResultsDto,
+    })
+    async getFeedsPostedByUser(@Req() req): Promise<PaginateFeedResultsDto> {
+        const userId = req.params.userId
+        let next = undefined
+        if (req.query) next = req.query['next']
+
+        return await this.feedsService.getFeedsPostedByUser(userId, next)
     }
 }

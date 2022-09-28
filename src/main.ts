@@ -16,6 +16,7 @@ import winston from 'winston'
 import moment from 'moment'
 import morgan from 'morgan'
 import rTracer from 'cls-rtracer'
+import { ValidationPipe } from '@nestjs/common'
 
 const createLogger = (logGroupName: string) => {
     const transports: winston.transport[] = []
@@ -141,6 +142,9 @@ async function bootstrap() {
 
     // Starts listening for shutdown hooks
     app.enableShutdownHooks()
+
+    // Global validation pipe
+    app.useGlobalPipes(new ValidationPipe())
 
     // Start application
     await app.listen(configService.getHostPort())

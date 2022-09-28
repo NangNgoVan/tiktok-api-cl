@@ -8,6 +8,7 @@ import { MongoPaging } from 'mongo-cursor-pagination'
 import { User, UserDocument } from 'src/shared/Schemas/user.schema'
 import { Model } from 'mongoose'
 import { GetUserFollowDto } from '../Dto/get-user-follow.dto'
+import { PaginateUserFollowsDto } from '../Dto/paginate-user-follows.dto'
 
 @Injectable()
 export class UserFollowsService {
@@ -54,12 +55,12 @@ export class UserFollowsService {
         userId: string,
         next?: string,
         rowsPerpage?: number,
-    ): Promise<GetUserFollowDto[]> {
+    ): Promise<PaginateUserFollowsDto> {
         try {
             if (!rowsPerpage) rowsPerpage = 5
             let followers = undefined
             if (!next) {
-                const followers = await this.userFollowModel.paginate({
+                followers = await this.userFollowModel.paginate({
                     query: { user_id: userId },
                     limit: rowsPerpage,
                 })
@@ -84,9 +85,9 @@ export class UserFollowsService {
             )
             followers.results = followerDetails
 
-            return followers
+            return new PaginateUserFollowsDto()
         } catch {
-            return []
+            return new PaginateUserFollowsDto()
         }
     }
 
@@ -94,7 +95,7 @@ export class UserFollowsService {
         userId: string,
         next?: string,
         rowsPerpage?: number,
-    ): Promise<GetUserFollowDto[]> {
+    ): Promise<PaginateUserFollowsDto> {
         try {
             if (!rowsPerpage) rowsPerpage = 5
             let followings = undefined
@@ -129,7 +130,7 @@ export class UserFollowsService {
 
             return followings
         } catch {
-            return []
+            return new PaginateUserFollowsDto()
         }
     }
 

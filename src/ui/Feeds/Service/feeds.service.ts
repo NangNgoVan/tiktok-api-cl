@@ -13,6 +13,8 @@ import { HashTagService } from 'src/ui/Hashtags/Service/hashtags.service'
 import { UsersService } from 'src/ui/Users/Service/users.service'
 import { CreatedUserDto } from '../../../shared/Dto/created-user.dto'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
+import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
+import { FeedResourcesService } from 'src/ui/Resources/Service/resources.service'
 
 @Injectable()
 export class FeedsService {
@@ -23,6 +25,7 @@ export class FeedsService {
         private readonly hashTagService: HashTagService,
         private readonly userService: UsersService,
         private readonly userfollowsService: UserFollowsService,
+        private readonly feedResourcesService: FeedResourcesService,
     ) {}
 
     async createFeed(
@@ -51,7 +54,7 @@ export class FeedsService {
         userId: string,
         next?: string,
         rowsPerpage?: number,
-    ): Promise<object> {
+    ): Promise<PaginateFeedResultsDto> {
         try {
             if (!rowsPerpage) rowsPerpage = 5
             let feeds = undefined
@@ -59,12 +62,14 @@ export class FeedsService {
                 feeds = await this.feedModel.paginate({
                     limit: rowsPerpage,
                     paginatedField: 'created_at',
+                    sortAscending: false,
                 })
             } else {
                 feeds = await this.feedModel.paginate({
                     limit: rowsPerpage,
                     next: next,
                     paginatedField: 'created_at',
+                    sortAscending: false,
                 })
             }
             const feedWithAuthors = await Promise.all(
@@ -90,17 +95,68 @@ export class FeedsService {
 
                         feed['created_user'] = feedAuthor
                     }
+
+                    const resources =
+                        await this.feedResourcesService.getResourceByIds(
+                            feed.resource_ids,
+                        )
+                    if (resources) {
+                        feed['resource_details'] = resources
+                    }
                     return feed
                 }),
             )
-            return feedWithAuthors
-        } catch {
+            feeds.results = feedWithAuthors
+            return feeds
+        } catch (e) {
             //throw or return empty
-            return []
+            return new PaginateFeedResultsDto()
         }
     }
 
     async getFeedDetail(feedId: string) {
         return await this.feedModel.findById(feedId)
+    }
+
+    async getFeedsPostedByUser(
+        userId: string,
+        next?: string,
+        rowsPerpage?: number,
+    ): Promise<PaginateFeedResultsDto> {
+        try {
+            if (!rowsPerpage) rowsPerpage = 5
+            let feeds = undefined
+            if (!next) {
+                feeds = await this.feedModel.paginate({
+                    query: { created_by: userId },
+                    limit: rowsPerpage,
+                })
+            } else {
+                feeds = await this.feedModel.paginate({
+                    query: { created_by: userId },
+                    limit: rowsPerpage,
+                    next: next,
+                })
+            }
+
+            const feedsWithResourceDetail = await Promise.all(
+                feeds.results.map(async (feed) => {
+                    const resources =
+                        await this.feedResourcesService.getResourceByIds(
+                            feed.resource_ids,
+                        )
+                    if (resources) {
+                        feed['resource_details'] = resources
+                    }
+                    return feed
+                }),
+            )
+            feeds.results = feedsWithResourceDetail
+            return feeds
+        } catch {
+            //throw
+            //return
+            return new PaginateFeedResultsDto()
+        }
     }
 }
