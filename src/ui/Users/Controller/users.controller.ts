@@ -50,7 +50,7 @@ import { PaginateFeedResultsDto } from 'src/ui/Feeds/Dto/paginate-feed-results.d
 import { FeedsService } from 'src/ui/Feeds/Service/feeds.service'
 
 @Controller('ui/users')
-@ApiTags('User API')
+@ApiTags('User APIs')
 export class UserController {
     private readonly logger: Logger = new Logger(UserController.name)
 

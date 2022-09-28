@@ -1,5 +1,10 @@
 import { Controller, Get, UseGuards } from '@nestjs/common'
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
+import {
+    ApiBearerAuth,
+    ApiOkResponse,
+    ApiOperation,
+    ApiTags,
+} from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { Interest } from 'src/shared/Schemas/interest.schema'
 import { InterestsService } from '../Service/interests.service'
@@ -10,6 +15,7 @@ export class InterestsController {
     constructor(private readonly interestsService: InterestsService) {}
 
     @Get('/interests/all')
+    @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Get all interests by alias `all`' })
     @ApiOkResponse({

@@ -5,9 +5,7 @@ import { AuthenticationMethod } from '../../../shared/Types/types'
 export class CreateUserAuthenticationMethodDto {
     @ApiProperty()
     data:
-        | {
-              address: string
-          }
+        | { address: string }
         | {
               username: string
               password: string

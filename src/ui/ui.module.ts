@@ -8,6 +8,7 @@ import { BlacklistMiddleware } from 'src/shared/Middlewares/blacklist.middleware
 import { RedisService } from 'src/shared/Services/redis.service'
 import { AuthService } from 'src/shared/Services/auth.service'
 import { JwtService } from '@nestjs/jwt'
+import { ReactionsModule } from './Reactions/reactions.module'
 @Module({
     imports: [
         AuthModule,
@@ -15,6 +16,7 @@ import { JwtService } from '@nestjs/jwt'
         InterestsModule,
         FeedsModule,
         FeedCommentsModule,
+        ReactionsModule,
     ],
     controllers: [],
     providers: [RedisService, AuthService, JwtService],

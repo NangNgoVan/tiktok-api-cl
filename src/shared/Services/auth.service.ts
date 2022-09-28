@@ -1,4 +1,5 @@
 // Nest dependencies
+import bcrypt from 'bcrypt'
 import { v4 as uuidv4 } from 'uuid'
 import {
     Injectable,
@@ -22,7 +23,6 @@ import { CredentialDto } from '../Dto/credential.dto'
 import { AuthenticationMethod, HttpStatusResult } from '../Types/types'
 import { UsersService } from 'src/ui/Users/Service/users.service'
 
-import { dataSerializerService } from './data-serializer.service'
 import { UserAuthenticationMethodsService } from 'src/ui/Users/Service/user-authentication-methods.service'
 import { UserDocument } from '../Schemas/user.schema'
 import { UserNotFoundException } from '../Exceptions/http.exceptions'
@@ -71,11 +71,13 @@ export class AuthService {
                 nick_name: `user${uuidNoHyphens}`,
             })
 
-            await this.userAuthenticationMethodsService.create({
-                user_id: user.id,
-                data: { address: verifiedAddress },
-                authentication_method: AuthenticationMethod.METAMASK,
-            })
+            await this.userAuthenticationMethodsService.createAuthenticationMethod(
+                {
+                    user_id: user.id,
+                    data: { address: verifiedAddress },
+                    authentication_method: AuthenticationMethod.METAMASK,
+                },
+            )
         } else {
             user = await this.userService.findById(
                 userAuthenticationMethod.user_id,
@@ -86,96 +88,89 @@ export class AuthService {
             throw new UserNotFoundException()
         }
 
-        const serializeUser = await dataSerializerService.selectProperties(
-            user,
-            ['id'],
-        )
-
-        const accessToken = this.jwtService.sign(
-            {
-                userId: serializeUser['id'],
-            },
-            {
-                secret: configService.getEnv('JWT_SECRET'),
-                expiresIn: 60,
-            },
-        )
-
-        const refreshToken = this.jwtService.sign(
-            {
-                userId: serializeUser['id'],
-            },
-            {
-                secret: configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
-                expiresIn: '7 days',
-            },
-        )
-
-        const dataResponse = {
-            token: accessToken,
-            refreshToken: refreshToken,
+        return {
+            token: this.generateAccessToken({
+                userId: user.id,
+            }),
+            refreshToken: this.generateRefreshToken({
+                userId: user.id,
+            }),
         }
-
-        return dataResponse
     }
 
     async logInWithCredential(dto: CredentialDto): Promise<TokenDataResponse> {
-        const token = 'token'
+        const userAuthenticationMethod =
+            await this.userAuthenticationMethodsService.findByUsername(
+                dto.username,
+            )
 
-        const accessToken = this.jwtService.sign(
-            {
-                data: 'data_to_generate_jwt_token',
-            },
-            {
-                secret: configService.getEnv('JWT_SECRET'),
-                expiresIn: 60,
-            },
-        )
-
-        const refreshToken = this.jwtService.sign(
-            {
-                data: 'data_to_generate_refresh_token',
-            },
-            {
-                secret: configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
-                expiresIn: 3600,
-            },
-        )
-
-        const dataResponse = {
-            token: accessToken,
-            refreshToken: refreshToken,
+        if (!userAuthenticationMethod) {
+            throw new NotFoundException(`Username ${dto.username} not found`)
         }
 
-        return dataResponse
+        const user = await this.userService.findById(
+            userAuthenticationMethod.user_id,
+        )
+
+        if (!user) {
+            throw new NotFoundException(
+                `User ${userAuthenticationMethod.user_id} not found`,
+            )
+        }
+
+        const { password } = userAuthenticationMethod.data as {
+            username: string
+            password: string
+        }
+
+        const isPasswordValid = await bcrypt.compare(dto.password, password)
+
+        if (!isPasswordValid) {
+            throw new BadRequestException('Password do not match')
+        }
+
+        return {
+            token: this.generateAccessToken({
+                userId: user.id,
+            }),
+            refreshToken: this.generateRefreshToken({
+                userId: user.id,
+            }),
+        }
     }
 
-    async verifyJWTToken(token: any, secretKey: string): Promise<string> {
+    generateAccessToken(payload: { userId: string }): string {
+        return this.jwtService.sign(payload, {
+            secret: configService.getEnv('JWT_SECRET'),
+            expiresIn: '4h',
+        })
+    }
+
+    generateRefreshToken(payload: { userId: string }): string {
+        return this.jwtService.sign(payload, {
+            secret: configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
+            expiresIn: '7 days',
+        })
+    }
+
+    verifyJWTToken(token: any, secretKey: string): string {
         try {
-            const verifyToken = await this.jwtService.verify(token, {
+            const verifyToken = this.jwtService.verify(token, {
                 secret: secretKey,
             })
+
             return verifyToken
         } catch (error) {
             return null
         }
     }
 
-    async createJWTToken(
-        data: object,
-        secretKey: string,
-        expiresIn: any,
-    ): Promise<TokenDataResponse> {
-        const token = this.jwtService.sign(data, {
-            secret: secretKey,
-            expiresIn: expiresIn,
-        })
-
-        const dataResponse = {
-            token: token,
+    async refreshAccessToken(userId: string): Promise<TokenDataResponse> {
+        return {
+            token: this.generateAccessToken({
+                userId,
+            }),
         }
-
-        return dataResponse
     }
 
     async logOut(refreshToken: string): Promise<HttpStatusResult> {
