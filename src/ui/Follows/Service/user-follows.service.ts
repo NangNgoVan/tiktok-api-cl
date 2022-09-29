@@ -9,6 +9,7 @@ import { User, UserDocument } from 'src/shared/Schemas/user.schema'
 import { Model } from 'mongoose'
 import { GetUserFollowDto } from '../Dto/get-user-follow.dto'
 import { PaginateUserFollowsDto } from '../Dto/paginate-user-follows.dto'
+import { UserNotFoundException } from 'src/shared/Exceptions/http.exceptions'
 
 @Injectable()
 export class UserFollowsService {
@@ -20,23 +21,34 @@ export class UserFollowsService {
     ) {}
 
     async addFollowerForUser(userId: string, followerId: string) {
+        const followingUser = await this.userModel.findById(userId)
+        if (!followingUser) throw new UserNotFoundException()
+        const followerUser = await this.userModel.findById(followerId)
+        if (!followerUser) throw new UserNotFoundException()
+
         const followData = {
             user_id: userId,
             created_by: followerId,
         } as UserFollow
 
         let followedData = await this.userFollowModel.findOne(followData)
-
         if (followedData) return followedData
-
         followedData = await this.userFollowModel.create(followData)
 
         if (!followedData) return null
+
+        followingUser.$inc('number_of_follower', 1).save()
+        followerUser.$inc('number_of_following', 1).save()
 
         return followedData
     }
 
     async removeFollowerFromUser(userId: string, unFollowerId: string) {
+        const followingUser = await this.userModel.findById(userId)
+        if (!followingUser) throw new UserNotFoundException()
+        const followerUser = await this.userModel.findById(unFollowerId)
+        if (!followerUser) throw new UserNotFoundException()
+
         const unfollowData = {
             user_id: userId,
             created_by: unFollowerId,
@@ -47,6 +59,9 @@ export class UserFollowsService {
         )
 
         if (!unfollowedData) return null
+
+        followingUser.$inc('number_of_follower', -1).save()
+        followerUser.$inc('number_of_following', -1).save()
 
         return unfollowedData
     }
@@ -72,20 +87,18 @@ export class UserFollowsService {
                 })
             }
 
-            const followerDetails = await Promise.all(
-                followers.map(async (id) => {
-                    const user = await this.userModel.findById(id)
-                    return {
-                        user_id: id,
-                        avatar: user.avatar,
-                        nick_name: user.nick_name,
-                        full_name: user.full_name,
-                    } as GetUserFollowDto
-                }),
+            const followerIds = followers.results.map(
+                (follower) => follower.created_by,
             )
+
+            const followerDetails = await this.userModel.find(
+                { _id: { $in: followerIds } },
+                ['_id', 'nick_name', 'full_name', 'avatar'],
+            )
+
             followers.results = followerDetails
 
-            return new PaginateUserFollowsDto()
+            return followers
         } catch {
             return new PaginateUserFollowsDto()
         }
@@ -112,18 +125,12 @@ export class UserFollowsService {
                 })
             }
 
-            const followingDetails = await Promise.all(
-                followings.results.map(async (followData) => {
-                    const user = await this.userModel.findById(
-                        followData.user_id,
-                    )
-                    return {
-                        user_id: user.id,
-                        avatar: user.avatar,
-                        nick_name: user.nick_name,
-                        full_name: user.full_name,
-                    } as GetUserFollowDto
-                }),
+            const followingIds = followings.results.map(
+                (following) => following.user_id,
+            )
+            const followingDetails = await this.userModel.find(
+                { _id: { $in: followingIds } },
+                ['_id', 'nick_name', 'full_name', 'avatar'],
             )
 
             followings.results = followingDetails

@@ -26,18 +26,18 @@ export class FeedResourcesService {
         resourceIds: string[],
     ): Promise<GetFeedResourceDto[]> {
         try {
-            return await Promise.all(
-                resourceIds.map(async (id) => {
-                    const resource = await this.feedResourcesModel.findById(id)
-                    return {
-                        resource_id: resource.id,
-                        path:
-                            configService.getEnv('AWS_IMAGE_BASE_URL') +
-                            '/' +
-                            resource.path,
-                    } as GetFeedResourceDto
-                }),
-            )
+            const resources = await this.feedResourcesModel.find({
+                _id: { $in: resourceIds },
+            })
+            return resources.map((resource) => {
+                return {
+                    resource_id: resource.id,
+                    path:
+                        configService.getEnv('AWS_IMAGE_BASE_URL') +
+                        '/' +
+                        resource.path,
+                } as GetFeedResourceDto
+            })
         } catch {
             return null
         }

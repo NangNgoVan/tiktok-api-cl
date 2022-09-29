@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import {
     CommentNotFoundException,
-    DatabaseUpdateFailException,
     FeedNotFoundException,
     ForbidenException,
 } from 'src/shared/Exceptions/http.exceptions'
