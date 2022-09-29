@@ -7,12 +7,13 @@ import {
 import { User, UserSchema } from 'src/shared/Schemas/user.schema'
 import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
 import { FeedsModule } from '../Feeds/feeds.module'
-import { FeedsService } from '../Feeds/Service/feeds.service'
 import { FollowsModule } from '../Follows/follows.module'
-import { UserController } from './Controller/users.controller'
+import { UsersController } from './Controller/users.controller'
 import { UserAuthenticationMethodsService } from './Service/user-authentication-methods.service'
 import { UsersService } from './Service/users.service'
 import { UserAuthenticationMethodsController } from './Controller/user-authentication-methods.controller'
+import { UserFollowsController } from './Controller/user-follows.controller'
+import { UserFeedsController } from './Controller/user-feeds.controller'
 
 @Module({
     imports: [
@@ -26,7 +27,12 @@ import { UserAuthenticationMethodsController } from './Controller/user-authentic
         FollowsModule,
         forwardRef(() => FeedsModule),
     ],
-    controllers: [UserController, UserAuthenticationMethodsController],
+    controllers: [
+        UsersController,
+        UserFollowsController,
+        UserFeedsController,
+        UserAuthenticationMethodsController,
+    ],
     providers: [
         UsersService,
         UserAuthenticationMethodsService,
