@@ -159,7 +159,7 @@ export class FeedsController {
         createdFeed.resource_ids = addedResources
         await createdFeed.save()
 
-        user.number_of_post += 1
+        user.$inc('number_of_post', 1)
         user.save()
 
         return createdFeed
