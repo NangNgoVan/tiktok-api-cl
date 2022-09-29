@@ -14,7 +14,10 @@ export class GetUserDto {
     @ApiProperty()
     @IsString()
     _id: string
-    @ApiProperty()
+    @ApiProperty({
+        enum: UserGenderType,
+        example: UserGenderType.FEMALE,
+    })
     gender: UserGenderType
     @IsString()
     @ApiProperty({

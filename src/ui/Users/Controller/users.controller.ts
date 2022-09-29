@@ -58,7 +58,7 @@ export class UsersController {
     @ApiOperation({ summary: 'Get user by `current` alias' })
     @ApiOkResponse({
         description: '200',
-        type: User,
+        type: GetUserDto,
     })
     async getCurrentUser(@Req() req): Promise<User> {
         const { userId } = req.user
