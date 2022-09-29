@@ -58,13 +58,6 @@ export class Feed {
     number_of_report: number
 
     @ApiProperty()
-    @IsBoolean()
-    @Prop({
-        default: true,
-    })
-    allowed_comment: boolean
-
-    @ApiProperty()
     @Prop({})
     created_by: string
 
