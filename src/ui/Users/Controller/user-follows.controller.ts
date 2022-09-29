@@ -56,27 +56,13 @@ export class UserFollowsController {
     })
     async followingUser(@Req() req): Promise<HttpStatusResult> {
         const followingUserId = req.params.userId
-        const followingUser = await this.userService.findById(followingUserId)
-        if (!followingUser) throw new UserNotFoundException()
-
         const { userId } = req.user
-        const followerUser = await this.userService.findById(userId)
-        if (!followerUser) throw new UserNotFoundException()
 
         const followed = await this.userFollowsService.addFollowerForUser(
             followingUserId,
             userId,
         )
-
         if (!followed) throw new DatabaseUpdateFailException()
-
-        await this.userService.updateUser(followingUserId, {
-            number_of_follower: followingUser.number_of_follower + 1,
-        } as UpdateUserDto)
-
-        await this.userService.updateUser(userId, {
-            number_of_following: followerUser.number_of_following + 1,
-        } as UpdateUserDto)
 
         const responseData = {
             statusCode: HttpStatus.OK,
@@ -104,12 +90,8 @@ export class UserFollowsController {
     })
     async unFollowingUser(@Req() req): Promise<HttpStatusResult> {
         const followingUserId = req.params.userId
-        const followingUser = await this.userService.findById(followingUserId)
-        if (!followingUser) throw new UserNotFoundException()
 
         const { userId } = req.user
-        const followerUser = await this.userService.findById(userId)
-        if (!followerUser) throw new UserNotFoundException()
 
         const unFollowed = await this.userFollowsService.removeFollowerFromUser(
             followingUserId,
@@ -117,18 +99,6 @@ export class UserFollowsController {
         )
 
         if (!unFollowed) throw new DatabaseUpdateFailException()
-
-        let numberOfFollower = followingUser.number_of_follower - 1
-        if (numberOfFollower < 0) numberOfFollower = 0
-        await this.userService.updateUser(followingUserId, {
-            number_of_follower: numberOfFollower,
-        } as UpdateUserDto)
-
-        let numberOfFollowing = followerUser.number_of_following - 1
-        if (numberOfFollowing < 0) numberOfFollowing = 0
-        await this.userService.updateUser(userId, {
-            number_of_following: followerUser.number_of_following - 1,
-        } as UpdateUserDto)
 
         const responseData = {
             statusCode: HttpStatus.OK,
