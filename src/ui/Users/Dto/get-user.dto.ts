@@ -66,4 +66,7 @@ export class GetUserDto {
         type: CurrentFollowedUser,
     })
     current_user?: CurrentFollowedUser
+    @ApiProperty()
+    @IsString()
+    avatar?: string
 }

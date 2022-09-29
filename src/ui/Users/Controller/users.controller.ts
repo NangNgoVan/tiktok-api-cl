@@ -119,9 +119,10 @@ export class UsersController {
         getUserDto.gender = user.gender
         getUserDto.number_of_follower = user.number_of_follower
         getUserDto.number_of_following = user.number_of_following
-        getUserDto.full_name = getUserDto.full_name
+        getUserDto.full_name = user.full_name
         getUserDto.nick_name = user.nick_name
         getUserDto.email = user.email
+        getUserDto.avatar = user.avatar
         getUserDto.current_user = {
             is_followed: followed,
         }
