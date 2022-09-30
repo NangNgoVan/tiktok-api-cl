@@ -2,11 +2,9 @@ import { ApiProperty } from '@nestjs/swagger'
 import { UserReactionType } from 'src/shared/Types/types'
 
 export class CreateFeedReactionDto {
-    feed_id: string
-
     @ApiProperty({
         enum: UserReactionType,
         example: UserReactionType.HEART,
     })
-    type: UserReactionType
+    type: string
 }

@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { IsBoolean, IsString } from 'class-validator'
 import { FeedReaction } from 'src/shared/Schemas/feed-reaction.schema'
 
-export class PaginateFeedCommentResultsDto {
+export class PaginateFeedReactionResultsDto {
     @ApiProperty({
         type: [FeedReaction],
     })
