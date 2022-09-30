@@ -30,7 +30,7 @@ export class GetUserDto {
     email?: string
     @ApiProperty()
     @IsNumber()
-    number_of_post?: number
+    number_of_feed?: number
     @IsNumber()
     @ApiProperty()
     number_of_follower?: number
