@@ -62,12 +62,12 @@ export class User {
     @ApiProperty()
     number_of_following: number
 
-    //number_of_post
+    //number_of_feed
     @Prop({
         default: 0,
     })
     @ApiProperty()
-    number_of_post: number
+    number_of_feed: number
 
     //birth_day
     @Prop({
