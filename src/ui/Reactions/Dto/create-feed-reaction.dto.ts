@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString } from 'class-validator'
 import { UserReactionType } from 'src/shared/Types/types'
 
 export class CreateFeedReactionDto {
@@ -7,12 +6,7 @@ export class CreateFeedReactionDto {
 
     @ApiProperty({
         enum: UserReactionType,
-        isArray: true,
-        example: [
-            UserReactionType.HEART,
-            UserReactionType.LAUGH,
-            UserReactionType.LIKE,
-        ],
+        example: UserReactionType.HEART,
     })
     type: UserReactionType
 }
