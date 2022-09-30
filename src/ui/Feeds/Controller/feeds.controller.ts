@@ -131,7 +131,7 @@ export class FeedsController {
             'hashtags',
             'created_by',
             'primary_image_index',
-            'allow_comment',
+            'allowed_comment',
         ])
         dto.hashtags = this.utilsService.splitHashtagFromString(dto.content)
 
@@ -200,7 +200,8 @@ export class FeedsController {
     })
     async getFeedDetail(@Req() req): Promise<any> {
         const feedId = req.params.id
-        const feed = await this.feedsService.getFeedDetail(feedId)
+        const { userId } = req.user
+        const feed = await this.feedsService.getFeedDetail(userId, feedId)
         if (!feed) throw new NotFoundException()
         return feed
     }

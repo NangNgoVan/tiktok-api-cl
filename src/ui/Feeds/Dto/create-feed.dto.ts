@@ -37,5 +37,5 @@ export class CreateFeedDto {
 
     @IsBoolean()
     @ApiProperty()
-    allow_comment: boolean
+    allowed_comment: boolean
 }

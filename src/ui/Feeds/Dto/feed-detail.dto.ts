@@ -1,6 +1,6 @@
 import { Prop } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsEnum, IsNumber, IsObject } from 'class-validator'
+import { IsArray, IsEnum, IsNumber, IsObject, IsString } from 'class-validator'
 import { Feed } from 'src/shared/Schemas/feed.schema'
 import { FeedType } from 'src/shared/Types/types'
 import { GetFeedResourceDto } from 'src/ui/Resources/Dto/get-feed-resource.dto'
@@ -8,6 +8,10 @@ import { CreatedUserDto } from '../../../shared/Dto/created-user.dto'
 import { FeedCurrentUserDto } from './feed-current-user.dto'
 
 export class FeedDetailDto {
+    @ApiProperty()
+    @IsString()
+    id: string
+
     @Prop()
     @ApiProperty()
     @IsEnum({
@@ -28,6 +32,10 @@ export class FeedDetailDto {
         default: 0,
     })
     number_of_reaction: number
+
+    @ApiProperty()
+    @IsNumber()
+    number_of_report: number
 
     @ApiProperty()
     @IsNumber()
@@ -69,4 +77,13 @@ export class FeedDetailDto {
     created_user: CreatedUserDto
 
     primary_image_index?: number
+
+    @ApiProperty()
+    @IsString()
+    allowed_comment: boolean
+
+    @ApiProperty({
+        type: [GetFeedResourceDto],
+    })
+    resource_details: GetFeedResourceDto[]
 }

@@ -3,6 +3,7 @@ import {
     IsAlpha,
     IsArray,
     IsBoolean,
+    IsEmail,
     IsNumber,
     IsString,
     Matches,
@@ -24,9 +25,7 @@ export class GetUserDto {
         required: true,
         example: 'updated@demo.com',
     })
-    @Matches(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, {
-        message: 'Email must be a type of email',
-    })
+    @IsEmail()
     email?: string
     @ApiProperty()
     @IsNumber()
