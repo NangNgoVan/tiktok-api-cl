@@ -1,9 +1,13 @@
-import { Injectable } from '@nestjs/common'
+import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { DatabaseUpdateFailException } from 'src/shared/Exceptions/http.exceptions'
 import { Feed, FeedDocument } from 'src/shared/Schemas/feed.schema'
-import { FeedType, UserReactionType } from 'src/shared/Types/types'
+import {
+    FeedFilterType,
+    FeedType,
+    UserReactionType,
+} from 'src/shared/Types/types'
 import { AddFeedResourceDto } from '../../Resources/Dto/add-feed-resource.dto'
 import { CreateFeedDto } from '../Dto/create-feed.dto'
 import { FeedDetailDto } from '../Dto/feed-detail.dto'
@@ -16,6 +20,7 @@ import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
 import { FeedResourcesService } from 'src/ui/Resources/Service/resources.service'
 import { FeedReactionsService } from 'src/ui/Reactions/Service/feed-reaction.service'
+import { BookmarksService } from 'src/ui/Bookmarks/Service/book-marks.service'
 
 @Injectable()
 export class FeedsService {
@@ -28,6 +33,7 @@ export class FeedsService {
         private readonly userfollowsService: UserFollowsService,
         private readonly feedResourcesService: FeedResourcesService,
         private readonly feedReactionService: FeedReactionsService,
+        private readonly bookmarkService: BookmarksService,
     ) {}
 
     async createFeed(
@@ -55,7 +61,7 @@ export class FeedsService {
     }
 
     async getNewestFeed(
-        userId: string,
+        currentUserId: string,
         next?: string,
         rowsPerpage?: number,
     ): Promise<PaginateFeedResultsDto> {
@@ -91,7 +97,7 @@ export class FeedsService {
                         current_user: {
                             is_followed:
                                 await this.userfollowsService.checkFollowRelationshipBetween(
-                                    userId,
+                                    currentUserId,
                                     feed.created_by,
                                 ),
                         },
@@ -99,8 +105,8 @@ export class FeedsService {
                     }
                     const userReaction =
                         await this.feedReactionService.getUserReactionWithFeed(
-                            userId,
-                            feed.id,
+                            currentUserId,
+                            feed._id,
                         )
                     feedDetailDto.current_user = {
                         is_reacted: userReaction ? true : false,
@@ -139,7 +145,7 @@ export class FeedsService {
     }
 
     async getFeedDetail(
-        userId: string,
+        currentUserId: string,
         feedId: string,
     ): Promise<FeedDetailDto> {
         const feed = await this.feedModel.findById(feedId)
@@ -154,7 +160,7 @@ export class FeedsService {
             current_user: {
                 is_followed:
                     await this.userfollowsService.checkFollowRelationshipBetween(
-                        userId,
+                        currentUserId,
                         feed.created_by,
                     ),
             },
@@ -163,8 +169,8 @@ export class FeedsService {
 
         const userReaction =
             await this.feedReactionService.getUserReactionWithFeed(
-                userId,
-                feed.id,
+                currentUserId,
+                feed._id,
             )
         feedDetailDto.current_user = {
             is_reacted: userReaction ? true : false,
@@ -194,30 +200,54 @@ export class FeedsService {
         return feedDetailDto
     }
 
-    async getFeedsPostedByUser(
-        userId: string,
+    async getFeedsByUser(
+        currentUserId: string,
+        userId: string, //created, bookmarked or reacted by userId
+        filterType: FeedFilterType, //filter by POSTED_BY, REACTED or BOOKMARKED
         next?: string,
         rowsPerpage?: number,
     ): Promise<PaginateFeedResultsDto> {
         try {
             if (!rowsPerpage) rowsPerpage = 5
             let feeds = undefined
-            if (!next) {
-                feeds = await this.feedModel.paginate({
-                    query: {
-                        created_by: userId,
-                    },
-                    limit: rowsPerpage,
-                })
-            } else {
-                feeds = await this.feedModel.paginate({
-                    query: {
-                        created_by: userId,
-                    },
-                    limit: rowsPerpage,
-                    next: next,
-                })
+            const paginateParams = {
+                limit: rowsPerpage,
             }
+
+            if (next) paginateParams['next'] = next
+
+            if (filterType === FeedFilterType.POSTED_BY) {
+                paginateParams['query'] = {
+                    created_by: userId,
+                }
+            } else if (filterType === FeedFilterType.BOOKMARKED) {
+                let bookmarkedIds =
+                    await this.bookmarkService.getFeedsBookmarkedByUser(userId)
+
+                bookmarkedIds = bookmarkedIds.map(
+                    (bookmarkData) => bookmarkData.feed_id,
+                )
+
+                paginateParams['query'] = {
+                    //Cannot query
+                    //_id: { $in: bookmarkedIds },
+                }
+            } else if (filterType === FeedFilterType.REACTED) {
+                let reactedIds =
+                    await this.feedReactionService.getFeedsReactedByUser(userId)
+                reactedIds = reactedIds.map(
+                    (reactionData) => reactionData.feed_id,
+                )
+
+                paginateParams['query'] = {
+                    //Cannot query
+                    //_id: { $in: reactedIds },
+                }
+            }
+
+            feeds = await this.feedModel.paginate(paginateParams)
+
+            if (!feeds) throw new HttpException('error', HttpStatus.BAD_REQUEST)
 
             const feedsWithResourceDetail = await Promise.all(
                 feeds.results.map(async (feed) => {
@@ -243,8 +273,8 @@ export class FeedsService {
 
                     const userReaction =
                         await this.feedReactionService.getUserReactionWithFeed(
-                            userId,
-                            feed.id,
+                            currentUserId,
+                            feed._id,
                         )
                     feedDetailDto.current_user = {
                         is_reacted: userReaction ? true : false,

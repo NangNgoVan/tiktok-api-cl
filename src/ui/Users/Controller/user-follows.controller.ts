@@ -127,6 +127,7 @@ export class UserFollowsController {
         if (req.query) next = req.query['next']
         return await this.userFollowsService.getAllFollowingsForUser(
             userId,
+            userId,
             next,
         )
     }
@@ -151,6 +152,7 @@ export class UserFollowsController {
         if (req.query) next = req.query['next']
         return await this.userFollowsService.getAllFollowersForUser(
             userId,
+            userId,
             next,
         )
     }
@@ -171,9 +173,11 @@ export class UserFollowsController {
     })
     async getFollowingsByUserId(@Req() req): Promise<PaginateUserFollowsDto> {
         const userId = req.params.userId
+        const currentUserId = req.user.userId
         let next = undefined
         if (req.query) next = req.query['next']
         return await this.userFollowsService.getAllFollowingsForUser(
+            currentUserId,
             userId,
             next,
         )
@@ -195,9 +199,11 @@ export class UserFollowsController {
     })
     async getFollowers(@Req() req): Promise<PaginateUserFollowsDto> {
         const userId = req.params.userId
+        const currentUserId = req.user.userId
         let next = undefined
         if (req.query) next = req.query['next']
         return await this.userFollowsService.getAllFollowersForUser(
+            currentUserId,
             userId,
             next,
         )
