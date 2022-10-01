@@ -98,24 +98,27 @@ export class FeedCommentService {
         let feedComments = undefined
         if (!next) {
             feedComments = await this.commentModel.paginate({
-                query: { reply_to: feedId, level: FeedCommentLevel.LEVEL_ONE },
+                query: { feed_id: feedId, level: FeedCommentLevel.LEVEL_ONE },
                 limit: rowsPerpage,
             })
         } else {
             feedComments = await this.commentModel.paginate({
-                query: { reply_to: feedId, level: FeedCommentLevel.LEVEL_ONE },
+                query: { feed_id: feedId, level: FeedCommentLevel.LEVEL_ONE },
                 limit: rowsPerpage,
                 next: next,
             })
         }
 
-        if (!feedComments) throw new CommentNotFoundException()
+        let listUserInfo = null
+        if (!_.isEmpty(feedComments.results)) {
+            listUserInfo = await this.userModel.find({
+                _id: _.uniq(_.map(feedComments.results, (it) => it.created_by)),
+            })
+        }
 
-        const listUserInfo = await this.userModel.find({
-            _id: _.uniq(_.map(feedComments, (it) => it.created_by)),
-        })
+        console.log(feedComments)
 
-        return feedComments.map((cmt) => {
+        feedComments.results = feedComments.results.map((cmt) => {
             const userInfo = listUserInfo.find((u) => cmt.created_by === u.id)
             return {
                 ..._.pick(cmt, [
@@ -129,6 +132,8 @@ export class FeedCommentService {
                 created_user: _.pick(userInfo, ['_id', 'full_name', 'avatar']),
             }
         })
+
+        return feedComments
     }
 
     async getCommentByFeedIdAndCommentId(
