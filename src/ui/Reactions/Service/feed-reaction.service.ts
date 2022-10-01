@@ -107,10 +107,6 @@ export class FeedReactionsService {
 
         if (!feed) throw new FeedNotFoundException()
 
-        if (feed.created_by !== currentUserId) {
-            throw new ForbidenException()
-        }
-
         return this.feedReactionModel.deleteOne({
             feed_id: feedId,
             created_by: currentUserId,
@@ -131,10 +127,6 @@ export class FeedReactionsService {
             { $inc: { number_of_reaction: -1 } },
         )
         if (!comment) throw new CommentNotFoundException()
-
-        if (comment.created_by !== currentUserId) {
-            throw new ForbidenException()
-        }
 
         return this.feedCommentReaction.delete({
             comment_id,
