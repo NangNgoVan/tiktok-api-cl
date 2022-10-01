@@ -16,6 +16,7 @@ import { FeedHashTagsService } from '../Hashtags/Service/feed-hashtags.service'
 import { HashTagService } from '../Hashtags/Service/hashtags.service'
 import { HashTagsModule } from '../Hashtags/hashtags.module'
 import { FollowsModule } from '../Follows/follows.module'
+import { ReactionsModule } from '../Reactions/reactions.module'
 
 @Module({
     imports: [
@@ -26,6 +27,7 @@ import { FollowsModule } from '../Follows/follows.module'
         forwardRef(() => UsersModule),
         HashTagsModule,
         FollowsModule,
+        ReactionsModule,
     ],
     controllers: [FeedsController],
     providers: [

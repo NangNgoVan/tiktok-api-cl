@@ -30,5 +30,6 @@ import { FeedReactionsService } from './Service/feed-reaction.service'
     ],
     controllers: [FeedReactionController],
     providers: [FeedReactionsService],
+    exports: [FeedReactionsService],
 })
 export class ReactionsModule {}

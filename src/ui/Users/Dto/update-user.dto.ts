@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import {
     IsArray,
     IsBoolean,
+    IsEmail,
     IsEnum,
     IsOptional,
     IsString,
@@ -23,9 +24,7 @@ export class UpdateUserDto {
         example: 'updated@demo.com',
         required: false,
     })
-    @Matches(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, {
-        message: 'Email must be a type of email',
-    })
+    @IsEmail()
     email?: string
 
     @IsString({})

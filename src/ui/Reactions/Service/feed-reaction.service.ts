@@ -22,6 +22,7 @@ import {
     FeedComment,
     FeedCommentDocument,
 } from 'src/shared/Schemas/feed-comment.schema'
+import { UserReactionType } from 'src/shared/Types/types'
 
 @Injectable()
 export class FeedReactionsService {
@@ -119,5 +120,22 @@ export class FeedReactionsService {
             comment_id,
             created_by: currentUserId,
         })
+    }
+
+    async getUserReactionWithFeed(
+        userId: string,
+        feedId: string,
+    ): Promise<UserReactionType> {
+        try {
+            const reactionData = await this.feedReactionModel.findOne({
+                feed_id: feedId,
+                created_by: userId,
+            })
+            console.log(reactionData, userId, feedId)
+            if (reactionData) return reactionData.type
+            return null
+        } catch {
+            return null
+        }
     }
 }
