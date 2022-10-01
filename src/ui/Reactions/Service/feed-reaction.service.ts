@@ -32,7 +32,7 @@ export class FeedReactionsService {
         private readonly feedReactionModel: MongoPaging<FeedReactionDocument>,
 
         @InjectModel(FeedReaction.name)
-        private readonly FeedCommentReaction: MongoPaging<FeedCommentReactionDocument>,
+        private readonly feedCommentReaction: MongoPaging<FeedCommentReactionDocument>,
 
         @InjectModel(Feed.name)
         private readonly feedModel: Model<FeedDocument>,
@@ -52,7 +52,10 @@ export class FeedReactionsService {
         )
         if (!feed) throw new FeedNotFoundException()
 
-        const reaction = await this.feedReactionModel.findOne({ created_by })
+        const reaction = await this.feedReactionModel.findOne({
+            created_by,
+            feed_id,
+        })
         if (reaction) throw new CreatedOnlyReactionException()
 
         return this.feedReactionModel.create({
@@ -74,10 +77,12 @@ export class FeedReactionsService {
         })
         if (!feed) throw new FeedNotFoundException()
 
-        const reaction = await this.FeedCommentReaction.findOne({
+        const reaction = await this.feedCommentReaction.findOne({
             created_by,
             comment_id,
+            feed_id,
         })
+
         if (reaction) throw new CreatedOnlyReactionException()
 
         const comment = await this.commentModel.findOneAndUpdate(
@@ -86,7 +91,7 @@ export class FeedReactionsService {
         )
         if (!comment) throw new CommentNotFoundException()
 
-        return this.FeedCommentReaction.create({
+        return this.feedCommentReaction.create({
             feed_id,
             created_by,
             comment_id,
@@ -99,6 +104,7 @@ export class FeedReactionsService {
             { _id: feedId },
             { $inc: { number_of_reaction: -1 } },
         )
+
         if (!feed) throw new FeedNotFoundException()
 
         if (feed.created_by !== currentUserId) {
@@ -117,6 +123,7 @@ export class FeedReactionsService {
         currentUserId: string,
     ) {
         const feed = await this.feedModel.findById(feed_id)
+
         if (!feed) throw new FeedNotFoundException()
 
         const comment = await this.commentModel.findOneAndUpdate(
@@ -129,7 +136,7 @@ export class FeedReactionsService {
             throw new ForbidenException()
         }
 
-        return this.FeedCommentReaction.delete({
+        return this.feedCommentReaction.delete({
             comment_id,
             created_by: currentUserId,
         })
