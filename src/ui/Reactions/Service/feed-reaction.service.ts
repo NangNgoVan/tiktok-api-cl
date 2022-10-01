@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import {
     CommentNotFoundException,
+    CreatedOnlyReactionException,
     FeedNotFoundException,
     ForbidenException,
 } from 'src/shared/Exceptions/http.exceptions'
@@ -46,10 +47,13 @@ export class FeedReactionsService {
         createReaction: CreateFeedReactionDto,
     ) {
         const feed = await this.feedModel.findOneAndUpdate(
-            { _id: feed_id },
+            { _id: feed_id, allow_comment: true },
             { $inc: { number_of_reaction: 1 } },
         )
         if (!feed) throw new FeedNotFoundException()
+
+        const reaction = await this.feedReactionModel.findOne({ created_by })
+        if (reaction) throw new CreatedOnlyReactionException()
 
         return this.feedReactionModel.create({
             feed_id,
@@ -64,7 +68,10 @@ export class FeedReactionsService {
         created_by: string,
         createReaction: CreateFeedReactionDto,
     ) {
-        const feed = await this.feedModel.findById(feed_id)
+        const feed = await this.feedModel.findOne({
+            feed_id,
+            allow_comment: true,
+        })
         if (!feed) throw new FeedNotFoundException()
 
         const comment = await this.commentModel.findOneAndUpdate(
@@ -72,6 +79,9 @@ export class FeedReactionsService {
             { $inc: { number_of_reaction: 1 } },
         )
         if (!comment) throw new CommentNotFoundException()
+
+        const reaction = await this.feedReactionModel.findOne({ created_by })
+        if (reaction) throw new CreatedOnlyReactionException()
 
         return this.FeedCommentReaction.create({
             feed_id,

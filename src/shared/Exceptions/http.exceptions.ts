@@ -36,6 +36,12 @@ export class CommentNotFoundException extends HttpException {
     }
 }
 
+export class CreatedOnlyReactionException extends HttpException {
+    constructor() {
+        super('User has created only reaction!', HttpStatus.BAD_REQUEST)
+    }
+}
+
 export class ForbidenException extends HttpException {
     constructor() {
         super('Forbidden', HttpStatus.FORBIDDEN)
