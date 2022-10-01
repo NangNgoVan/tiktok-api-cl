@@ -87,7 +87,7 @@ export class Feed {
     @Prop({
         default: true,
     })
-    allow_comment: boolean
+    allowed_comment: boolean
 }
 
 export const FeedSchema = SchemaFactory.createForClass(Feed)

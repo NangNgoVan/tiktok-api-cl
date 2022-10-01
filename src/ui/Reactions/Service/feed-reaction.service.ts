@@ -73,7 +73,7 @@ export class FeedReactionsService {
     ) {
         const feed = await this.feedModel.findOne({
             feed_id,
-            allow_comment: true,
+            allowed_comment: true,
         })
         if (!feed) throw new FeedNotFoundException()
 
@@ -134,6 +134,16 @@ export class FeedReactionsService {
         })
     }
 
+    async getFeedsReactedByUser(userId: string) {
+        try {
+            return await this.feedReactionModel.find({
+                created_by: userId,
+            })
+        } catch {
+            return []
+        }
+    }
+
     async getUserReactionWithFeed(
         userId: string,
         feedId: string,
@@ -143,7 +153,6 @@ export class FeedReactionsService {
                 feed_id: feedId,
                 created_by: userId,
             })
-            console.log(reactionData, userId, feedId)
             if (reactionData) return reactionData.type
             return null
         } catch {

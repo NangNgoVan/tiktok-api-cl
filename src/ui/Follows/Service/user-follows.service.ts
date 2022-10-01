@@ -60,13 +60,16 @@ export class UserFollowsService {
 
         if (!unfollowedData) return null
 
-        followingUser.$inc('number_of_follower', -1).save()
-        followerUser.$inc('number_of_following', -1).save()
+        if (followingUser.number_of_follower > 0)
+            followingUser.$inc('number_of_follower', -1).save()
+        if (followerUser.number_of_following > 0)
+            followerUser.$inc('number_of_following', -1).save()
 
         return unfollowedData
     }
 
     async getAllFollowersForUser(
+        currentUserId: string,
         userId: string,
         next?: string,
         rowsPerpage?: number,
@@ -96,7 +99,24 @@ export class UserFollowsService {
                 ['_id', 'nick_name', 'full_name', 'avatar'],
             )
 
-            followers.results = followerDetails
+            const followerDetailsWithCurrentUserData = await Promise.all(
+                followerDetails.map(async (data) => {
+                    const dto = new GetUserFollowDto()
+                    dto._id = data._id
+                    dto.nick_name = data.nick_name
+                    dto.full_name = data.full_name
+                    dto.avatar = data.avatar
+                    dto.current_user = {
+                        is_followed: await this.checkFollowRelationshipBetween(
+                            currentUserId,
+                            data._id,
+                        ),
+                    }
+                    return dto
+                }),
+            )
+
+            followers.results = followerDetailsWithCurrentUserData
 
             return followers
         } catch {
@@ -105,6 +125,7 @@ export class UserFollowsService {
     }
 
     async getAllFollowingsForUser(
+        currentUserId: string,
         userId: string,
         next?: string,
         rowsPerpage?: number,
@@ -128,12 +149,30 @@ export class UserFollowsService {
             const followingIds = followings.results.map(
                 (following) => following.user_id,
             )
+
             const followingDetails = await this.userModel.find(
                 { _id: { $in: followingIds } },
                 ['_id', 'nick_name', 'full_name', 'avatar'],
             )
 
-            followings.results = followingDetails
+            const followingDetailsWithCurrentUserData = await Promise.all(
+                followingDetails.map(async (data) => {
+                    const dto = new GetUserFollowDto()
+                    dto._id = data._id
+                    dto.nick_name = data.nick_name
+                    dto.full_name = data.full_name
+                    dto.avatar = data.avatar
+                    dto.current_user = {
+                        is_followed: await this.checkFollowRelationshipBetween(
+                            currentUserId,
+                            data._id,
+                        ),
+                    }
+                    return dto
+                }),
+            )
+
+            followings.results = followingDetailsWithCurrentUserData
 
             return followings
         } catch {

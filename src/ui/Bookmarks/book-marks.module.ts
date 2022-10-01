@@ -19,4 +19,4 @@ import { BookmarksService } from './Service/book-marks.service'
     providers: [BookmarksService],
     exports: [BookmarksService],
 })
-export class ReactionsModule {}
+export class BookmarksModule {}

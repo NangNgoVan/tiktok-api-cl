@@ -17,6 +17,7 @@ import { HashTagService } from '../Hashtags/Service/hashtags.service'
 import { HashTagsModule } from '../Hashtags/hashtags.module'
 import { FollowsModule } from '../Follows/follows.module'
 import { ReactionsModule } from '../Reactions/reactions.module'
+import { BookmarksModule } from '../Bookmarks/book-marks.module'
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { ReactionsModule } from '../Reactions/reactions.module'
         HashTagsModule,
         FollowsModule,
         ReactionsModule,
+        BookmarksModule,
     ],
     controllers: [FeedsController],
     providers: [

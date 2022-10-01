@@ -50,4 +50,14 @@ export class BookmarksService {
             created_by: currentUserId,
         })
     }
+
+    async getFeedsBookmarkedByUser(userId: string): Promise<any> {
+        try {
+            return await this.feedBookmarkModel.find({
+                created_by: userId,
+            })
+        } catch {
+            return []
+        }
+    }
 }

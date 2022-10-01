@@ -30,3 +30,9 @@ export enum FeedCommentLevel {
     LEVEL_ONE = 1,
     LEVEL_TWO = 2,
 }
+
+export enum FeedFilterType {
+    POSTED_BY = 'posted_by',
+    BOOKMARKED = 'bookmarked',
+    REACTED = 'reacted',
+}
