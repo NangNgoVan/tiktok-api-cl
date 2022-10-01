@@ -1,4 +1,4 @@
-### In this issue we are going to define our data types which will follow some conditions.
+### In this issue we a going to define our data types which will follow some conditions.
 - Data type should be flattened (avoid create a data types which allow to create a nested data)
 - Easy to scale (it's allow 10, 100, 1000, 10 000, even 1000 000 end user interact with data without performance issue)
 
@@ -14,6 +14,9 @@
 - number_of_view (number, default: 0)
 - number_of_reaction (number, default: 0)
 - number_of_bookmark (number, default: 0)
+- number_of_comment (number, default: 0)
+- number_of_report (number, default: 0)
+- allowed_comment (boolean, default: true)
 - created_by (string)
 - content (string, `max 255`)
 - ~~url (string[])~~ // deprecated using resource_ids instead
@@ -32,11 +35,11 @@ _the reason why we should split url  property from feed collection into this col
 - created_by (string)
 - updated_by (string)
 
-### Feed hashtag
+### Feed hash tag
 *Actually `hashtags` property in `feed` collection is enough but we are going to duplicate hashtag data to this collection for multi reason*
 - id (string)
 - feed_id (string)
-- hashtag (string, example: 'blacklivematter')
+- tag (string, example: 'blacklivematter')
 - created_by (string)
 - created_at (string)
 
@@ -79,6 +82,7 @@ _the reason why we should split url  property from feed collection into this col
 - content (string, `max 255`)
 - number_of_reaction (number)
 - number_of_reply (number)
+- number_of_comment (number)
 
 ### Feed reaction (user reaction to a feed)
 *One user have one reaction on a feed*
@@ -109,6 +113,7 @@ _the reason why we should split url  property from feed collection into this col
 - gender (must be one of `male`, `female`)
 - number_of_follower (number, `default to: 0`)
 - number_of_following (number, `default to: 0`)
+- number_of_feed (number, `default to: 0`)
 - birth_day (string)
 - full_name (string, `max 50`)
 - nick_name (string, `max 50`)
@@ -201,14 +206,14 @@ example:
 ```
 
 Note: structure of the permission is `subject:action`
-- `subject` which is an objective that we are going to do some `action`
+- `subject` which is an objective that we are going to to some `action`
 - `action` is what we do on `subject`
 - `*` mean all
   1. `*:read` mean this role can read all subject
   2. `feeds:*` mean this role can do every thing on subject `feeds`
   3. `comments:read` mean this role can only do action `read` on subject `comment`
 
-Reference (we will can using node acl to implement this):
+Reference (we will using node acl to implement this):
 https://github.com/OptimalBits/node_acl
 
 ### Action
