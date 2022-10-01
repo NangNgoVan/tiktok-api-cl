@@ -22,8 +22,10 @@ export class FeedCommentService {
     constructor(
         @InjectModel(FeedComment.name)
         private commentModel: MongoPaging<FeedCommentDocument>,
+
         @InjectModel(Feed.name)
         private feedModel: Model<FeedDocument>,
+
         @InjectModel(User.name)
         private userModel: Model<UserDocument>,
     ) {}

@@ -74,14 +74,17 @@ export class FeedReactionsService {
         })
         if (!feed) throw new FeedNotFoundException()
 
+        const reaction = await this.FeedCommentReaction.findOne({
+            created_by,
+            comment_id,
+        })
+        if (reaction) throw new CreatedOnlyReactionException()
+
         const comment = await this.commentModel.findOneAndUpdate(
             { _id: comment_id },
             { $inc: { number_of_reaction: 1 } },
         )
         if (!comment) throw new CommentNotFoundException()
-
-        const reaction = await this.feedReactionModel.findOne({ created_by })
-        if (reaction) throw new CreatedOnlyReactionException()
 
         return this.FeedCommentReaction.create({
             feed_id,
