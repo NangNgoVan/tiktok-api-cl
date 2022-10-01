@@ -107,7 +107,7 @@ export class FeedsService {
                         is_bookmarked: false,
                         reaction_type: userReaction,
                     }
-                    feedDetailDto.id = feed.id
+                    feedDetailDto.id = feed._id
                     feedDetailDto.allowed_comment = feed.allowed_comment
                     feedDetailDto.number_of_view = feed.number_of_view
                     feedDetailDto.number_of_reaction = feed.number_of_reaction
@@ -172,7 +172,7 @@ export class FeedsService {
             reaction_type: userReaction,
         }
 
-        feedDetailDto.id = feed.id
+        feedDetailDto.id = feed._id
         feedDetailDto.allowed_comment = feed.allowed_comment
         feedDetailDto.number_of_view = feed.number_of_view
         feedDetailDto.number_of_reaction = feed.number_of_reaction
@@ -252,7 +252,7 @@ export class FeedsService {
                         reaction_type: userReaction,
                     }
 
-                    feedDetailDto.id = feed.id
+                    feedDetailDto.id = feed._id
                     feedDetailDto.allowed_comment = feed.allowed_comment
                     feedDetailDto.number_of_view = feed.number_of_view
                     feedDetailDto.number_of_reaction = feed.number_of_reaction
