@@ -99,3 +99,19 @@ jobs:
           rm -rf /tmp/.buildx-cache-builder
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
           mv /tmp/.buildx-cache-builder-new /tmp/.buildx-cache-builder
+
+      - name: Send telegram message after deploy successfully
+        if: github.actor != 'anhdiepmmk'
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ${{ github.actor }} released:
+            ${{ github.event.head_commit.message }}
+            
+            Branch: ${{ github.ref_name }}
+            
+            Repository: ${{ github.repository }}
+            
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
