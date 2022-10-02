@@ -72,7 +72,7 @@ export class BookmarksService {
     ): Promise<FeedBookmarkDocument | undefined> {
         const feedBookmark = await this.feedBookmarkModel.findOne({
             feed_id: feedId,
-            user_id: userId,
+            created_by: userId,
         })
 
         return feedBookmark
