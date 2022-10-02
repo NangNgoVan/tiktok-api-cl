@@ -169,14 +169,9 @@ export class FeedCommentService {
         let listUserInfo = null
         if (!_.isEmpty(feedComments.results)) {
             listUserInfo = await this.userModel.find({
-                _id: _.chain(feedComments)
-                    .map('created_by')
-                    .uniq()
-                    .compact()
-                    .value(),
+                _id: _.uniq(_.map(feedComments.results, (it) => it.created_by)),
             })
         }
-
         feedComments.results = feedComments.results.map((cmt) => {
             const userInfo = listUserInfo.find((u) => cmt.created_by === u.id)
             return {
@@ -190,7 +185,12 @@ export class FeedCommentService {
                     'created_at',
                     'updated_at',
                 ]),
-                created_user: _.pick(userInfo, ['_id', 'full_name', 'avatar']),
+                created_user: _.pick(userInfo, [
+                    '_id',
+                    'full_name',
+                    'nick_name',
+                    'avatar',
+                ]),
             }
         })
 

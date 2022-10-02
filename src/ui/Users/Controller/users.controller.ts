@@ -119,6 +119,7 @@ export class UsersController {
         getUserDto.gender = user.gender
         getUserDto.number_of_follower = user.number_of_follower
         getUserDto.number_of_following = user.number_of_following
+        getUserDto.number_of_feed = user.number_of_feed
         getUserDto.full_name = user.full_name
         getUserDto.nick_name = user.nick_name
         getUserDto.email = user.email
