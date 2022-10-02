@@ -8,13 +8,14 @@ import {
 import { NextFunction } from 'express'
 import { RefreshTokenInvalidException } from '../Exceptions/http.exceptions'
 import { AuthService } from '../Services/auth.service'
+import { BlacklistService } from '../Services/blacklist-redis.service'
 import { configService } from '../Services/config.service'
 import { RedisService } from '../Services/redis.service'
 
 @Injectable()
 export class BlacklistMiddleware implements NestMiddleware {
     constructor(
-        private readonly redisService: RedisService,
+        private readonly blackListService: BlacklistService,
         private readonly authService: AuthService,
     ) {}
 
@@ -27,7 +28,11 @@ export class BlacklistMiddleware implements NestMiddleware {
             configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
         )
 
-        if (!refreshToken /**or refresh token not in the blacklist */) {
+        if (!refreshToken) {
+            throw new UnauthorizedException()
+        }
+
+        if (await this.blackListService.getJwtToken(refreshToken)) {
             throw new UnauthorizedException()
         }
 
