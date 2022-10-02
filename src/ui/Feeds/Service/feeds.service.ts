@@ -130,6 +130,34 @@ export class FeedsService {
         return { ...feeds, results: transformedFeeds }
     }
 
+    async getFeedsBySongId(
+        songId: string,
+        currentUserId: string,
+        nextCursor?: string,
+        perPage = 6,
+    ) {
+        const options = {
+            limit: perPage,
+            paginatedField: 'created_at',
+            sortAscending: false,
+            next: nextCursor,
+            query: {
+                song_id: songId,
+            },
+        }
+
+        const feeds = await this.feedModel.paginate(options)
+
+        const feedIds: string[] = _.map(
+            _.get(feeds, 'results', []),
+            (feed) => feed._id,
+        )
+
+        const transformedFeeds = await this.buildFeeds(feedIds, currentUserId)
+
+        return { ...feeds, results: transformedFeeds }
+    }
+
     async getBookmarkedFeeds(
         bookmarkedBy: string,
         currentUserId: string,
