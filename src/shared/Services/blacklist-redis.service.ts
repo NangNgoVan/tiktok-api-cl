@@ -1,10 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { configService } from './config.service'
 import { RedisService } from './redis.service'
 
 @Injectable()
 export class BlacklistService {
+    private readonly logger: Logger = new Logger(BlacklistService.name)
     private prefixKey = 'blacklist-key-'
     constructor(
         @Inject(RedisService)
@@ -22,7 +23,8 @@ export class BlacklistService {
                 await this.redisService.set(key, value, exp)
                 return true
             }
-        } catch {
+        } catch (e) {
+            this.logger.log({ error: e })
             return false
         }
     }
@@ -33,7 +35,8 @@ export class BlacklistService {
             const token = await this.redisService.get(key)
             if (token) return true
             return false
-        } catch {
+        } catch (e) {
+            this.logger.log({ error: e })
             return false
         }
     }
