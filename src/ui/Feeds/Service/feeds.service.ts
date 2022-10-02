@@ -113,7 +113,9 @@ export class FeedsService {
             paginatedField: 'created_at',
             sortAscending: false,
             next: nextCursor,
-            created_by: createdBy,
+            query: {
+                created_by: createdBy,
+            },
         }
 
         const feeds = await this.feedModel.paginate(options)
@@ -139,7 +141,9 @@ export class FeedsService {
             paginatedField: 'created_at',
             sortAscending: false,
             next: nextCursor,
-            created_by: bookmarkedBy,
+            query: {
+                created_by: bookmarkedBy,
+            },
         }
 
         const bookmarkedFeeds = await this.feedBookmarkModel.paginate(options)
@@ -165,7 +169,9 @@ export class FeedsService {
             paginatedField: 'created_at',
             sortAscending: false,
             next: nextCursor,
-            created_by: reactedBy,
+            query: {
+                created_by: reactedBy,
+            },
         }
 
         const reactedFeeds = await this.feedReactionModel.paginate(options)
