@@ -16,6 +16,7 @@ import { FeedCommentLevel } from 'src/shared/Types/types'
 import { CreateFeedCommentDto } from '../Dto/create-feed-comment.dto'
 import { MongoPaging } from 'mongo-cursor-pagination'
 import _ from 'lodash'
+import { FeedReactionsService } from 'src/ui/Reactions/Service/feed-reaction.service'
 
 @Injectable()
 export class FeedCommentService {
@@ -28,6 +29,8 @@ export class FeedCommentService {
 
         @InjectModel(User.name)
         private userModel: Model<UserDocument>,
+
+        private readonly feedReactionService: FeedReactionsService,
     ) {}
 
     async createFeedComment(payload: CreateFeedCommentDto) {
@@ -88,6 +91,7 @@ export class FeedCommentService {
 
     async getCommentByFeedId(
         feedId: string,
+        currentUserId: string,
         next?: string,
         rowsPerpage?: number,
     ) {
@@ -116,22 +120,41 @@ export class FeedCommentService {
             })
         }
 
-        feedComments.results = feedComments.results.map((cmt) => {
-            const userInfo = listUserInfo.find((u) => cmt.created_by === u.id)
-            return {
-                ..._.pick(cmt, [
-                    '_id',
-                    'feed_id',
-                    'created_by',
-                    'content',
-                    'number_of_reaction',
-                    'number_of_reply',
-                    'created_at',
-                    'updated_at',
-                ]),
-                created_user: _.pick(userInfo, ['_id', 'full_name', 'avatar']),
-            }
-        })
+        feedComments.results = await Promise.all(
+            feedComments.results.map(async (cmt) => {
+                const userInfo = listUserInfo.find(
+                    (u) => cmt.created_by === u.id,
+                )
+                const commentReaction =
+                    await this.feedReactionService.getCommentReaction(
+                        feedId,
+                        cmt.comment_id,
+                        currentUserId,
+                    )
+                return {
+                    ..._.pick(cmt, [
+                        '_id',
+                        'feed_id',
+                        'created_by',
+                        'content',
+                        'number_of_reaction',
+                        'number_of_reply',
+                        'created_at',
+                        'updated_at',
+                        'level',
+                    ]),
+                    current_user: {
+                        is_reacted: !_.isEmpty(commentReaction) ? true : false,
+                        reaction_type: _.get(commentReaction, 'type') || '',
+                    },
+                    created_user: _.pick(userInfo, [
+                        '_id',
+                        'full_name',
+                        'avatar',
+                    ]),
+                }
+            }),
+        )
 
         return feedComments
     }
@@ -139,6 +162,7 @@ export class FeedCommentService {
     async getCommentByFeedIdAndCommentId(
         feedId: string,
         commentId: string,
+        currentUserId: string,
         next?: string,
         rowsPerpage?: number,
     ) {
@@ -172,27 +196,42 @@ export class FeedCommentService {
                 _id: _.uniq(_.map(feedComments.results, (it) => it.created_by)),
             })
         }
-        feedComments.results = feedComments.results.map((cmt) => {
-            const userInfo = listUserInfo.find((u) => cmt.created_by === u.id)
-            return {
-                ..._.pick(cmt, [
-                    '_id',
-                    'feed_id',
-                    'created_by',
-                    'content',
-                    'number_of_reaction',
-                    'number_of_reply',
-                    'created_at',
-                    'updated_at',
-                ]),
-                created_user: _.pick(userInfo, [
-                    '_id',
-                    'full_name',
-                    'nick_name',
-                    'avatar',
-                ]),
-            }
-        })
+
+        feedComments.results = await Promise.all(
+            feedComments.results.map(async (cmt) => {
+                const userInfo = listUserInfo.find(
+                    (u) => cmt.created_by === u.id,
+                )
+                const commentReaction =
+                    await this.feedReactionService.getCommentReaction(
+                        feedId,
+                        cmt.comment_id,
+                        currentUserId,
+                    )
+                return {
+                    ..._.pick(cmt, [
+                        '_id',
+                        'feed_id',
+                        'created_by',
+                        'content',
+                        'number_of_reaction',
+                        'number_of_reply',
+                        'created_at',
+                        'updated_at',
+                    ]),
+                    current_user: {
+                        is_reacted: _.isEmpty(commentReaction) ? false : true,
+                        reaction_type: _.get(commentReaction, 'type') || '',
+                    },
+                    created_user: _.pick(userInfo, [
+                        '_id',
+                        'full_name',
+                        'nick_name',
+                        'avatar',
+                    ]),
+                }
+            }),
+        )
 
         return feedComments
     }

@@ -123,7 +123,12 @@ export class FeedCommentsController {
         let next = undefined
         if (req.query) next = req.query['next']
         const feedId = req.params.id
-        return this.feedCommentService.getCommentByFeedId(feedId, next)
+        const currentUserId = req.user.userId
+        return this.feedCommentService.getCommentByFeedId(
+            feedId,
+            currentUserId,
+            next,
+        )
     }
 
     @Get('/:id/comments/:commentId/replies')
@@ -145,9 +150,11 @@ export class FeedCommentsController {
 
         const feedId = req.params.id
         const commentId = req.params.commentId
+        const currentUserId = req.user.userId
         return this.feedCommentService.getCommentByFeedIdAndCommentId(
             feedId,
             commentId,
+            currentUserId,
             next,
         )
     }

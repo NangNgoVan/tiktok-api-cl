@@ -142,6 +142,18 @@ export class FeedReactionsService {
         })
     }
 
+    async getCommentReaction(
+        feedId: string,
+        commentId: string,
+        userId: string,
+    ): Promise<FeedReactionDocument | undefined> {
+        return this.feedReactionModel.findOne({
+            feed_id: feedId,
+            comment_id: commentId,
+            created_by: userId,
+        })
+    }
+
     async getFeedReactions(
         reactedBy: string,
         nextCursor?: string,

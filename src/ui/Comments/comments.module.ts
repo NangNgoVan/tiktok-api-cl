@@ -8,6 +8,7 @@ import { User, UserSchema } from 'src/shared/Schemas/user.schema'
 import { Feed, FeedSchema } from 'src/shared/Schemas/feed.schema'
 import { FeedCommentsController } from './Controller/feed-comments.controller'
 import { FeedCommentService } from './Service/feed-comments.service'
+import { ReactionsModule } from '../Reactions/reactions.module'
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import { FeedCommentService } from './Service/feed-comments.service'
             { name: Feed.name, schema: FeedSchema },
             { name: User.name, schema: UserSchema },
         ]),
+        ReactionsModule,
     ],
     controllers: [FeedCommentsController],
     providers: [FeedCommentService],
