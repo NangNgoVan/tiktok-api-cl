@@ -45,6 +45,13 @@ export class FeedDetailDto {
     number_of_bookmark: number
 
     @ApiProperty()
+    @IsNumber()
+    @Prop({
+        default: 0,
+    })
+    number_of_comment: number
+
+    @ApiProperty()
     @Prop({})
     created_by: string
 

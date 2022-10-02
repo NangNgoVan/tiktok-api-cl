@@ -273,6 +273,7 @@ export class FeedsService {
             feedDetailDto.number_of_view = feed.number_of_view
             feedDetailDto.number_of_reaction = feed.number_of_reaction
             feedDetailDto.number_of_bookmark = feed.number_of_bookmark
+            feedDetailDto.number_of_comment = feed.number_of_comment
             feedDetailDto.number_of_report = feed.number_of_report
             feedDetailDto.created_by = feed.created_by
             feedDetailDto.content = feed.content
