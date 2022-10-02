@@ -176,4 +176,31 @@ export class UserFeedsController {
             nextCursor,
         )
     }
+
+    @Get('/current/feed-followings')
+    @ApiImplicitQuery({
+        name: 'next',
+        type: 'string',
+        required: false,
+    })
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({
+        summary: "Get following's feeds by `current` alias",
+    })
+    @ApiOkResponse({
+        type: PaginateFeedResultsDto,
+    })
+    async getFollowingFeedsByCurrentUser(
+        @Req() req,
+    ): Promise<PaginateFeedResultsDto> {
+        const userId = req.user.userId
+        const currentUserId = req.user.userId
+        const nextCursor: string | undefined = req.query['next']
+
+        return this.feedsService.getFollowingFeeds(
+            userId,
+            currentUserId,
+            nextCursor,
+        )
+    }
 }

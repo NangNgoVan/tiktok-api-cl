@@ -10,6 +10,7 @@ import { Model } from 'mongoose'
 import { GetUserFollowDto } from '../Dto/get-user-follow.dto'
 import { PaginateUserFollowsDto } from '../Dto/paginate-user-follows.dto'
 import { UserNotFoundException } from 'src/shared/Exceptions/http.exceptions'
+import _ from 'lodash'
 
 @Injectable()
 export class UserFollowsService {
@@ -178,6 +179,16 @@ export class UserFollowsService {
         } catch {
             return new PaginateUserFollowsDto()
         }
+    }
+
+    async getAllFollowingIdsByUserId(userId: string): Promise<string[]> {
+        const followings = await this.userFollowModel
+            .find({
+                created_by: userId,
+            })
+            .distinct('_id')
+
+        return _.map(followings, (following) => following._id)
     }
 
     async checkFollowRelationshipBetween(

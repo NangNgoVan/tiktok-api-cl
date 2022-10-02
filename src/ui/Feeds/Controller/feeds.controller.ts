@@ -188,6 +188,35 @@ export class FeedsController {
         return this.feedsService.getNewestFeeds(currentUserId, nextCursor)
     }
 
+    @Get('/by-song/:songId')
+    @UseGuards(JwtAuthGuard)
+    @ApiQuery({
+        name: 'next',
+        type: 'string',
+        required: false,
+    })
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Get feeds by song id' })
+    @ApiOkResponse({
+        type: PaginateFeedResultsDto,
+    })
+    @ApiImplicitQuery({
+        required: false,
+        name: 'next',
+        type: String,
+    })
+    async getFeedsBySongId(@Query() query, @Req() req) {
+        const nextCursor: string | undefined = query['next']
+        const currentUserId = req.user.userId
+        const songId = req.params.songId
+
+        return this.feedsService.getFeedsBySongId(
+            songId,
+            currentUserId,
+            nextCursor,
+        )
+    }
+
     @Get('/:id')
     @UseGuards(JwtAuthGuard)
     @ApiOperation({ summary: 'Get feed by id' })
@@ -196,7 +225,7 @@ export class FeedsController {
         description: 'OK',
         type: FeedDetailDto,
     })
-    async getFeedDetail(@Req() req): Promise<any> {
+    async getFeedById(@Req() req): Promise<any> {
         const feedId = req.params.id
         const currentUserId = req.user.userId
         return this.feedsService.getFeedById(feedId, currentUserId)

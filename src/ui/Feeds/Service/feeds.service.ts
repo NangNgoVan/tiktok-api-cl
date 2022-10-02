@@ -202,6 +202,39 @@ export class FeedsService {
         return { ...feedReactions, results: transformedFeeds }
     }
 
+    async getFollowingFeeds(
+        userId: string,
+        currentUserId: string,
+        nextCursor?: string,
+        perPage = 6,
+    ) {
+        // FIXME: this is a temporary solution, we should split following ids into multiple pieces
+        // then we query by following ids and created_at between a range [start - end]
+        const followingIds =
+            await this.userFollowService.getAllFollowingIdsByUserId(userId)
+
+        const feeds = await this.feedModel.paginate({
+            limit: perPage,
+            paginatedField: 'created_at',
+            sortAscending: false,
+            next: nextCursor,
+            query: {
+                created_by: {
+                    $in: followingIds,
+                },
+            },
+        })
+
+        const feedIds: string[] = _.map(
+            _.get(feeds, 'results', []),
+            (feed) => feed._id,
+        )
+
+        const transformedFeeds = await this.buildFeeds(feedIds, currentUserId)
+
+        return { ...feeds, results: transformedFeeds }
+    }
+
     private async buildFeeds(
         feedIds: string[],
         currentUserId: string,
