@@ -188,6 +188,29 @@ export class FeedsController {
         return this.feedsService.getNewestFeeds(currentUserId, nextCursor)
     }
 
+    @Get('/trending')
+    @UseGuards(JwtAuthGuard)
+    @ApiQuery({
+        name: 'next',
+        type: 'string',
+        required: false,
+    })
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Get trending feeds' })
+    @ApiOkResponse({
+        type: PaginateFeedResultsDto,
+    })
+    @ApiImplicitQuery({
+        required: false,
+        name: 'next',
+        type: String,
+    })
+    async getTrendingFeeds(@Query() query, @Req() req) {
+        const nextCursor: string | undefined = query['next']
+        const currentUserId = req.user.userId
+        return this.feedsService.getNewestFeeds(currentUserId, nextCursor)
+    }
+
     @Get('/by-song/:songId')
     @UseGuards(JwtAuthGuard)
     @ApiQuery({
