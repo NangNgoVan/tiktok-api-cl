@@ -10,6 +10,7 @@ import { AuthService } from 'src/shared/Services/auth.service'
 import { JwtService } from '@nestjs/jwt'
 import { ReactionsModule } from './Reactions/reactions.module'
 import { BookmarksModule } from './Bookmarks/bookmarks.module'
+import { BlacklistService } from 'src/shared/Services/blacklist-redis.service'
 @Module({
     imports: [
         AuthModule,
@@ -21,7 +22,7 @@ import { BookmarksModule } from './Bookmarks/bookmarks.module'
         ReactionsModule,
     ],
     controllers: [],
-    providers: [RedisService, AuthService, JwtService],
+    providers: [RedisService, AuthService, JwtService, BlacklistService],
 })
 export class UIModule {
     configure(consumer: MiddlewareConsumer) {
