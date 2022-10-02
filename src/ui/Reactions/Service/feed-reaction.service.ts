@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import {
@@ -56,7 +56,10 @@ export class FeedReactionsService {
             created_by,
             feed_id,
         })
-        if (reaction) throw new CreatedOnlyReactionException()
+
+        if (reaction) {
+            throw new BadRequestException('you already reacted to this feed')
+        }
 
         const ret = await this.feedReactionModel.create({
             feed_id,
@@ -87,7 +90,9 @@ export class FeedReactionsService {
             feed_id,
         })
 
-        if (reaction) throw new CreatedOnlyReactionException()
+        if (reaction) {
+            throw new BadRequestException('you already reacted to this comment')
+        }
 
         const comment = await this.commentModel.findOneAndUpdate(
             { _id: comment_id },

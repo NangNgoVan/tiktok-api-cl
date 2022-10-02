@@ -20,7 +20,7 @@ import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
 import { FeedResourcesService } from 'src/ui/Resources/Service/resources.service'
 import { FeedReactionsService } from 'src/ui/Reactions/Service/feed-reaction.service'
-import { BookmarksService } from 'src/ui/Bookmarks/Service/book-marks.service'
+import { BookmarksService } from 'src/ui/Bookmarks/Service/bookmarks.service'
 
 @Injectable()
 export class FeedsService {

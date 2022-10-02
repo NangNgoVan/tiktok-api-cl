@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { FeedNotFoundException } from 'src/shared/Exceptions/http.exceptions'
@@ -24,7 +28,17 @@ export class BookmarksService {
             { _id: feed_id },
             { $inc: { number_of_bookmark: 1 } },
         )
+
         if (!feed) throw new FeedNotFoundException()
+
+        const feedBookmark = await this.feedBookmarkModel.findOne({
+            feed_id,
+            created_by,
+        })
+
+        if (feedBookmark) {
+            throw new BadRequestException('you already bookmarked this feed')
+        }
 
         return this.feedBookmarkModel.create({
             feed_id,

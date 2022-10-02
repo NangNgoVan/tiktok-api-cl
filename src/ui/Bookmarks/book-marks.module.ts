@@ -6,7 +6,7 @@ import {
 } from 'src/shared/Schemas/feed-bookmark.schema'
 import { Feed, FeedSchema } from 'src/shared/Schemas/feed.schema'
 import { BookmarksController } from './Controller/bookmarks.controller'
-import { BookmarksService } from './Service/book-marks.service'
+import { BookmarksService } from './Service/bookmarks.service'
 
 @Module({
     imports: [

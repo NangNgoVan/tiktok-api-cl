@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { FeedReaction } from 'src/shared/Schemas/feed-reaction.schema'
-import { BookmarksService } from '../Service/book-marks.service'
+import { BookmarksService } from '../Service/bookmarks.service'
 
 @Controller('ui/feeds')
 @ApiTags('Feed Bookmarks APIs')
