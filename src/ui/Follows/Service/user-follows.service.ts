@@ -182,13 +182,11 @@ export class UserFollowsService {
     }
 
     async getAllFollowingIdsByUserId(userId: string): Promise<string[]> {
-        const followings = await this.userFollowModel
-            .find({
-                created_by: userId,
-            })
-            .distinct('_id')
+        const followings = await this.userFollowModel.find({
+            created_by: userId,
+        })
 
-        return _.map(followings, (following) => following._id)
+        return _.map(followings, (following) => following.user_id)
     }
 
     async checkFollowRelationshipBetween(

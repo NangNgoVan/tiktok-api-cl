@@ -14,24 +14,12 @@ import { FeedResourcesService } from 'src/ui/Resources/Service/resources.service
 import { FeedReactionsService } from 'src/ui/Reactions/Service/feed-reaction.service'
 import { BookmarksService } from 'src/ui/Bookmarks/Service/bookmarks.service'
 import _ from 'lodash'
-import {
-    FeedBookmark,
-    FeedBookmarkDocument,
-} from '../../../shared/Schemas/feed-bookmark.schema'
-import {
-    FeedReaction,
-    FeedReactionDocument,
-} from '../../../shared/Schemas/feed-reaction.schema'
 
 @Injectable()
 export class FeedsService {
     constructor(
         @InjectModel(Feed.name)
         private readonly feedModel: MongoPaging<FeedDocument>,
-        // @InjectModel(FeedBookmark.name)
-        // private readonly feedBookmarkModel: MongoPaging<FeedBookmarkDocument>,
-        // @InjectModel(FeedReaction.name)
-        // private readonly feedReactionModel: MongoPaging<FeedReactionDocument>,
         private readonly feedHashTagService: FeedHashTagsService,
         private readonly hashTagService: HashTagService,
         private readonly userService: UsersService,
