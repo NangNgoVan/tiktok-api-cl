@@ -227,11 +227,13 @@ export class FeedsService {
         feedIds: string[],
         currentUserId: string,
     ): Promise<FeedDetailDto[]> {
-        const feeds = await this.feedModel.find({
-            _id: {
-                $in: feedIds,
-            },
-        })
+        const feeds = await this.feedModel
+            .find({
+                _id: {
+                    $in: feedIds,
+                },
+            })
+            .sort({ created_at: 'desc' })
 
         const promises = _.map(feeds, async (feed) => {
             const feedDetailDto = new FeedDetailDto()
@@ -280,6 +282,7 @@ export class FeedsService {
             feedDetailDto.song_id = feed.song_id
             feedDetailDto.hashtags = feed.hashtags
             feedDetailDto.primary_image_index = feed.primary_image_index
+            feedDetailDto.created_at = feed.created_at
 
             const resources = await this.feedResourcesService.getResourceByIds(
                 feed.resource_ids,

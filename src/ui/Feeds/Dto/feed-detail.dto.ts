@@ -93,4 +93,8 @@ export class FeedDetailDto {
         type: [GetFeedResourceDto],
     })
     resource_details: GetFeedResourceDto[]
+
+    @ApiProperty()
+    @IsString()
+    created_at: string
 }
