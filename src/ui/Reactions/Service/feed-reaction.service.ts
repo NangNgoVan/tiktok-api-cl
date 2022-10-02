@@ -58,11 +58,15 @@ export class FeedReactionsService {
         })
         if (reaction) throw new CreatedOnlyReactionException()
 
-        return this.feedReactionModel.create({
+        const ret = await this.feedReactionModel.create({
             feed_id,
             created_by,
             type: createReaction.type,
         })
+
+        // TODO: update increment o day
+
+        return ret
     }
 
     async createReactionByFeedIdAndCommentId(

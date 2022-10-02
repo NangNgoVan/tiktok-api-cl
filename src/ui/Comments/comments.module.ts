@@ -20,4 +20,4 @@ import { FeedCommentService } from './Service/feed-comments.service'
     controllers: [FeedCommentsController],
     providers: [FeedCommentService],
 })
-export class FeedCommentsModule {}
+export class CommentsModule {}
