@@ -47,7 +47,7 @@ export class FeedReactionsService {
         createReaction: CreateFeedReactionDto,
     ) {
         const feed = await this.feedModel.findOneAndUpdate(
-            { _id: feed_id, allow_comment: true },
+            { _id: feed_id },
             { $inc: { number_of_reaction: 1 } },
         )
         if (!feed) throw new FeedNotFoundException()
@@ -80,7 +80,6 @@ export class FeedReactionsService {
     ) {
         const feed = await this.feedModel.findOne({
             feed_id,
-            allowed_comment: true,
         })
         if (!feed) throw new FeedNotFoundException()
 
