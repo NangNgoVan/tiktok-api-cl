@@ -190,7 +190,7 @@ export class FeedsController {
 
     @Get('/:id')
     @UseGuards(JwtAuthGuard)
-    @ApiOperation({ summary: 'Get feed detail' })
+    @ApiOperation({ summary: 'Get feed by id' })
     @ApiBearerAuth()
     @ApiOkResponse({
         description: 'OK',

@@ -35,11 +35,12 @@ export class UserFeedsController {
     async getFeedsPostedByCurrentUser(
         @Req() req,
     ): Promise<PaginateFeedResultsDto> {
+        const createdBy = req.user.userId
         const currentUserId = req.user.userId
         const nextCursor: string | undefined = req.query['next']
 
         return this.feedsService.getPostedFeeds(
-            currentUserId,
+            createdBy,
             currentUserId,
             nextCursor,
         )
@@ -59,12 +60,12 @@ export class UserFeedsController {
         type: PaginateFeedResultsDto,
     })
     async getFeedsPostedByUser(@Req() req): Promise<PaginateFeedResultsDto> {
-        const userId = req.params.userId
+        const createdBy = req.params.userId
         const currentUserId = req.user.userId
         const nextCursor: string | undefined = req.query['next']
 
         return this.feedsService.getPostedFeeds(
-            userId,
+            createdBy,
             currentUserId,
             nextCursor,
         )
@@ -86,11 +87,12 @@ export class UserFeedsController {
     async getFeedBookmarksByCurrentUser(
         @Req() req,
     ): Promise<PaginateFeedResultsDto> {
+        const bookmarkedBy = req.user.userId
         const currentUserId = req.user.userId
         const nextCursor: string | undefined = req.query['next']
 
         return this.feedsService.getBookmarkedFeeds(
-            currentUserId,
+            bookmarkedBy,
             currentUserId,
             nextCursor,
         )
@@ -112,12 +114,12 @@ export class UserFeedsController {
     async getBookmarkedFeedsByUser(
         @Req() req,
     ): Promise<PaginateFeedResultsDto> {
-        const userId = req.params.userId
+        const bookmarkedBy = req.params.userId
         const currentUserId = req.user.userId
         const nextCursor: string | undefined = req.query['next']
 
         return this.feedsService.getBookmarkedFeeds(
-            userId,
+            bookmarkedBy,
             currentUserId,
             nextCursor,
         )
@@ -139,11 +141,12 @@ export class UserFeedsController {
     async getReactedFeedsByCurrentUser(
         @Req() req,
     ): Promise<PaginateFeedResultsDto> {
+        const reactedBy = req.user.userId
         const currentUserId = req.user.userId
         const nextCursor: string | undefined = req.query['next']
 
         return this.feedsService.getReactedFeeds(
-            currentUserId,
+            reactedBy,
             currentUserId,
             nextCursor,
         )
@@ -163,12 +166,12 @@ export class UserFeedsController {
         type: PaginateFeedResultsDto,
     })
     async getReactedFeedsByUser(@Req() req): Promise<PaginateFeedResultsDto> {
-        const userId = req.params.userId
+        const reactedBy = req.params.userId
         const currentUserId = req.user.userId
         const nextCursor: string | undefined = req.query['next']
 
         return this.feedsService.getReactedFeeds(
-            userId,
+            reactedBy,
             currentUserId,
             nextCursor,
         )
