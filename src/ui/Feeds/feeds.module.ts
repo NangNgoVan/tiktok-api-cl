@@ -16,22 +16,12 @@ import { HashTagsModule } from '../Hashtags/hashtags.module'
 import { FollowsModule } from '../Follows/follows.module'
 import { ReactionsModule } from '../Reactions/reactions.module'
 import { BookmarksModule } from '../Bookmarks/bookmarks.module'
-import {
-    FeedBookmark,
-    FeedBookmarkSchema,
-} from '../../shared/Schemas/feed-bookmark.schema'
-import {
-    FeedReaction,
-    FeedReactionSchema,
-} from '../../shared/Schemas/feed-reaction.schema'
 
 @Module({
     imports: [
         MongooseModule.forFeature([
             { name: Feed.name, schema: FeedSchema },
             { name: FeedResource.name, schema: FeedResourceSchema },
-            { name: FeedBookmark.name, schema: FeedBookmarkSchema }, // TODO: forward ref
-            { name: FeedReaction.name, schema: FeedReactionSchema }, // TODO: forward ref
         ]),
         forwardRef(() => UsersModule),
         HashTagsModule,

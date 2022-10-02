@@ -141,4 +141,22 @@ export class FeedReactionsService {
             created_by: userId,
         })
     }
+
+    async getFeedReactions(
+        reactedBy: string,
+        nextCursor?: string,
+        perPage = 6,
+    ) {
+        const options = {
+            limit: perPage,
+            paginatedField: 'created_at',
+            sortAscending: false,
+            next: nextCursor,
+            query: {
+                created_by: reactedBy,
+            },
+        }
+
+        return this.feedReactionModel.paginate(options)
+    }
 }

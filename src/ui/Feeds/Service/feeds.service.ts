@@ -28,10 +28,10 @@ export class FeedsService {
     constructor(
         @InjectModel(Feed.name)
         private readonly feedModel: MongoPaging<FeedDocument>,
-        @InjectModel(FeedBookmark.name)
-        private readonly feedBookmarkModel: MongoPaging<FeedBookmarkDocument>,
-        @InjectModel(FeedReaction.name)
-        private readonly feedReactionModel: MongoPaging<FeedReactionDocument>,
+        // @InjectModel(FeedBookmark.name)
+        // private readonly feedBookmarkModel: MongoPaging<FeedBookmarkDocument>,
+        // @InjectModel(FeedReaction.name)
+        // private readonly feedReactionModel: MongoPaging<FeedReactionDocument>,
         private readonly feedHashTagService: FeedHashTagsService,
         private readonly hashTagService: HashTagService,
         private readonly userService: UsersService,
@@ -164,26 +164,20 @@ export class FeedsService {
         nextCursor?: string,
         perPage = 6,
     ) {
-        const options = {
-            limit: perPage,
-            paginatedField: 'created_at',
-            sortAscending: false,
-            next: nextCursor,
-            query: {
-                created_by: bookmarkedBy,
-            },
-        }
-
-        const bookmarkedFeeds = await this.feedBookmarkModel.paginate(options)
+        const feedBookmarks = await this.bookmarkService.getFeedBookmarks(
+            bookmarkedBy,
+            nextCursor,
+            perPage,
+        )
 
         const feedIds: string[] = _.map(
-            _.get(bookmarkedFeeds, 'results', []),
-            (bookmarkedFeed) => bookmarkedFeed.feed_id,
+            _.get(feedBookmarks, 'results', []),
+            (feedBookmark) => feedBookmark.feed_id,
         )
 
         const transformedFeeds = await this.buildFeeds(feedIds, currentUserId)
 
-        return { ...bookmarkedFeeds, results: transformedFeeds }
+        return { ...feedBookmarks, results: transformedFeeds }
     }
 
     async getReactedFeeds(
@@ -192,26 +186,20 @@ export class FeedsService {
         nextCursor?: string,
         perPage = 6,
     ) {
-        const options = {
-            limit: perPage,
-            paginatedField: 'created_at',
-            sortAscending: false,
-            next: nextCursor,
-            query: {
-                created_by: reactedBy,
-            },
-        }
-
-        const reactedFeeds = await this.feedReactionModel.paginate(options)
+        const feedReactions = await this.feedReactionService.getFeedReactions(
+            reactedBy,
+            nextCursor,
+            perPage,
+        )
 
         const feedIds: string[] = _.map(
-            _.get(reactedFeeds, 'results', []),
-            (reactedFeed) => reactedFeed.feed_id,
+            _.get(feedReactions, 'results', []),
+            (feedReaction) => feedReaction.feed_id,
         )
 
         const transformedFeeds = await this.buildFeeds(feedIds, currentUserId)
 
-        return { ...reactedFeeds, results: transformedFeeds }
+        return { ...feedReactions, results: transformedFeeds }
     }
 
     private async buildFeeds(
