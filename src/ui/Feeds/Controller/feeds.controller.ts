@@ -183,11 +183,9 @@ export class FeedsController {
         type: String,
     })
     async getNewestFeeds(@Query() query, @Req() req) {
-        let next = undefined
-        if (query) next = query['next']
-        const { userId } = req.user
-        const feeds = await this.feedsService.getNewestFeed(userId, next)
-        return feeds
+        const nextCursor: string | undefined = query['next']
+        const currentUserId = req.user.userId
+        return this.feedsService.getNewestFeed(currentUserId, nextCursor)
     }
 
     @Get('/:id')
@@ -200,9 +198,7 @@ export class FeedsController {
     })
     async getFeedDetail(@Req() req): Promise<any> {
         const feedId = req.params.id
-        const { userId } = req.user
-        const feed = await this.feedsService.getFeedDetail(userId, feedId)
-        if (!feed) throw new NotFoundException()
-        return feed
+        const currentUserId = req.user.userId
+        return this.feedsService.getFeedById(feedId, currentUserId)
     }
 }

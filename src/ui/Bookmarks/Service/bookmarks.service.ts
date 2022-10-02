@@ -18,22 +18,21 @@ export class BookmarksService {
     constructor(
         @InjectModel(FeedBookmark.name)
         private readonly feedBookmarkModel: Model<FeedBookmarkDocument>,
-
         @InjectModel(Feed.name)
         private readonly feedModel: Model<FeedDocument>,
     ) {}
 
-    async createBookmarkByFeedId(feed_id: string, created_by: string) {
+    async createFeedBookmark(feedId: string, userId: string) {
         const feed = await this.feedModel.findOneAndUpdate(
-            { _id: feed_id },
+            { _id: feedId },
             { $inc: { number_of_bookmark: 1 } },
         )
 
         if (!feed) throw new FeedNotFoundException()
 
         const feedBookmark = await this.feedBookmarkModel.findOne({
-            feed_id,
-            created_by,
+            feed_id: feedId,
+            created_by: userId,
         })
 
         if (feedBookmark) {
@@ -41,37 +40,41 @@ export class BookmarksService {
         }
 
         return this.feedBookmarkModel.create({
-            feed_id,
-            created_by,
+            feed_id: feedId,
+            created_by: userId,
         })
     }
 
-    async deleteBookmark(feedId: string, currentUserId: string) {
+    async deleteFeedBookmark(feedId: string, userId: string) {
         const feedBookmark = await this.feedBookmarkModel.findOne({
             feed_id: feedId,
-            user_id: currentUserId,
+            created_by: userId,
         })
+
         if (!feedBookmark) throw new NotFoundException()
 
         const feed = await this.feedModel.findOneAndUpdate(
             { _id: feedId },
             { $inc: { number_of_bookmark: -1 } },
         )
+
         if (!feed) throw new FeedNotFoundException()
 
         return this.feedBookmarkModel.deleteOne({
             feed_id: feedId,
-            created_by: currentUserId,
+            created_by: userId,
         })
     }
 
-    async getFeedsBookmarkedByUser(userId: string): Promise<any> {
-        try {
-            return await this.feedBookmarkModel.find({
-                created_by: userId,
-            })
-        } catch {
-            return []
-        }
+    async getFeedBookmark(
+        feedId: string,
+        userId: string,
+    ): Promise<FeedBookmarkDocument | undefined> {
+        const feedBookmark = await this.feedBookmarkModel.findOne({
+            feed_id: feedId,
+            user_id: userId,
+        })
+
+        return feedBookmark
     }
 }

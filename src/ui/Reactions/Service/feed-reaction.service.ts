@@ -3,40 +3,30 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import {
     CommentNotFoundException,
-    CreatedOnlyReactionException,
     FeedNotFoundException,
-    ForbidenException,
 } from 'src/shared/Exceptions/http.exceptions'
 import { Feed, FeedDocument } from 'src/shared/Schemas/feed.schema'
 import {
     FeedReaction,
     FeedReactionDocument,
 } from 'src/shared/Schemas/feed-reaction.schema'
-import {
-    FeedCommentReaction,
-    FeedCommentReactionDocument,
-} from 'src/shared/Schemas/feed-comment-reaction.schema'
+import { FeedCommentReactionDocument } from 'src/shared/Schemas/feed-comment-reaction.schema'
 import { MongoPaging } from 'mongo-cursor-pagination'
-import _ from 'lodash'
 import { CreateFeedReactionDto } from '../Dto/create-feed-reaction.dto'
 import {
     FeedComment,
     FeedCommentDocument,
 } from 'src/shared/Schemas/feed-comment.schema'
-import { UserReactionType } from 'src/shared/Types/types'
 
 @Injectable()
 export class FeedReactionsService {
     constructor(
         @InjectModel(FeedReaction.name)
         private readonly feedReactionModel: MongoPaging<FeedReactionDocument>,
-
         @InjectModel(FeedReaction.name)
         private readonly feedCommentReaction: MongoPaging<FeedCommentReactionDocument>,
-
         @InjectModel(Feed.name)
         private readonly feedModel: Model<FeedDocument>,
-
         @InjectModel(FeedComment.name)
         private commentModel: MongoPaging<FeedCommentDocument>,
     ) {}
@@ -142,29 +132,13 @@ export class FeedReactionsService {
         })
     }
 
-    async getFeedsReactedByUser(userId: string) {
-        try {
-            return await this.feedReactionModel.find({
-                created_by: userId,
-            })
-        } catch {
-            return []
-        }
-    }
-
-    async getUserReactionWithFeed(
-        userId: string,
+    async getFeedReaction(
         feedId: string,
-    ): Promise<UserReactionType> {
-        try {
-            const reactionData = await this.feedReactionModel.findOne({
-                feed_id: feedId,
-                created_by: userId,
-            })
-            if (reactionData) return reactionData.type
-            return null
-        } catch {
-            return null
-        }
+        userId: string,
+    ): Promise<FeedReactionDocument | undefined> {
+        return this.feedReactionModel.findOne({
+            feed_id: feedId,
+            created_by: userId,
+        })
     }
 }

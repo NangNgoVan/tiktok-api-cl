@@ -26,10 +26,7 @@ export class BookmarksController {
         const feed_id = req.params.id
         const created_by = req.user.userId
 
-        return this.feedBookmarksService.createBookmarkByFeedId(
-            feed_id,
-            created_by,
-        )
+        return this.feedBookmarksService.createFeedBookmark(feed_id, created_by)
     }
 
     @Delete('/:id/bookmarks')
@@ -43,6 +40,9 @@ export class BookmarksController {
         const feedId = req.params.id
         const currentUserId = req.user.userId
 
-        return this.feedBookmarksService.deleteBookmark(feedId, currentUserId)
+        return this.feedBookmarksService.deleteFeedBookmark(
+            feedId,
+            currentUserId,
+        )
     }
 }

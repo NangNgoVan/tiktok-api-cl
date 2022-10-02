@@ -9,7 +9,7 @@ import { RedisService } from 'src/shared/Services/redis.service'
 import { AuthService } from 'src/shared/Services/auth.service'
 import { JwtService } from '@nestjs/jwt'
 import { ReactionsModule } from './Reactions/reactions.module'
-import { BookmarksModule } from './Bookmarks/book-marks.module'
+import { BookmarksModule } from './Bookmarks/bookmarks.module'
 @Module({
     imports: [
         AuthModule,

@@ -12,18 +12,26 @@ import { UsersModule } from '../Users/users.module'
 import { FeedsController } from './Controller/feeds.controller'
 import { FeedResourcesService } from '../Resources/Service/resources.service'
 import { FeedsService } from './Service/feeds.service'
-import { FeedHashTagsService } from '../Hashtags/Service/feed-hashtags.service'
-import { HashTagService } from '../Hashtags/Service/hashtags.service'
 import { HashTagsModule } from '../Hashtags/hashtags.module'
 import { FollowsModule } from '../Follows/follows.module'
 import { ReactionsModule } from '../Reactions/reactions.module'
-import { BookmarksModule } from '../Bookmarks/book-marks.module'
+import { BookmarksModule } from '../Bookmarks/bookmarks.module'
+import {
+    FeedBookmark,
+    FeedBookmarkSchema,
+} from '../../shared/Schemas/feed-bookmark.schema'
+import {
+    FeedReaction,
+    FeedReactionSchema,
+} from '../../shared/Schemas/feed-reaction.schema'
 
 @Module({
     imports: [
         MongooseModule.forFeature([
             { name: Feed.name, schema: FeedSchema },
             { name: FeedResource.name, schema: FeedResourceSchema },
+            { name: FeedBookmark.name, schema: FeedBookmarkSchema }, // TODO: forward ref
+            { name: FeedReaction.name, schema: FeedReactionSchema }, // TODO: forward ref
         ]),
         forwardRef(() => UsersModule),
         HashTagsModule,

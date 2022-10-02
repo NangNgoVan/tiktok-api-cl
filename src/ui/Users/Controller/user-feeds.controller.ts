@@ -8,7 +8,6 @@ import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 import { PaginateFeedResultsDto } from 'src/ui/Feeds/Dto/paginate-feed-results.dto'
 import { FeedsService } from 'src/ui/Feeds/Service/feeds.service'
-import { FeedFilterType } from 'src/shared/Types/types'
 
 @Controller('ui/users')
 @ApiTags('User Feed APIs')
@@ -28,7 +27,7 @@ export class UserFeedsController {
     })
     @UseGuards(JwtAuthGuard)
     @ApiOperation({
-        summary: 'Get feeds posted by current user',
+        summary: 'Get posted feeds by current user',
     })
     @ApiOkResponse({
         type: PaginateFeedResultsDto,
@@ -36,15 +35,13 @@ export class UserFeedsController {
     async getFeedsPostedByCurrentUser(
         @Req() req,
     ): Promise<PaginateFeedResultsDto> {
-        const { userId } = req.user
-        let next = undefined
-        if (req.query) next = req.query['next']
+        const currentUserId = req.user.userId
+        const nextCursor: string | undefined = req.query['next']
 
-        return await this.feedsService.getFeedsByUser(
-            userId,
-            userId,
-            FeedFilterType.POSTED_BY,
-            next,
+        return this.feedsService.getPostedFeeds(
+            currentUserId,
+            currentUserId,
+            nextCursor,
         )
     }
 
@@ -56,7 +53,7 @@ export class UserFeedsController {
     })
     @UseGuards(JwtAuthGuard)
     @ApiOperation({
-        summary: 'Get feeds posted by user id',
+        summary: 'Get posted feeds by user',
     })
     @ApiOkResponse({
         type: PaginateFeedResultsDto,
@@ -64,16 +61,15 @@ export class UserFeedsController {
     async getFeedsPostedByUser(@Req() req): Promise<PaginateFeedResultsDto> {
         const userId = req.params.userId
         const currentUserId = req.user.userId
-        let next = undefined
-        if (req.query) next = req.query['next']
+        const nextCursor: string | undefined = req.query['next']
 
-        return await this.feedsService.getFeedsByUser(
-            currentUserId,
+        return this.feedsService.getPostedFeeds(
             userId,
-            FeedFilterType.POSTED_BY,
-            next,
+            currentUserId,
+            nextCursor,
         )
     }
+
     @Get('/current/feed-bookmarks')
     @ApiImplicitQuery({
         name: 'next',
@@ -91,14 +87,12 @@ export class UserFeedsController {
         @Req() req,
     ): Promise<PaginateFeedResultsDto> {
         const currentUserId = req.user.userId
-        let next = undefined
-        if (req.query) next = req.query['next']
+        const nextCursor: string | undefined = req.query['next']
 
-        return await this.feedsService.getFeedsByUser(
+        return this.feedsService.getBookmarkedFeeds(
             currentUserId,
             currentUserId,
-            FeedFilterType.BOOKMARKED,
-            next,
+            nextCursor,
         )
     }
 
@@ -110,22 +104,22 @@ export class UserFeedsController {
     })
     @UseGuards(JwtAuthGuard)
     @ApiOperation({
-        summary: 'Get feeds bookmarked by user id',
+        summary: 'Get feeds bookmarked by user',
     })
     @ApiOkResponse({
         type: PaginateFeedResultsDto,
     })
-    async getFeedBookmarksByUser(@Req() req): Promise<PaginateFeedResultsDto> {
+    async getBookmarkedFeedsByUser(
+        @Req() req,
+    ): Promise<PaginateFeedResultsDto> {
         const userId = req.params.userId
         const currentUserId = req.user.userId
-        let next = undefined
-        if (req.query) next = req.query['next']
+        const nextCursor: string | undefined = req.query['next']
 
-        return await this.feedsService.getFeedsByUser(
-            currentUserId,
+        return this.feedsService.getBookmarkedFeeds(
             userId,
-            FeedFilterType.BOOKMARKED,
-            next,
+            currentUserId,
+            nextCursor,
         )
     }
 
@@ -137,23 +131,21 @@ export class UserFeedsController {
     })
     @UseGuards(JwtAuthGuard)
     @ApiOperation({
-        summary: 'Get feeds reacted by current user',
+        summary: 'Get reacted feeds by current user',
     })
     @ApiOkResponse({
         type: PaginateFeedResultsDto,
     })
-    async getFeedsReactedByCurrentUser(
+    async getReactedFeedsByCurrentUser(
         @Req() req,
     ): Promise<PaginateFeedResultsDto> {
         const currentUserId = req.user.userId
-        let next = undefined
-        if (req.query) next = req.query['next']
+        const nextCursor: string | undefined = req.query['next']
 
-        return await this.feedsService.getFeedsByUser(
+        return this.feedsService.getReactedFeeds(
             currentUserId,
             currentUserId,
-            FeedFilterType.REACTED,
-            next,
+            nextCursor,
         )
     }
 
@@ -165,22 +157,20 @@ export class UserFeedsController {
     })
     @UseGuards(JwtAuthGuard)
     @ApiOperation({
-        summary: 'Get feeds reacted by user',
+        summary: 'Get reacted feeds by user',
     })
     @ApiOkResponse({
         type: PaginateFeedResultsDto,
     })
-    async getFeedsReactedByUser(@Req() req): Promise<PaginateFeedResultsDto> {
+    async getReactedFeedsByUser(@Req() req): Promise<PaginateFeedResultsDto> {
         const userId = req.params.userId
         const currentUserId = req.user.userId
-        let next = undefined
-        if (req.query) next = req.query['next']
+        const nextCursor: string | undefined = req.query['next']
 
-        return await this.feedsService.getFeedsByUser(
-            currentUserId,
+        return this.feedsService.getReactedFeeds(
             userId,
-            FeedFilterType.REACTED,
-            next,
+            currentUserId,
+            nextCursor,
         )
     }
 }
