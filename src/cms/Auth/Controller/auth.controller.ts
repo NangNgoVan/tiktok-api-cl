@@ -13,7 +13,7 @@ import { AuthService } from 'src/shared/Services/auth.service'
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
-    @Post('/authentication-method/credential')
+    @Post('/authentication-methods/credential')
     async logInWithCredential(
         @Body() dto: CredentialDto,
     ): Promise<TokenDataResponse> {
