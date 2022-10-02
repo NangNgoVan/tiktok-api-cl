@@ -126,6 +126,8 @@ export class FeedCommentService {
                     'content',
                     'number_of_reaction',
                     'number_of_reply',
+                    'created_at',
+                    'updated_at',
                 ]),
                 created_user: _.pick(userInfo, ['_id', 'full_name', 'avatar']),
             }
@@ -185,6 +187,8 @@ export class FeedCommentService {
                     'content',
                     'number_of_reaction',
                     'number_of_reply',
+                    'created_at',
+                    'updated_at',
                 ]),
                 created_user: _.pick(userInfo, ['_id', 'full_name', 'avatar']),
             }
