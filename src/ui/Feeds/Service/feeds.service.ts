@@ -65,7 +65,7 @@ export class FeedsService {
         return createdFeed.save()
     }
 
-    async getNewestFeed(
+    async getNewestFeeds(
         currentUserId: string,
         nextCursor?: string,
         perPage = 6,
@@ -89,8 +89,11 @@ export class FeedsService {
         return { ...feeds, results: transformedFeeds }
     }
 
-    async getFeedById(feedId: string, userId: string): Promise<FeedDetailDto> {
-        const transformedFeeds = await this.buildFeeds([feedId], userId)
+    async getFeedById(
+        feedId: string,
+        currentUserId: string,
+    ): Promise<FeedDetailDto> {
+        const transformedFeeds = await this.buildFeeds([feedId], currentUserId)
 
         if (_.isEmpty(transformedFeeds)) {
             throw new NotFoundException()
@@ -100,7 +103,7 @@ export class FeedsService {
     }
 
     async getPostedFeeds(
-        userId: string,
+        createdBy: string,
         currentUserId: string,
         nextCursor?: string,
         perPage = 6,
@@ -110,7 +113,7 @@ export class FeedsService {
             paginatedField: 'created_at',
             sortAscending: false,
             next: nextCursor,
-            created_by: userId,
+            created_by: createdBy,
         }
 
         const feeds = await this.feedModel.paginate(options)
@@ -126,7 +129,7 @@ export class FeedsService {
     }
 
     async getBookmarkedFeeds(
-        userId: string,
+        bookmarkedBy: string,
         currentUserId: string,
         nextCursor?: string,
         perPage = 6,
@@ -136,7 +139,7 @@ export class FeedsService {
             paginatedField: 'created_at',
             sortAscending: false,
             next: nextCursor,
-            created_by: userId,
+            created_by: bookmarkedBy,
         }
 
         const bookmarkedFeeds = await this.feedBookmarkModel.paginate(options)
@@ -152,7 +155,7 @@ export class FeedsService {
     }
 
     async getReactedFeeds(
-        userId: string,
+        reactedBy: string,
         currentUserId: string,
         nextCursor?: string,
         perPage = 6,
@@ -162,7 +165,7 @@ export class FeedsService {
             paginatedField: 'created_at',
             sortAscending: false,
             next: nextCursor,
-            created_by: userId,
+            created_by: reactedBy,
         }
 
         const reactedFeeds = await this.feedReactionModel.paginate(options)
@@ -179,7 +182,7 @@ export class FeedsService {
 
     private async buildFeeds(
         feedIds: string[],
-        userId: string,
+        currentUserId: string,
     ): Promise<FeedDetailDto[]> {
         const feeds = await this.feedModel.find({
             _id: {
@@ -199,7 +202,7 @@ export class FeedsService {
                 current_user: {
                     is_followed:
                         await this.userFollowService.checkFollowRelationshipBetween(
-                            userId,
+                            currentUserId,
                             feed.created_by,
                         ),
                 },
@@ -208,12 +211,12 @@ export class FeedsService {
 
             const feedReaction = await this.feedReactionService.getFeedReaction(
                 feed._id,
-                userId,
+                currentUserId,
             )
 
             const feedBookmark = await this.bookmarkService.getFeedBookmark(
                 feed._id,
-                userId,
+                currentUserId,
             )
 
             feedDetailDto.current_user = {

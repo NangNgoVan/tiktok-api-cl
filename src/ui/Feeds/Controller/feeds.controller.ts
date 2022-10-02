@@ -185,7 +185,7 @@ export class FeedsController {
     async getNewestFeeds(@Query() query, @Req() req) {
         const nextCursor: string | undefined = query['next']
         const currentUserId = req.user.userId
-        return this.feedsService.getNewestFeed(currentUserId, nextCursor)
+        return this.feedsService.getNewestFeeds(currentUserId, nextCursor)
     }
 
     @Get('/:id')
