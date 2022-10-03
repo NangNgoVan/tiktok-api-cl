@@ -36,7 +36,7 @@ export class FeedResourcesService {
                     configService.getEnv('AWS_IMAGE_BASE_URL') +
                     '/' +
                     resource.path,
-            } as GetFeedResourceDto
+            }
         })
     }
 }
