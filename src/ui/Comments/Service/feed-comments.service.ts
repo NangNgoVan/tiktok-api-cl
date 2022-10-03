@@ -92,68 +92,54 @@ export class FeedCommentService {
     async getCommentByFeedId(
         feedId: string,
         currentUserId: string,
-        next?: string,
-        rowsPerpage = 6,
+        nextCursor?: string,
+        perPage = 6,
     ) {
         const feed = await this.feedModel.findById(feedId)
         if (!feed) throw new FeedNotFoundException()
 
-        let feedComments = undefined
-        if (!next) {
-            feedComments = await this.commentModel.paginate({
-                query: { feed_id: feedId, level: FeedCommentLevel.LEVEL_ONE },
-                limit: rowsPerpage,
-            })
-        } else {
-            feedComments = await this.commentModel.paginate({
-                query: { feed_id: feedId, level: FeedCommentLevel.LEVEL_ONE },
-                limit: rowsPerpage,
-                next: next,
-            })
+        const queryOption = {
+            limit: perPage,
+            next: nextCursor,
+            query: { feed_id: feedId, level: FeedCommentLevel.LEVEL_ONE },
         }
+        const feedComments = await this.commentModel.paginate(queryOption)
 
-        let listUserInfo = null
-        if (!_.isEmpty(feedComments.results)) {
-            listUserInfo = await this.userModel.find({
-                _id: _.uniq(_.map(feedComments.results, (it) => it.created_by)),
-            })
-        }
+        const listUserInfo = await this.userModel.find({
+            _id: _.uniq(_.map(feedComments.results, (it) => it.created_by)),
+        })
 
-        feedComments.results = await Promise.all(
-            feedComments.results.map(async (cmt) => {
-                const userInfo = listUserInfo.find(
-                    (u) => cmt.created_by === u.id,
-                )
-                const commentReaction =
-                    await this.feedReactionService.getFeedReaction(
-                        feedId,
-                        currentUserId,
-                    )
-                return {
-                    ..._.pick(cmt, [
-                        '_id',
-                        'feed_id',
-                        'created_by',
-                        'content',
-                        'number_of_reaction',
-                        'number_of_reply',
-                        'created_at',
-                        'updated_at',
-                        'level',
-                    ]),
-                    current_user: {
-                        is_reacted: !_.isEmpty(commentReaction) ? true : false,
-                        reaction_type: _.get(commentReaction, 'type'),
-                    },
-                    created_user: _.pick(userInfo, [
-                        '_id',
-                        'full_name',
-                        'avatar',
-                        'nick_name',
-                    ]),
-                }
-            }),
+        const commentReaction = await this.feedReactionService.getFeedReaction(
+            feedId,
+            currentUserId,
         )
+
+        feedComments.results = feedComments.results.map((cmt) => {
+            const userInfo = listUserInfo.find((u) => cmt.created_by === u.id)
+            return {
+                ..._.pick(cmt, [
+                    '_id',
+                    'feed_id',
+                    'created_by',
+                    'content',
+                    'number_of_reaction',
+                    'number_of_reply',
+                    'created_at',
+                    'updated_at',
+                    'level',
+                ]),
+                current_user: {
+                    is_reacted: !_.isEmpty(commentReaction) ? true : false,
+                    reaction_type: _.get(commentReaction, 'type'),
+                },
+                created_user: _.pick(userInfo, [
+                    '_id',
+                    'full_name',
+                    'avatar',
+                    'nick_name',
+                ]),
+            }
+        })
 
         return feedComments
     }
@@ -162,8 +148,8 @@ export class FeedCommentService {
         feedId: string,
         commentId: string,
         currentUserId: string,
-        next?: string,
-        rowsPerpage?: number,
+        nextCursor?: string,
+        perPage = 6,
     ) {
         const feed = await this.feedModel.findById(feedId)
         if (!feed) throw new FeedNotFoundException()
@@ -174,63 +160,61 @@ export class FeedCommentService {
         })
         if (!currentComment) throw new CommentNotFoundException()
 
-        if (!rowsPerpage) rowsPerpage = 5
-        let feedComments = undefined
-        if (!next) {
-            feedComments = await this.commentModel.paginate({
-                query: { reply_to: commentId },
-                limit: rowsPerpage,
-            })
-        } else {
-            feedComments = await this.commentModel.paginate({
-                query: { reply_to: commentId },
-                limit: rowsPerpage,
-                next: next,
-            })
+        const queryOption = {
+            limit: perPage,
+            next: nextCursor,
+            query: { reply_to: commentId },
         }
 
-        let listUserInfo = null
-        if (!_.isEmpty(feedComments.results)) {
-            listUserInfo = await this.userModel.find({
-                _id: _.uniq(_.map(feedComments.results, (it) => it.created_by)),
-            })
-        }
+        const feedComments = await this.commentModel.paginate(queryOption)
 
-        feedComments.results = await Promise.all(
-            feedComments.results.map(async (cmt) => {
-                const userInfo = listUserInfo.find(
-                    (u) => cmt.created_by === u.id,
-                )
-                const commentReaction =
-                    await this.feedReactionService.getCommentReaction(
-                        feedId,
-                        cmt._id,
-                        currentUserId,
-                    )
-                return {
-                    ..._.pick(cmt, [
-                        '_id',
-                        'feed_id',
-                        'created_by',
-                        'content',
-                        'number_of_reaction',
-                        'number_of_reply',
-                        'created_at',
-                        'updated_at',
-                    ]),
-                    current_user: {
-                        is_reacted: _.isEmpty(commentReaction) ? false : true,
-                        reaction_type: _.get(commentReaction, 'type'),
-                    },
-                    created_user: _.pick(userInfo, [
-                        '_id',
-                        'full_name',
-                        'nick_name',
-                        'avatar',
-                    ]),
-                }
-            }),
+        const listUserInfo = await this.userModel.find({
+            _id: _.uniq(_.map(feedComments.results, (it) => it.created_by)),
+        })
+
+        const listFeedCommentId: string[] = _.map(
+            feedComments.results,
+            (it) => it._id,
         )
+
+        const commentReaction =
+            await this.feedReactionService.getCommentsReaction(
+                feedId,
+                listFeedCommentId,
+                currentUserId,
+            )
+
+        feedComments.results = feedComments.results.map((cmt) => {
+            const userInfo = listUserInfo.find((u) => cmt.created_by === u.id)
+            const currentCommentReaction = _.find(
+                commentReaction,
+                (it) => it.comment_id === cmt._id.toString(),
+            )
+            return {
+                ..._.pick(cmt, [
+                    '_id',
+                    'feed_id',
+                    'created_by',
+                    'content',
+                    'number_of_reaction',
+                    'number_of_reply',
+                    'created_at',
+                    'updated_at',
+                ]),
+                current_user: {
+                    is_reacted: _.isEmpty(currentCommentReaction)
+                        ? false
+                        : true,
+                    reaction_type: _.get(currentCommentReaction, 'type'),
+                },
+                created_user: _.pick(userInfo, [
+                    '_id',
+                    'full_name',
+                    'nick_name',
+                    'avatar',
+                ]),
+            }
+        })
 
         return feedComments
     }

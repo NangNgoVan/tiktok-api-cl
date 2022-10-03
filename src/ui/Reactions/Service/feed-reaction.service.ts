@@ -73,16 +73,6 @@ export class FeedReactionsService {
         })
         if (!feed) throw new FeedNotFoundException()
 
-        const reaction = await this.feedCommentReaction.findOne({
-            created_by,
-            comment_id,
-            feed_id,
-        })
-
-        if (reaction) {
-            throw new BadRequestException('you already reacted to this comment')
-        }
-
         const comment = await this.commentModel.findOneAndUpdate(
             { _id: comment_id },
             { $inc: { number_of_reaction: 1 } },
@@ -155,6 +145,18 @@ export class FeedReactionsService {
     ): Promise<FeedReactionDocument | undefined> {
         return this.feedReactionModel.findOne({
             feed_id: feedId,
+            comment_id: commentId,
+            created_by: userId,
+        })
+    }
+
+    async getCommentsReaction(
+        feedId: string,
+        commentId: string[],
+        userId: string,
+    ): Promise<FeedReactionDocument | undefined> {
+        return this.feedReactionModel.find({
+            feed_id: { $in: feedId },
             comment_id: commentId,
             created_by: userId,
         })
