@@ -98,17 +98,20 @@ export class FeedReactionsService {
     }
 
     async deleteFeedReaction(feedId: string, currentUserId: string) {
-        const feed = await this.feedModel.findOneAndUpdate(
+        const feed = await this.feedModel.findById(feedId)
+        if (!feed) throw new FeedNotFoundException()
+
+        await this.feedReactionModel.deleteOne({
+            feed_id: feedId,
+            created_by: currentUserId,
+        })
+
+        await this.feedModel.findOneAndUpdate(
             { _id: feedId },
             { $inc: { number_of_reaction: -1 } },
         )
 
-        if (!feed) throw new FeedNotFoundException()
-
-        return this.feedReactionModel.deleteOne({
-            feed_id: feedId,
-            created_by: currentUserId,
-        })
+        return 'OK'
     }
 
     async deleteFeedCommentReaction(
@@ -117,19 +120,22 @@ export class FeedReactionsService {
         currentUserId: string,
     ) {
         const feed = await this.feedModel.findById(feed_id)
-
         if (!feed) throw new FeedNotFoundException()
 
-        const comment = await this.commentModel.findOneAndUpdate(
-            { _id: comment_id },
-            { $inc: { number_of_reaction: -1 } },
-        )
+        const comment = await this.commentModel.findById(comment_id)
         if (!comment) throw new CommentNotFoundException()
 
-        return this.feedCommentReaction.delete({
+        await this.feedCommentReaction.deleteOne({
             comment_id,
             created_by: currentUserId,
         })
+
+        await this.commentModel.findOneAndUpdate(
+            { _id: comment_id },
+            { $inc: { number_of_reaction: -1 } },
+        )
+
+        return 'OK'
     }
 
     async getFeedReaction(

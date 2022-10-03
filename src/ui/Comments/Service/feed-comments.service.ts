@@ -93,12 +93,11 @@ export class FeedCommentService {
         feedId: string,
         currentUserId: string,
         next?: string,
-        rowsPerpage?: number,
+        rowsPerpage = 6,
     ) {
         const feed = await this.feedModel.findById(feedId)
         if (!feed) throw new FeedNotFoundException()
 
-        if (!rowsPerpage) rowsPerpage = 5
         let feedComments = undefined
         if (!next) {
             feedComments = await this.commentModel.paginate({
@@ -126,9 +125,8 @@ export class FeedCommentService {
                     (u) => cmt.created_by === u.id,
                 )
                 const commentReaction =
-                    await this.feedReactionService.getCommentReaction(
+                    await this.feedReactionService.getFeedReaction(
                         feedId,
-                        cmt.comment_id,
                         currentUserId,
                     )
                 return {
@@ -145,12 +143,13 @@ export class FeedCommentService {
                     ]),
                     current_user: {
                         is_reacted: !_.isEmpty(commentReaction) ? true : false,
-                        reaction_type: _.get(commentReaction, 'type') || '',
+                        reaction_type: _.get(commentReaction, 'type'),
                     },
                     created_user: _.pick(userInfo, [
                         '_id',
                         'full_name',
                         'avatar',
+                        'nick_name',
                     ]),
                 }
             }),
@@ -205,7 +204,7 @@ export class FeedCommentService {
                 const commentReaction =
                     await this.feedReactionService.getCommentReaction(
                         feedId,
-                        cmt.comment_id,
+                        cmt._id,
                         currentUserId,
                     )
                 return {
@@ -221,7 +220,7 @@ export class FeedCommentService {
                     ]),
                     current_user: {
                         is_reacted: _.isEmpty(commentReaction) ? false : true,
-                        reaction_type: _.get(commentReaction, 'type') || '',
+                        reaction_type: _.get(commentReaction, 'type'),
                     },
                     created_user: _.pick(userInfo, [
                         '_id',
