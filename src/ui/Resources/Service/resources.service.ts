@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { FeedReactionDocument } from 'src/shared/Schemas/feed-reaction.schema'
 import {
     FeedResource,
     FeedResourceDocument,
@@ -9,6 +8,7 @@ import {
 import { configService } from 'src/shared/Services/config.service'
 import { AddFeedResourceDto } from '../Dto/add-feed-resource.dto'
 import { GetFeedResourceDto } from '../Dto/get-feed-resource.dto'
+import _ from 'lodash'
 
 @Injectable()
 export class FeedResourcesService {
@@ -25,21 +25,18 @@ export class FeedResourcesService {
     async getResourceByIds(
         resourceIds: string[],
     ): Promise<GetFeedResourceDto[]> {
-        try {
-            const resources = await this.feedResourcesModel.find({
-                _id: { $in: resourceIds },
-            })
-            return resources.map((resource) => {
-                return {
-                    resource_id: resource.id,
-                    path:
-                        configService.getEnv('AWS_IMAGE_BASE_URL') +
-                        '/' +
-                        resource.path,
-                } as GetFeedResourceDto
-            })
-        } catch {
-            return null
-        }
+        const resources = await this.feedResourcesModel.find({
+            _id: { $in: resourceIds },
+        })
+
+        return _.map(resources, (resource) => {
+            return {
+                resource_id: resource.id,
+                path:
+                    configService.getEnv('AWS_IMAGE_BASE_URL') +
+                    '/' +
+                    resource.path,
+            } as GetFeedResourceDto
+        })
     }
 }
