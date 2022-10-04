@@ -174,11 +174,12 @@ export class FeedsService {
         nextCursor?: string,
         perPage = 6,
     ) {
-        const feedReactions = await this.feedReactionService.getFeedReactions(
-            reactedBy,
-            nextCursor,
-            perPage,
-        )
+        const feedReactions =
+            await this.feedReactionService.getPaginatedFeedReactions(
+                reactedBy,
+                nextCursor,
+                perPage,
+            )
 
         const feedIds: string[] = _.map(
             _.get(feedReactions, 'results', []),

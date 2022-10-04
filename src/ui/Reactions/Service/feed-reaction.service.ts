@@ -162,7 +162,7 @@ export class FeedReactionsService {
         })
     }
 
-    async getFeedReactions(
+    async getPaginatedFeedReactions(
         reactedBy: string,
         nextCursor?: string,
         perPage = 6,
