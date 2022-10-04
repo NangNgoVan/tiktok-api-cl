@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import e from 'express'
 import { Model } from 'mongoose'
 import _ from 'lodash'
 import {
@@ -16,19 +15,19 @@ export class FeedHashTagsService {
     ) {}
 
     async addFeedHashTag(feedId: string, createdBy: string, tags: string[]) {
-        tags = _.uniq(tags)
+        const validTags: string[] = _.compact(_.uniq(tags))
         await Promise.all(
-            tags.map(async (tag) => {
+            _.map(validTags, async (tag) => {
                 const feedHashTag = await this.feedHashTagModel.findOne({
                     feed_id: feedId,
-                    tag: tag.trim(),
+                    tag,
                     created_by: createdBy,
                 })
 
                 if (!feedHashTag) {
                     await this.feedHashTagModel.create({
                         feed_id: feedId,
-                        tag: tag.trim(),
+                        tag,
                         created_by: createdBy,
                     })
                 }
