@@ -37,7 +37,7 @@ export class FeedComment {
 
     @ApiProperty()
     @Prop({})
-    content?: string
+    content: string
 
     @ApiProperty()
     @IsNumber()

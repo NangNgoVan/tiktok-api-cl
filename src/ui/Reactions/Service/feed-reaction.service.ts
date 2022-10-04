@@ -150,7 +150,7 @@ export class FeedReactionsService {
         })
     }
 
-    async getCommentsReaction(
+    async getCommentReactions(
         feedId: string,
         commentId: string[],
         userId: string,
