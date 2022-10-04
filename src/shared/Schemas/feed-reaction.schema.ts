@@ -25,10 +25,6 @@ export class FeedReaction {
 
     @Prop()
     @ApiProperty()
-    comment_id?: string
-
-    @Prop()
-    @ApiProperty()
     type: UserReactionType
 }
 

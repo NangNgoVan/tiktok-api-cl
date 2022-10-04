@@ -19,7 +19,7 @@ import {
 } from 'src/shared/Schemas/feed-comment.schema'
 
 @Injectable()
-export class FeedReactionsService {
+export class ReactionsService {
     constructor(
         @InjectModel(FeedReaction.name)
         private readonly feedReactionModel: MongoPaging<FeedReactionDocument>,
@@ -73,18 +73,32 @@ export class FeedReactionsService {
         })
         if (!feed) throw new FeedNotFoundException()
 
-        const comment = await this.commentModel.findOneAndUpdate(
-            { _id: comment_id },
-            { $inc: { number_of_reaction: 1 } },
-        )
+        const reaction = await this.feedReactionModel.findOne({
+            created_by,
+            feed_id,
+            comment_id,
+        })
+
+        if (reaction) {
+            throw new BadRequestException('you already reacted to this feed')
+        }
+
+        const comment = await this.commentModel.findById(comment_id)
         if (!comment) throw new CommentNotFoundException()
 
-        return this.feedCommentReaction.create({
+        const createdComment = this.feedCommentReaction.create({
             feed_id,
             created_by,
             comment_id,
             type: createReaction.type,
         })
+
+        await this.commentModel.findOneAndUpdate(
+            { _id: comment_id },
+            { $inc: { number_of_reaction: 1 } },
+        )
+
+        return createdComment
     }
 
     async deleteFeedReaction(feedId: string, currentUserId: string) {

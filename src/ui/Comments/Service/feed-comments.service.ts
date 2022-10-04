@@ -16,7 +16,7 @@ import { FeedCommentLevel } from 'src/shared/Types/types'
 import { CreateFeedCommentDto } from '../Dto/create-feed-comment.dto'
 import { MongoPaging } from 'mongo-cursor-pagination'
 import _ from 'lodash'
-import { FeedReactionsService } from 'src/ui/Reactions/Service/feed-reaction.service'
+import { ReactionsService } from 'src/ui/Reactions/Service/reaction.service'
 
 @Injectable()
 export class FeedCommentService {
@@ -30,7 +30,7 @@ export class FeedCommentService {
         @InjectModel(User.name)
         private userModel: Model<UserDocument>,
 
-        private readonly feedReactionService: FeedReactionsService,
+        private readonly feedReactionService: ReactionsService,
     ) {}
 
     async createFeedComment(payload: CreateFeedCommentDto) {
@@ -52,14 +52,16 @@ export class FeedCommentService {
         const feed = await this.feedModel.findById(payload.feed_id)
         if (!feed) throw new FeedNotFoundException()
 
-        const comment = await this.commentModel.findOneAndUpdate(
-            { _id: payload.reply_to },
-            { $inc: { number_of_comment: 1 } },
-        )
+        const comment = await this.commentModel.findById(payload.reply_to)
         if (!comment) throw new CommentNotFoundException()
 
         const createComment = await this.commentModel.create(payload)
         createComment.level = FeedCommentLevel.LEVEL_TWO
+
+        await this.commentModel.findOneAndUpdate(
+            { _id: payload.reply_to },
+            { $inc: { number_of_comment: 1 } },
+        )
 
         return createComment.save()
     }
@@ -79,9 +81,15 @@ export class FeedCommentService {
             throw new ForbidenException()
         }
 
-        if (comment.level === FeedCommentLevel.LEVEL_TWO) {
-            return this.commentModel.deleteOne({ reply_to: commentId })
-        }
+        await this.commentModel.deleteOne({
+            _id: commentId,
+            created_by: currentUserId,
+        })
+
+        await this.feedModel.findOneAndUpdate(
+            { _id: feedId },
+            { $inc: { number_of_comment: -1 } },
+        )
 
         return this.commentModel.deleteMany({
             feed_id: feedId,

@@ -14,7 +14,7 @@ import {
 } from 'src/shared/Schemas/feed-reaction.schema'
 import { Feed, FeedSchema } from 'src/shared/Schemas/feed.schema'
 import { FeedReactionController } from './Controller/reactions.controller'
-import { FeedReactionsService } from './Service/feed-reaction.service'
+import { ReactionsService } from './Service/reaction.service'
 
 @Module({
     imports: [
@@ -29,7 +29,7 @@ import { FeedReactionsService } from './Service/feed-reaction.service'
         ]),
     ],
     controllers: [FeedReactionController],
-    providers: [FeedReactionsService],
-    exports: [FeedReactionsService],
+    providers: [ReactionsService],
+    exports: [ReactionsService],
 })
 export class ReactionsModule {}
