@@ -10,6 +10,7 @@ export type FeedCommentReactionDocument = FeedCommentReaction & Document
         updatedAt: 'updated_at',
     },
     validateBeforeSave: true,
+    collection: 'feed_comment_reactions',
 })
 export class FeedCommentReaction {
     @Prop()

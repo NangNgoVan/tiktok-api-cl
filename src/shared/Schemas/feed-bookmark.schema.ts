@@ -9,6 +9,7 @@ export type FeedBookmarkDocument = FeedBookmark & Document
         updatedAt: 'updated_at',
     },
     validateBeforeSave: true,
+    collection: 'feed_bookmarks',
 })
 export class FeedBookmark {
     @Prop()
