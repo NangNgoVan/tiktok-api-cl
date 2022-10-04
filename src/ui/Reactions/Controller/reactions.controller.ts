@@ -30,7 +30,7 @@ export class FeedReactionController {
         const feed_id = req.params.id
         const created_by = req.user.userId
 
-        return this.reactionsService.createReactionByFeedId(
+        return this.reactionsService.createFeedReaction(
             feed_id,
             created_by,
             createFeedReactionDto,
@@ -53,7 +53,7 @@ export class FeedReactionController {
         const commentId = req.params.commentId
         const created_by = req.user.userId
 
-        return this.reactionsService.createReactionByFeedIdAndCommentId(
+        return this.reactionsService.createCommentReaction(
             feed_id,
             commentId,
             created_by,
