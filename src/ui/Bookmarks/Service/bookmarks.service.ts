@@ -23,11 +23,7 @@ export class BookmarksService {
     ) {}
 
     async createFeedBookmark(feedId: string, createdBy: string) {
-        const feed = await this.feedModel.findOneAndUpdate(
-            { _id: feedId },
-            { $inc: { number_of_bookmark: 1 } },
-        )
-
+        const feed = await this.feedModel.findById(feedId)
         if (!feed) throw new FeedNotFoundException()
 
         const feedBookmark = await this.feedBookmarkModel.findOne({
@@ -39,10 +35,17 @@ export class BookmarksService {
             throw new BadRequestException('you already bookmarked this feed')
         }
 
-        return this.feedBookmarkModel.create({
+        const createFeedBookmarks = await this.feedBookmarkModel.create({
             feed_id: feedId,
             created_by: createdBy,
         })
+
+        await this.feedModel.findOneAndUpdate(
+            { _id: feedId },
+            { $inc: { number_of_bookmark: 1 } },
+        )
+
+        return createFeedBookmarks
     }
 
     async deleteFeedBookmark(feedId: string, createdBy: string) {
@@ -53,17 +56,20 @@ export class BookmarksService {
 
         if (!feedBookmark) throw new NotFoundException()
 
-        const feed = await this.feedModel.findOneAndUpdate(
-            { _id: feedId },
-            { $inc: { number_of_bookmark: -1 } },
-        )
-
+        const feed = await this.feedModel.findById(feedId)
         if (!feed) throw new FeedNotFoundException()
 
-        return this.feedBookmarkModel.deleteOne({
+        await this.feedBookmarkModel.deleteOne({
             feed_id: feedId,
             created_by: createdBy,
         })
+
+        if (feed.number_of_bookmark > 0) {
+            await this.feedModel.findOneAndUpdate(
+                { _id: feedId },
+                { $inc: { number_of_bookmark: -1 } },
+            )
+        }
     }
 
     async getFeedBookmark(

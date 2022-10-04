@@ -86,15 +86,17 @@ export class FeedCommentService {
             created_by: currentUserId,
         })
 
-        await this.feedModel.findOneAndUpdate(
-            { _id: feedId },
-            { $inc: { number_of_comment: -1 } },
-        )
-
-        return this.commentModel.deleteMany({
+        await this.commentModel.deleteMany({
             feed_id: feedId,
             reply_to: commentId,
         })
+
+        if (feed.number_of_comment > 0) {
+            await this.feedModel.findOneAndUpdate(
+                { _id: feedId },
+                { $inc: { number_of_comment: -1 } },
+            )
+        }
     }
 
     async getCommentByFeedId(
