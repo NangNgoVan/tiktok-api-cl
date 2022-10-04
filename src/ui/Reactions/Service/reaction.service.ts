@@ -38,16 +38,16 @@ export class ReactionsService {
     ) {}
 
     async createFeedReaction(
-        feed_id: string,
-        created_by: string,
+        feedId: string,
+        currentUserId: string,
         createReaction: CreateFeedReactionDto,
     ) {
-        const feed = await this.feedModel.findById(feed_id)
+        const feed = await this.feedModel.findById(feedId)
         if (!feed) throw new FeedNotFoundException()
 
         const reaction = await this.feedReactionModel.findOne({
-            created_by,
-            feed_id,
+            created_by: currentUserId,
+            feed_id: feedId,
         })
 
         if (reaction) {
@@ -55,13 +55,13 @@ export class ReactionsService {
         }
 
         const create = await this.feedReactionModel.create({
-            feed_id,
-            created_by,
+            feed_id: feedId,
+            created_by: currentUserId,
             type: createReaction.type,
         })
 
         await this.feedModel.findOneAndUpdate(
-            { _id: feed_id },
+            { _id: feedId },
             { $inc: { number_of_reaction: 1 } },
         )
 
@@ -110,14 +110,16 @@ export class ReactionsService {
         if (!feed) throw new FeedNotFoundException()
 
         const deleteFeedReaction = await this.feedReactionModel.deleteOne({
-            feed_id: feedId,
             created_by: currentUserId,
+            feed_id: feedId,
         })
 
-        await this.feedModel.findOneAndUpdate(
-            { _id: feedId },
-            { $inc: { number_of_reaction: -1 } },
-        )
+        if (feed.number_of_reaction > 0) {
+            await this.feedModel.findOneAndUpdate(
+                { _id: feedId },
+                { $inc: { number_of_reaction: -1 } },
+            )
+        }
 
         return deleteFeedReaction
     }
@@ -139,10 +141,12 @@ export class ReactionsService {
                 created_by: currentUserId,
             })
 
-        await this.commentModel.findOneAndUpdate(
-            { _id: comment_id },
-            { $inc: { number_of_reaction: -1 } },
-        )
+        if (comment.number_of_reaction > 0) {
+            await this.commentModel.findOneAndUpdate(
+                { _id: comment_id },
+                { $inc: { number_of_reaction: -1 } },
+            )
+        }
 
         return deleteFeedCommentReaction
     }

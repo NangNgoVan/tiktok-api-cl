@@ -28,11 +28,11 @@ export class FeedReactionController {
         @Body() createFeedReactionDto: CreateFeedReactionDto,
     ): Promise<any> {
         const feed_id = req.params.id
-        const created_by = req.user.userId
+        const currentUserId = req.user.userId
 
         return this.reactionsService.createFeedReaction(
             feed_id,
-            created_by,
+            currentUserId,
             createFeedReactionDto,
         )
     }
