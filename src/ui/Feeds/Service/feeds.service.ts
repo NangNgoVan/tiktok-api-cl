@@ -45,10 +45,7 @@ export class FeedsService {
             createdFeed.hashtags,
         )
         /**await */
-        this.hashTagService.addHashTag(
-            createdFeed.created_by,
-            createdFeed.hashtags,
-        )
+        this.hashTagService.addHashTag(createdFeed.hashtags)
 
         return createdFeed.save()
     }

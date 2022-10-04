@@ -10,22 +10,13 @@ export class HashTagService {
         private readonly hashTagModel: Model<HashTagDocument>,
     ) {}
 
-    async addHashTag(createdBy: string, tags: string[]) {
-        await Promise.all(
-            tags.map(async (tag) => {
-                const hashTag = await this.hashTagModel.findOne({
-                    tag: tag.trim(),
-                })
-                if (!hashTag) {
-                    await this.hashTagModel.create({
-                        tag: tag.trim(),
-                        created_by: createdBy,
-                    })
-                } else {
-                    hashTag.number_of_use = hashTag.number_of_use + 1
-                    await hashTag.save()
-                }
-            }),
+    async addHashTag(tags: string[]) {
+        return this.hashTagModel.findOneAndUpdate(
+            { tag: { $in: tags } },
+            { $inc: { number_of_use: 1 } },
+            {
+                upsert: true,
+            },
         )
     }
 }
