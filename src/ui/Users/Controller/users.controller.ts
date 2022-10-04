@@ -3,8 +3,10 @@ import {
     Body,
     Controller,
     Get,
+    HttpStatus,
     Logger,
     Param,
+    ParseFilePipeBuilder,
     Patch,
     Post,
     Req,
@@ -154,7 +156,19 @@ export class UsersController {
         type: UploadMetaDataDto,
     })
     async uploadAvatarToAWS3(
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFile(
+            new ParseFilePipeBuilder()
+                .addFileTypeValidator({
+                    fileType: /(jpg|jpeg|png|gif)$/,
+                })
+                .addMaxSizeValidator({
+                    maxSize: 5 * 1024 * 1024,
+                })
+                .build({
+                    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+                }),
+        )
+        file: Express.Multer.File,
         @Req() req,
     ): Promise<UploadMetaDataDto> {
         const { userId } = req.user

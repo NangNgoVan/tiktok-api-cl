@@ -2,7 +2,9 @@ import {
     Body,
     Controller,
     Get,
+    HttpStatus,
     NotFoundException,
+    ParseFilePipeBuilder,
     Post,
     Query,
     Req,
@@ -45,6 +47,7 @@ import { FeedCurrentUserDto } from '../Dto/feed-current-user.dto'
 import { CreatedUserDto } from '../../../shared/Dto/created-user.dto'
 import _, { create } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
+import { FeedMetadataValidationPipe } from 'src/shared/Pipes/FeedMetadataValidation.pipe'
 
 @Controller('ui/feeds')
 @ApiTags('Feed APIs')
@@ -98,11 +101,52 @@ export class FeedsController {
     async uploadFeedImageType(
         @Req() req,
         @Body() formData: object,
-        @UploadedFiles() files: { resources?: Express.Multer.File[] },
+        @UploadedFiles(
+            new ParseFilePipeBuilder()
+                .addFileTypeValidator({
+                    fileType: /(jpg|jpeg|png|gif)$/,
+                })
+                .addMaxSizeValidator({
+                    maxSize: 5 * 1024 * 1024,
+                })
+                .build({
+                    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+                }),
+        )
+        files: { resources?: Express.Multer.File[] },
     ) {
         const { userId } = req.user
         const user = await this.userService.findById(userId)
         if (!user) throw new UserNotFoundException()
+
+        let data = null
+
+        if (formData['data']) {
+            try {
+                data = JSON.parse(formData['data'])
+            } catch (e) {
+                //parse error
+            }
+        }
+
+        let dto = data as CreateFeedDto
+        dto = _.pick(dto, [
+            'content',
+            'song_id',
+            'hashtags',
+            'created_by',
+            'primary_image_index',
+            'allowed_comment',
+        ])
+
+        dto.hashtags = this.utilsService.splitHashtagFromString(dto.content)
+
+        dto.created_by = userId
+        const createdFeed = await this.feedsService.createFeed(
+            dto,
+            FeedType.IMAGE,
+        )
+        if (!createdFeed) return DatabaseUpdateFailException
 
         const aws3FeedResourcePath = 'feeds/' + moment().format('yyyy-MM-DD')
 
@@ -128,34 +172,6 @@ export class FeedsController {
                 return Key
             }),
         )
-
-        let data = null
-
-        if (formData['data']) {
-            try {
-                data = JSON.parse(formData['data'])
-            } catch (e) {
-                //parse error
-            }
-        }
-
-        let dto = data as CreateFeedDto
-        dto = _.pick(dto, [
-            'content',
-            'song_id',
-            'hashtags',
-            'created_by',
-            'primary_image_index',
-            'allowed_comment',
-        ])
-        dto.hashtags = this.utilsService.splitHashtagFromString(dto.content)
-
-        dto.created_by = userId
-        const createdFeed = await this.feedsService.createFeed(
-            dto,
-            FeedType.IMAGE,
-        )
-        if (!createdFeed) return DatabaseUpdateFailException
 
         const resourceDtos = resource_urls.map((url) => {
             return {
@@ -224,12 +240,35 @@ export class FeedsController {
     async uploadFeedVideoType(
         @Req() req,
         @Body() formData: object,
-        @UploadedFiles()
+        @UploadedFiles(new FeedMetadataValidationPipe())
         files: { video: Express.Multer.File; thumbnail: Express.Multer.File },
     ) {
         const { userId } = req.user
         const user = await this.userService.findById(userId)
         if (!user) throw new UserNotFoundException()
+
+        let data = null
+
+        if (formData['data']) {
+            try {
+                data = JSON.parse(formData['data'])
+            } catch (e) {
+                //parse error
+            }
+        }
+
+        let dto = data as CreateFeedDto
+
+        dto = _.pick(dto, ['content', 'allowed_comment'])
+
+        dto.hashtags = this.utilsService.splitHashtagFromString(dto.content)
+        dto.created_by = userId
+
+        const createdFeed = await this.feedsService.createFeed(
+            dto,
+            FeedType.VIDEO,
+        )
+        if (!createdFeed) return DatabaseUpdateFailException
 
         const aws3FeedResourcePath =
             'videos/feeds/' + moment().format('yyyy-MM-DD')
@@ -260,29 +299,6 @@ export class FeedsController {
 
         if (!uploadedVideoUrl || !uploadedThumbnailUrl)
             throw new FileUploadFailException()
-
-        let data = null
-
-        if (formData['data']) {
-            try {
-                data = JSON.parse(formData['data'])
-            } catch (e) {
-                //parse error
-            }
-        }
-
-        let dto = data as CreateFeedDto
-
-        dto = _.pick(dto, ['content', 'allowed_comment'])
-
-        dto.hashtags = this.utilsService.splitHashtagFromString(dto.content)
-        dto.created_by = userId
-
-        const createdFeed = await this.feedsService.createFeed(
-            dto,
-            FeedType.VIDEO,
-        )
-        if (!createdFeed) return DatabaseUpdateFailException
 
         const videoResource = {
             path: uploadedVideoUrl.Key,
