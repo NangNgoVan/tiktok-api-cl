@@ -60,7 +60,7 @@ export class FeedCommentService {
 
         await this.commentModel.findOneAndUpdate(
             { _id: payload.reply_to },
-            { $inc: { number_of_comment: 1 } },
+            { $inc: { number_of_reply: 1 } },
         )
 
         return createComment.save()
@@ -193,7 +193,9 @@ export class FeedCommentService {
 
             const currentCommentReaction = _.find(
                 commentReactionsByCurrentUser,
-                (commentReaction) => commentReaction.comment_id === comment.id,
+                (commentReaction) =>
+                    commentReaction.comment_id ===
+                    _.get(comment, '_id').toString(),
             )
 
             return {

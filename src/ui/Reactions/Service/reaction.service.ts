@@ -166,7 +166,7 @@ export class ReactionsService {
         commentId: string,
         userId: string,
     ): Promise<FeedReactionDocument | undefined> {
-        return this.feedReactionModel.findOne({
+        return this.feedCommentReaction.findOne({
             feed_id: feedId,
             comment_id: commentId,
             created_by: userId,
@@ -175,13 +175,15 @@ export class ReactionsService {
 
     async getCommentReactions(
         feedId: string,
-        commentId: string[],
+        commentIds: string[],
         userId: string,
     ): Promise<FeedReactionDocument | undefined> {
-        return this.feedReactionModel.find({
-            feed_id: { $in: feedId },
-            comment_id: commentId,
-            created_by: userId,
+        return this.feedCommentReaction.find({
+            query: {
+                feed_id: feedId,
+                comment_id: { $in: commentIds },
+                created_by: userId,
+            },
         })
     }
 
