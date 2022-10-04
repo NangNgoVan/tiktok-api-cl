@@ -40,6 +40,7 @@ import { UploadMetaDataDto } from '../Dto/upload-metadata.dto'
 import moment from 'moment'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { FeedsService } from 'src/ui/Feeds/Service/feeds.service'
+import { v4 as uuidv4 } from 'uuid'
 
 @Controller('ui/users')
 @ApiTags('User APIs')
@@ -162,16 +163,16 @@ export class UsersController {
 
         const { originalname, /*encoding,*/ mimetype, buffer, size } = file
 
-        const path = 'avatars/' + moment().format('yyyy-MM-DD')
+        const avatarResourcePath = 'avatars/' + moment().format('yyyy-MM-DD')
+        const originalAvatarName = file.originalname
+        const avatarExt = originalAvatarName.split('.').pop()
+        const pathToSaveAvatar = `${avatarResourcePath}/${userId}/${uuidv4()}.${avatarExt}`
 
         const uploadedData =
             await this.aws3FileUploadService.uploadFileToS3Bucket(
+                pathToSaveAvatar,
                 buffer,
-                configService.getEnv('AWS_BUCKET_NAME'),
-                originalname,
                 mimetype,
-                userId,
-                path,
             )
 
         if (!uploadedData) throw new FileUploadFailException()

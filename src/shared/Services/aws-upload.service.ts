@@ -9,20 +9,39 @@ export class AWS3FileUploadService {
     s3() {
         return new aws.S3(configService.AWS3Configuration())
     }
-    async uploadFileToS3Bucket(
-        file,
-        bucket,
-        name,
-        mimeType,
-        ownerId,
-        subfolderPath,
-    ) {
-        const userFolder = `${subfolderPath}/${ownerId}`
-        const ext = name.split('.').pop()
+    // async uploadFileToS3Bucket(
+    //     buffer,
+    //     bucket,
+    //     originalName,
+    //     mimeType,
+    //     ownerId,
+    //     subfolderPath,
+    // ) {
+    //     const userFolder = `${subfolderPath}/${ownerId}`
+    //     const ext = originalName.split('.').pop()
+    //     const uploadParams = {
+    //         Bucket: this.AWS_BUCKET_NAME,
+    //         Key: `${userFolder}/${uuidv4()}.${ext}`,
+    //         Body: buffer,
+    //         ContentType: mimeType,
+    //         ContentDisposition: 'inline',
+    //         CreateBucketConfiguration: {
+    //             LocationConstraint: configService.getEnv('AWS_REGION'),
+    //         },
+    //     }
+    //     //
+    //     try {
+    //         const uploadData = await this.s3().upload(uploadParams).promise()
+    //         return uploadData
+    //     } catch (e) {
+    //         return null
+    //     }
+    // }
+    async uploadFileToS3Bucket(key, mimeType, buffer) {
         const uploadParams = {
-            Bucket: bucket,
-            Key: `${userFolder}/${uuidv4()}.${ext}`,
-            Body: file,
+            Bucket: configService.getEnv('AWS_BUCKET_NAME'),
+            Key: key,
+            Body: buffer,
             ContentType: mimeType,
             ContentDisposition: 'inline',
             CreateBucketConfiguration: {

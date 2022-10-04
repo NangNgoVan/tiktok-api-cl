@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsBoolean, IsEnum, IsNumber, IsString } from 'class-validator'
+import {
+    IsArray,
+    IsBoolean,
+    IsEnum,
+    IsNumber,
+    IsString,
+    MaxLength,
+} from 'class-validator'
+import { max } from 'lodash'
 import { FeedType } from 'src/shared/Types/types'
 
 export class CreateFeedDto {
@@ -14,6 +22,7 @@ export class CreateFeedDto {
 
     @IsString()
     @ApiProperty()
+    @MaxLength(255)
     content: string
 
     // @IsArray()

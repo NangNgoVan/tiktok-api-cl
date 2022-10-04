@@ -97,4 +97,8 @@ export class FeedDetailDto {
     @ApiProperty()
     @IsString()
     created_at: string
+
+    @ApiProperty()
+    @IsString()
+    thumbnail: string
 }

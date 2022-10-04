@@ -6,11 +6,12 @@ import {
     Post,
     Query,
     Req,
+    UploadedFile,
     UploadedFiles,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common'
-import { FileFieldsInterceptor } from '@nestjs/platform-express'
+import { ExpressAdapter, FileFieldsInterceptor } from '@nestjs/platform-express'
 import {
     ApiBearerAuth,
     ApiBody,
@@ -23,6 +24,7 @@ import {
 import moment from 'moment'
 import {
     DatabaseUpdateFailException,
+    FileUploadFailException,
     UserNotFoundException,
 } from 'src/shared/Exceptions/http.exceptions'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
@@ -41,7 +43,8 @@ import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 import { FeedCurrentUserDto } from '../Dto/feed-current-user.dto'
 import { CreatedUserDto } from '../../../shared/Dto/created-user.dto'
-import _ from 'lodash'
+import _, { create } from 'lodash'
+import { v4 as uuidv4 } from 'uuid'
 
 @Controller('ui/feeds')
 @ApiTags('Feed APIs')
@@ -61,7 +64,7 @@ export class FeedsController {
     @UseInterceptors(FileFieldsInterceptor([{ name: 'resources' }]))
     @ApiOkResponse({
         description: 'OK',
-        type: Feed,
+        type: FeedDetailDto,
     })
     @ApiConsumes('multipart/form-data')
     @ApiBody({
@@ -84,6 +87,9 @@ export class FeedsController {
                         primary_image_index: {
                             type: 'number',
                         },
+                        allowed_comment: {
+                            type: 'boolean',
+                        },
                     },
                 },
             },
@@ -99,20 +105,25 @@ export class FeedsController {
         if (!user) throw new UserNotFoundException()
 
         const aws3FeedResourcePath = 'feeds/' + moment().format('yyyy-MM-DD')
+
         const resource_urls = await Promise.all(
             files.resources.map(async (file) => {
                 const { originalname, /*encoding,*/ mimetype, buffer, size } =
                     file
+
+                const ext = originalname.split('.').pop()
+                const pathToSaveResource = `${aws3FeedResourcePath}/${userId}/${uuidv4()}.${ext}`
+
                 const uploadedData =
                     await this.aws3FileUploadService.uploadFileToS3Bucket(
-                        buffer,
-                        configService.getEnv('AWS_BUCKET_NAME'),
-                        originalname,
+                        pathToSaveResource,
                         mimetype,
-                        userId,
-                        aws3FeedResourcePath,
+                        buffer,
                     )
-                if (!uploadedData) return null
+                if (!uploadedData) {
+                    throw new FileUploadFailException()
+                    //return null
+                }
                 const { /*ETag,*/ /*Location ,*/ Key /*Bucket*/ } = uploadedData
                 return Key
             }),
@@ -121,7 +132,11 @@ export class FeedsController {
         let data = null
 
         if (formData['data']) {
-            data = JSON.parse(formData['data'])
+            try {
+                data = JSON.parse(formData['data'])
+            } catch (e) {
+                //parse error
+            }
         }
 
         let dto = data as CreateFeedDto
@@ -162,7 +177,142 @@ export class FeedsController {
         user.$inc('number_of_feed', 1)
         user.save()
 
-        return createdFeed
+        return await this.feedsService.getFeedById(createdFeed.id, userId)
+    }
+
+    @Post('/by-type/video')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Create video feed' })
+    @UseInterceptors(
+        FileFieldsInterceptor([
+            { name: 'video', maxCount: 1 },
+            { name: 'thumbnail', maxCount: 1 },
+        ]),
+    )
+    @ApiOkResponse({
+        description: 'OK',
+        type: FeedDetailDto,
+    })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                video: {
+                    type: 'string',
+                    format: 'binary',
+                },
+                thumbnail: {
+                    type: 'string',
+                    format: 'binary',
+                },
+                data: {
+                    type: 'object',
+                    properties: {
+                        content: {
+                            type: 'string',
+                        },
+                        allowed_comment: {
+                            type: 'boolean',
+                        },
+                    },
+                },
+            },
+        },
+    })
+    async uploadFeedVideoType(
+        @Req() req,
+        @Body() formData: object,
+        @UploadedFiles()
+        files: { video: Express.Multer.File; thumbnail: Express.Multer.File },
+    ) {
+        const { userId } = req.user
+        const user = await this.userService.findById(userId)
+        if (!user) throw new UserNotFoundException()
+
+        const aws3FeedResourcePath =
+            'videos/feeds/' + moment().format('yyyy-MM-DD')
+        //Video
+        const video = files.video[0]
+        const videoExt = video.originalname.split('.').pop()
+        const pathToSaveVideo = `${aws3FeedResourcePath}/${userId}/video-${uuidv4()}.${videoExt}`
+
+        //Thumbnail
+        const thumbnail = files.thumbnail[0]
+        const thumbnailExt = thumbnail.originalname.split('.').pop()
+        const pathToSaveThumbnail = `${aws3FeedResourcePath}/${userId}/thumbnail-${uuidv4()}.${thumbnailExt}`
+
+        //Upload files to aws3
+        const uploadedVideoUrl =
+            await this.aws3FileUploadService.uploadFileToS3Bucket(
+                pathToSaveVideo,
+                video.mimetype,
+                video.buffer,
+            )
+
+        const uploadedThumbnailUrl =
+            await this.aws3FileUploadService.uploadFileToS3Bucket(
+                pathToSaveThumbnail,
+                thumbnail.mimetype,
+                thumbnail.buffer,
+            )
+
+        if (!uploadedVideoUrl || !uploadedThumbnailUrl)
+            throw new FileUploadFailException()
+
+        let data = null
+
+        if (formData['data']) {
+            try {
+                data = JSON.parse(formData['data'])
+            } catch (e) {
+                //parse error
+            }
+        }
+
+        let dto = data as CreateFeedDto
+
+        dto = _.pick(dto, ['content', 'allowed_comment'])
+
+        dto.hashtags = this.utilsService.splitHashtagFromString(dto.content)
+        dto.created_by = userId
+
+        const createdFeed = await this.feedsService.createFeed(
+            dto,
+            FeedType.VIDEO,
+        )
+        if (!createdFeed) return DatabaseUpdateFailException
+
+        const videoResource = {
+            path: uploadedVideoUrl.Key,
+            feed_id: createdFeed.id,
+            type: FeedType.VIDEO,
+            created_by: userId,
+        } as AddFeedResourceDto
+
+        const thumbnailResource = {
+            path: uploadedThumbnailUrl.Key,
+            feed_id: createdFeed.id,
+            type: FeedType.VIDEO,
+            created_by: userId,
+        } as AddFeedResourceDto
+
+        const addedResources = await this.feedResourcesService.addFeedResource([
+            videoResource,
+            thumbnailResource,
+        ])
+        if (!addedResources) return DatabaseUpdateFailException
+
+        createdFeed.resource_ids = addedResources
+        createdFeed.thumbnail = addedResources[1]
+
+        await createdFeed.save()
+
+        user.$inc('number_of_feed', 1)
+        user.save()
+
+        return await this.feedsService.getFeedById(createdFeed.id, userId)
     }
 
     @Get('/newest')
