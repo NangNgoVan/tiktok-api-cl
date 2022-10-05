@@ -239,9 +239,10 @@ export class FeedsService {
             const createdUser = await this.userService.findById(feed.created_by)
 
             feedDetailDto.created_user = {
-                nick_name: createdUser.nick_name,
-                full_name: createdUser.full_name,
-                avatar: createdUser.avatar,
+                nick_name: _.get(createdUser, 'nick_name'),
+                full_name: _.get(createdUser, 'full_name'),
+                avatar: _.get(createdUser, 'avatar'),
+                id: _.get(createdUser, 'id'),
                 current_user: {
                     is_followed:
                         await this.userFollowService.checkFollowRelationshipBetween(
@@ -249,7 +250,6 @@ export class FeedsService {
                             feed.created_by,
                         ),
                 },
-                id: createdUser.id,
             }
 
             const feedReaction = await this.feedReactionService.getFeedReaction(
