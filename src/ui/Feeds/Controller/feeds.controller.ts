@@ -48,6 +48,7 @@ import { CreatedUserDto } from '../../../shared/Dto/created-user.dto'
 import _, { create } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { FeedMetadataValidationPipe } from 'src/shared/Pipes/FeedMetadataValidation.pipe'
+import { ParseFormDataJsonPipe } from 'src/shared/Pipes/ParseFormDataJson.pipe'
 
 @Controller('ui/feeds')
 @ApiTags('Feed APIs')
@@ -100,7 +101,7 @@ export class FeedsController {
     })
     async uploadFeedImageType(
         @Req() req,
-        @Body() formData: object,
+        @Body(new ParseFormDataJsonPipe()) formData: object,
         @UploadedFiles(
             new ParseFilePipeBuilder()
                 .addFileTypeValidator({
@@ -119,17 +120,8 @@ export class FeedsController {
         const user = await this.userService.findById(userId)
         if (!user) throw new UserNotFoundException()
 
-        let data = null
+        let dto = formData['data'] as CreateFeedDto
 
-        if (formData['data']) {
-            try {
-                data = JSON.parse(formData['data'])
-            } catch (e) {
-                //parse error
-            }
-        }
-
-        let dto = data as CreateFeedDto
         dto = _.pick(dto, [
             'content',
             'song_id',
@@ -154,7 +146,6 @@ export class FeedsController {
             files.resources.map(async (file) => {
                 const { originalname, /*encoding,*/ mimetype, buffer, size } =
                     file
-
                 const ext = originalname.split('.').pop()
                 const pathToSaveResource = `${aws3FeedResourcePath}/${userId}/${uuidv4()}.${ext}`
 
@@ -239,7 +230,7 @@ export class FeedsController {
     })
     async uploadFeedVideoType(
         @Req() req,
-        @Body() formData: object,
+        @Body(new ParseFormDataJsonPipe()) formData: object,
         @UploadedFiles(new FeedMetadataValidationPipe())
         files: { video: Express.Multer.File; thumbnail: Express.Multer.File },
     ) {
@@ -247,18 +238,7 @@ export class FeedsController {
         const user = await this.userService.findById(userId)
         if (!user) throw new UserNotFoundException()
 
-        let data = null
-
-        if (formData['data']) {
-            try {
-                data = JSON.parse(formData['data'])
-            } catch (e) {
-                //parse error
-            }
-        }
-
-        let dto = data as CreateFeedDto
-
+        let dto = formData['data'] as CreateFeedDto
         dto = _.pick(dto, ['content', 'allowed_comment'])
 
         dto.hashtags = this.utilsService.splitHashtagFromString(dto.content)
