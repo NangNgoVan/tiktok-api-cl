@@ -37,6 +37,7 @@ const createLogger = (logGroupName: string) => {
         })
 
         transports.push(cloudWatchTransport)
+        transports.push(new winston.transports.Console({ level: 'error' }))
     }
 
     const requestIdFormatter = winston.format((info) => {
