@@ -20,7 +20,7 @@ import { CredentialDto } from '../../../shared/Dto/credential.dto'
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
-    @Get('/login/authentication-method/metamask')
+    @Get('/login/authentication-methods/metamask')
     @ApiOperation({ summary: 'Nonce' })
     @ApiOkResponse({
         description: '200',
@@ -30,7 +30,7 @@ export class AuthController {
         return this.authService.createNonce()
     }
 
-    @Post('/login/authentication-method/metamask')
+    @Post('/login/authentication-methods/metamask')
     @ApiOperation({ summary: 'Login with metamask' })
     @ApiOkResponse({
         description: '200',
@@ -42,7 +42,7 @@ export class AuthController {
         return this.authService.logInWithMetamask(dto)
     }
 
-    @Post('/login/authentication-method/credential')
+    @Post('/login/authentication-methods/credential')
     @ApiOperation({ summary: 'Login with credential' })
     @ApiOkResponse({
         description: '200',
