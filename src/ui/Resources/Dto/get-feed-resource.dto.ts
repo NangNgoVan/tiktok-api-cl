@@ -8,4 +8,7 @@ export class GetFeedResourceDto {
     @IsString()
     @ApiProperty()
     path: string
+    @ApiProperty()
+    @IsString()
+    mime: string
 }

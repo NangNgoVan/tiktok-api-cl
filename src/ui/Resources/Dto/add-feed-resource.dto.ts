@@ -6,4 +6,5 @@ export class AddFeedResourceDto {
     feed_id: string
     type: FeedType
     created_by: string
+    mime: string
 }

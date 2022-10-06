@@ -3,8 +3,10 @@ import {
     Body,
     Controller,
     Get,
+    HttpStatus,
     Logger,
     Param,
+    ParseFilePipeBuilder,
     Patch,
     Post,
     Req,
@@ -39,6 +41,8 @@ import { configService } from 'src/shared/Services/config.service'
 import { UploadMetaDataDto } from '../RequestDTO/upload-metadata.dto'
 import moment from 'moment'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
+import { FeedsService } from 'src/ui/Feeds/Service/feeds.service'
+import { v4 as uuidv4 } from 'uuid'
 
 @Controller('ui/users')
 @ApiTags('User APIs')
@@ -152,7 +156,19 @@ export class UsersController {
         type: UploadMetaDataDto,
     })
     async uploadAvatarToAWS3(
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFile(
+            new ParseFilePipeBuilder()
+                .addFileTypeValidator({
+                    fileType: /(jpg|jpeg|png|gif)$/,
+                })
+                .addMaxSizeValidator({
+                    maxSize: 5 * 1024 * 1024,
+                })
+                .build({
+                    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+                }),
+        )
+        file: Express.Multer.File,
         @Req() req,
     ): Promise<UploadMetaDataDto> {
         const { userId } = req.user
@@ -161,16 +177,16 @@ export class UsersController {
 
         const { originalname, /*encoding,*/ mimetype, buffer, size } = file
 
-        const path = 'avatars/' + moment().format('yyyy-MM-DD')
+        const avatarResourcePath = 'avatars/' + moment().format('yyyy-MM-DD')
+        const originalAvatarName = file.originalname
+        const avatarExt = originalAvatarName.split('.').pop()
+        const pathToSaveAvatar = `${avatarResourcePath}/${userId}/${uuidv4()}.${avatarExt}`
 
         const uploadedData =
             await this.aws3FileUploadService.uploadFileToS3Bucket(
+                pathToSaveAvatar,
                 buffer,
-                configService.getEnv('AWS_BUCKET_NAME'),
-                originalname,
                 mimetype,
-                userId,
-                path,
             )
 
         if (!uploadedData) throw new FileUploadFailException()
