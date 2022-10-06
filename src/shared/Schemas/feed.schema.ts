@@ -90,10 +90,6 @@ export class Feed {
         default: true,
     })
     allowed_comment: boolean
-
-    @ApiProperty()
-    @Prop()
-    thumbnail?: string
 }
 
 export const FeedSchema = SchemaFactory.createForClass(Feed)

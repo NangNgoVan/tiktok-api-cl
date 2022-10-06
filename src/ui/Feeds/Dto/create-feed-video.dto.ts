@@ -4,11 +4,13 @@ import {
     IsBoolean,
     IsEnum,
     IsNumber,
+    IsOptional,
     IsString,
     MaxLength,
 } from 'class-validator'
 import { max } from 'lodash'
 import { FeedType } from 'src/shared/Types/types'
+import { Transform } from 'class-transformer'
 
 export class CreateFeedVideoDto {
     @IsString()
@@ -17,6 +19,7 @@ export class CreateFeedVideoDto {
     content: string
 
     @IsString()
+    @IsOptional()
     @ApiProperty()
     song_id?: string
 
@@ -30,5 +33,10 @@ export class CreateFeedVideoDto {
 
     @IsBoolean()
     @ApiProperty()
+    @Transform(({ value }) => {
+        if (value === 'true') return true
+        if (value === 'false') return false
+        return value
+    })
     allowed_comment: boolean
 }

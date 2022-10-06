@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsBoolean, IsNumber, IsString, MaxLength } from 'class-validator'
+import {
+    IsBoolean,
+    IsNumber,
+    IsOptional,
+    IsString,
+    MaxLength,
+} from 'class-validator'
 
 export class CreateFeedImageDto {
     @IsString()
@@ -8,6 +14,7 @@ export class CreateFeedImageDto {
     content: string
 
     @IsString()
+    @IsOptional()
     @ApiProperty()
     song_id?: string
 
