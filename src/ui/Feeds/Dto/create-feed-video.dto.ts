@@ -10,24 +10,11 @@ import {
 import { max } from 'lodash'
 import { FeedType } from 'src/shared/Types/types'
 
-export class CreateFeedDto {
-    // @IsEnum({
-    //     enum: FeedType
-    // })
-    // @ApiProperty({
-    //     required: true,
-    //     example: 'image'
-    // })
-    // type: FeedType
-
+export class CreateFeedVideoDto {
     @IsString()
     @ApiProperty()
     @MaxLength(255)
     content: string
-
-    // @IsArray()
-    // @ApiProperty()
-    // resources: string[]
 
     @IsString()
     @ApiProperty()
@@ -40,9 +27,6 @@ export class CreateFeedDto {
     // @ApiProperty()
     // @IsString()
     created_by?: string
-    @IsNumber()
-    @ApiProperty()
-    primary_image_index?: number
 
     @IsBoolean()
     @ApiProperty()

@@ -16,7 +16,6 @@ import { HashTagsModule } from '../Hashtags/hashtags.module'
 import { FollowsModule } from '../Follows/follows.module'
 import { ReactionsModule } from '../Reactions/reactions.module'
 import { BookmarksModule } from '../Bookmarks/bookmarks.module'
-import { RedisCacheService } from 'src/shared/Services/cache-redis.service'
 
 @Module({
     imports: [
@@ -36,7 +35,6 @@ import { RedisCacheService } from 'src/shared/Services/cache-redis.service'
         FeedResourcesService,
         AWS3FileUploadService,
         UtilsService,
-        RedisCacheService,
     ],
     exports: [FeedsService],
 })

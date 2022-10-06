@@ -26,7 +26,7 @@ import { UsersService } from 'src/ui/Users/Service/users.service'
 import { UserAuthenticationMethodsService } from 'src/ui/Users/Service/user-authentication-methods.service'
 import { UserDocument } from '../Schemas/user.schema'
 import { UserNotFoundException } from '../Exceptions/http.exceptions'
-import { BlacklistService } from './blacklist-redis.service'
+import { BlacklistTokenService } from './blacklist-token.service'
 import { SignUpWithAuthenticationMethodCredentialRequestDto } from '../../ui/Auth/Controller/RequestDTO/signup-with-authentication-method-credential-request.dto'
 import _ from 'lodash'
 
@@ -36,7 +36,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private userService: UsersService,
         private userAuthenticationMethodsService: UserAuthenticationMethodsService,
-        private blackListService: BlacklistService,
+        private blackListTokenService: BlacklistTokenService,
     ) {}
 
     async createNonce(): Promise<NonceTokenDataResponse> {
@@ -222,7 +222,7 @@ export class AuthService {
     }
 
     async logOut(refreshToken: string): Promise<HttpStatusResult> {
-        this.blackListService.addJwtToken(refreshToken)
+        this.blackListTokenService.addTokenToBlacklist(refreshToken)
         return {
             statusCode: 200,
             message: 'Logged out success!',
