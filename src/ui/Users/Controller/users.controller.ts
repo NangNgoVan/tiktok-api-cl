@@ -39,7 +39,6 @@ import { configService } from 'src/shared/Services/config.service'
 import { UploadMetaDataDto } from '../RequestDTO/upload-metadata.dto'
 import moment from 'moment'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
-import { FeedsService } from 'src/ui/Feeds/Service/feeds.service'
 
 @Controller('ui/users')
 @ApiTags('User APIs')

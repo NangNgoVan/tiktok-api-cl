@@ -27,6 +27,7 @@ import { CreateUserAuthenticationMethodResponseDto } from '../ResponseDTO/create
 import { CreateUserAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-authentication-method-credential-request.dto'
 import { CreateUserAuthenticationMethodMetamaskRequestDto } from '../RequestDTO/create-user-authentication-method-metamask-request.dto'
 import { AuthService } from '../../../shared/Services/auth.service'
+import { UsersService } from '../Service/users.service'
 
 @ApiTags('User Authentication Method APIs')
 @Controller('ui/users/current/authentication-methods')
@@ -34,6 +35,7 @@ export class UserAuthenticationMethodsController {
     constructor(
         private readonly authenticationMethodsService: UserAuthenticationMethodsService,
         private readonly authenticationService: AuthService,
+        private readonly userService: UsersService,
     ) {}
 
     @Get()
@@ -118,10 +120,13 @@ export class UserAuthenticationMethodsController {
                 user_id: userId,
             })
 
+        await this.userService.updateUser(userId, {
+            is_trail_user: false,
+        })
+
         return _.omit(createdUserAuthenticationMethod, ['data', 'user_id'])
     }
 
-    // FIXME: mark user field is_trail_user = false
     // FIXME: move logic from controller to service
 
     @Post('metamask')
@@ -186,6 +191,10 @@ export class UserAuthenticationMethodsController {
                 },
                 user_id: userId,
             })
+
+        await this.userService.updateUser(userId, {
+            is_trail_user: false,
+        })
 
         return _.omit(createdUserAuthenticationMethod, ['data', 'user_id'])
     }
