@@ -39,8 +39,6 @@ import { FeedsService } from '../Service/feeds.service'
 import { FeedDetailDto } from '../Dto/feed-detail.dto'
 import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
-import { FeedCurrentUserDto } from '../Dto/feed-current-user.dto'
-import { CreatedUserDto } from '../../../shared/Dto/created-user.dto'
 import _ from 'lodash'
 
 @Controller('ui/feeds')
