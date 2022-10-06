@@ -15,7 +15,7 @@ import { configService } from './shared/Services/config.service'
 import { HealthController } from './shared/Controllers/health.controller'
 import { TerminusModule } from '@nestjs/terminus'
 import { IndexController } from './shared/Controllers/index.controller'
-import { AuthController } from './ui/Auth/Controller/auth.controller'
+import { AuthenticationController } from './ui/Auth/Controller/authentication.controller'
 import MongoPaging from 'mongo-cursor-pagination'
 
 @Module({

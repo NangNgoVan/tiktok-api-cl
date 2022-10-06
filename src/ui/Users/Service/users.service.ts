@@ -2,8 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { User, UserDocument } from 'src/shared/Schemas/user.schema'
 import { Model } from 'mongoose'
-import { CreateUserDto } from '../Dto/create-user.dto'
-import { UpdateUserDto } from '../Dto/update-user.dto'
+import { CreateUserDto } from '../RequestDTO/create-user.dto'
+import { UpdateUserDto } from '../RequestDTO/update-user.dto'
 import { UserNotFoundException } from 'src/shared/Exceptions/http.exceptions'
 import _ from 'lodash'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
@@ -15,7 +15,7 @@ export class UsersService {
         private readonly userFollowsService: UserFollowsService,
     ) {}
 
-    async create(createUserDto: CreateUserDto): Promise<UserDocument> {
+    async create(createUserDto: CreateUserDto) {
         const createdUser = new this.userModel(createUserDto)
 
         return createdUser.save()

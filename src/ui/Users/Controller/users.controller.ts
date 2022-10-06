@@ -31,14 +31,14 @@ import {
 } from 'src/shared/Exceptions/http.exceptions'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { HttpStatusResult } from 'src/shared/Types/types'
-import { GetUserDto } from '../Dto/get-user.dto'
-import { UpdateUserDto } from '../Dto/update-user.dto'
+import { UserResponseDto } from '../ResponseDTO/user-response.dto'
+import { UpdateUserDto } from '../RequestDTO/update-user.dto'
 import { UsersService } from '../Service/users.service'
 import { User } from '../../../shared/Schemas/user.schema'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
 import { configService } from 'src/shared/Services/config.service'
-import { UploadMetaDataDto } from '../Dto/upload-metadata.dto'
+import { UploadMetaDataDto } from '../RequestDTO/upload-metadata.dto'
 import moment from 'moment'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { FeedsService } from 'src/ui/Feeds/Service/feeds.service'
@@ -61,7 +61,7 @@ export class UsersController {
     @ApiOperation({ summary: 'Get user by `current` alias' })
     @ApiOkResponse({
         description: '200',
-        type: GetUserDto,
+        type: UserResponseDto,
     })
     async getCurrentUser(@Req() req): Promise<User> {
         const { userId } = req.user
@@ -100,7 +100,7 @@ export class UsersController {
     @ApiOperation({ summary: 'Get user by user id' })
     @ApiOkResponse({
         description: '200',
-        type: GetUserDto,
+        type: UserResponseDto,
     })
     @ApiNotFoundResponse()
     async getUserById(@Param() params, @Req() req): Promise<any> {
@@ -117,7 +117,7 @@ export class UsersController {
                 id,
             )
 
-        const getUserDto = new GetUserDto()
+        const getUserDto = new UserResponseDto()
         getUserDto._id = user.id
         getUserDto.gender = user.gender
         getUserDto.number_of_follower = user.number_of_follower
