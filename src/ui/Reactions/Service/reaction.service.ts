@@ -10,7 +10,10 @@ import {
     FeedReaction,
     FeedReactionDocument,
 } from 'src/shared/Schemas/feed-reaction.schema'
-import { FeedCommentReactionDocument } from 'src/shared/Schemas/feed-comment-reaction.schema'
+import {
+    FeedCommentReactionDocument,
+    FeedCommentReaction,
+} from 'src/shared/Schemas/feed-comment-reaction.schema'
 import { MongoPaging } from 'mongo-cursor-pagination'
 import { CreateFeedReactionDto } from '../Dto/create-feed-reaction.dto'
 import {
@@ -19,89 +22,106 @@ import {
 } from 'src/shared/Schemas/feed-comment.schema'
 
 @Injectable()
-export class FeedReactionsService {
+export class ReactionsService {
     constructor(
         @InjectModel(FeedReaction.name)
         private readonly feedReactionModel: MongoPaging<FeedReactionDocument>,
-        @InjectModel(FeedReaction.name)
+
+        @InjectModel(FeedCommentReaction.name)
         private readonly feedCommentReaction: MongoPaging<FeedCommentReactionDocument>,
+
         @InjectModel(Feed.name)
         private readonly feedModel: Model<FeedDocument>,
+
         @InjectModel(FeedComment.name)
         private commentModel: MongoPaging<FeedCommentDocument>,
     ) {}
 
-    async createReactionByFeedId(
-        feed_id: string,
-        created_by: string,
+    async createFeedReaction(
+        feedId: string,
+        currentUserId: string,
         createReaction: CreateFeedReactionDto,
     ) {
-        const feed = await this.feedModel.findOneAndUpdate(
-            { _id: feed_id },
-            { $inc: { number_of_reaction: 1 } },
-        )
+        const feed = await this.feedModel.findById(feedId)
         if (!feed) throw new FeedNotFoundException()
 
         const reaction = await this.feedReactionModel.findOne({
-            created_by,
-            feed_id,
+            created_by: currentUserId,
+            feed_id: feedId,
         })
 
         if (reaction) {
             throw new BadRequestException('you already reacted to this feed')
         }
 
-        const ret = await this.feedReactionModel.create({
-            feed_id,
-            created_by,
+        const create = await this.feedReactionModel.create({
+            feed_id: feedId,
+            created_by: currentUserId,
             type: createReaction.type,
         })
 
-        // TODO: update increment o day
+        await this.feedModel.findOneAndUpdate(
+            { _id: feedId },
+            { $inc: { number_of_reaction: 1 } },
+        )
 
-        return ret
+        return create
     }
 
-    async createReactionByFeedIdAndCommentId(
+    async createCommentReaction(
         feed_id: string,
         comment_id: string,
         created_by: string,
         createReaction: CreateFeedReactionDto,
     ) {
-        const feed = await this.feedModel.findOne({
-            feed_id,
-        })
+        const feed = await this.feedModel.findById(feed_id)
         if (!feed) throw new FeedNotFoundException()
 
-        const comment = await this.commentModel.findOneAndUpdate(
-            { _id: comment_id },
-            { $inc: { number_of_reaction: 1 } },
-        )
+        const reaction = await this.feedCommentReaction.findOne({
+            feed_id,
+            created_by,
+            comment_id,
+        })
+
+        if (reaction) {
+            throw new BadRequestException('you already reacted to this feed')
+        }
+
+        const comment = await this.commentModel.findById(comment_id)
         if (!comment) throw new CommentNotFoundException()
 
-        return this.feedCommentReaction.create({
+        const createdComment = this.feedCommentReaction.create({
             feed_id,
             created_by,
             comment_id,
             type: createReaction.type,
         })
+
+        await this.commentModel.findOneAndUpdate(
+            { _id: comment_id },
+            { $inc: { number_of_reaction: 1 } },
+        )
+
+        return createdComment
     }
 
     async deleteFeedReaction(feedId: string, currentUserId: string) {
         const feed = await this.feedModel.findById(feedId)
         if (!feed) throw new FeedNotFoundException()
 
-        await this.feedReactionModel.deleteOne({
-            feed_id: feedId,
+        const deleteFeedReaction = await this.feedReactionModel.deleteOne({
             created_by: currentUserId,
+            feed_id: feedId,
         })
 
-        await this.feedModel.findOneAndUpdate(
-            { _id: feedId },
-            { $inc: { number_of_reaction: -1 } },
-        )
+        if (feed.number_of_reaction > 0) {
+            await this.feedModel.findOneAndUpdate(
+                { _id: feedId },
+                { $inc: { number_of_reaction: -1 } },
+            )
+        }
 
-        return 'OK'
+        return deleteFeedReaction
     }
 
     async deleteFeedCommentReaction(
@@ -115,17 +135,20 @@ export class FeedReactionsService {
         const comment = await this.commentModel.findById(comment_id)
         if (!comment) throw new CommentNotFoundException()
 
-        await this.feedCommentReaction.deleteOne({
-            comment_id,
-            created_by: currentUserId,
-        })
+        const deleteFeedCommentReaction =
+            await this.feedCommentReaction.deleteOne({
+                comment_id,
+                created_by: currentUserId,
+            })
 
-        await this.commentModel.findOneAndUpdate(
-            { _id: comment_id },
-            { $inc: { number_of_reaction: -1 } },
-        )
+        if (comment.number_of_reaction > 0) {
+            await this.commentModel.findOneAndUpdate(
+                { _id: comment_id },
+                { $inc: { number_of_reaction: -1 } },
+            )
+        }
 
-        return 'OK'
+        return deleteFeedCommentReaction
     }
 
     async getFeedReaction(
@@ -143,7 +166,7 @@ export class FeedReactionsService {
         commentId: string,
         userId: string,
     ): Promise<FeedReactionDocument | undefined> {
-        return this.feedReactionModel.findOne({
+        return this.feedCommentReaction.findOne({
             feed_id: feedId,
             comment_id: commentId,
             created_by: userId,
@@ -152,13 +175,15 @@ export class FeedReactionsService {
 
     async getCommentReactions(
         feedId: string,
-        commentId: string[],
+        commentIds: string[],
         userId: string,
     ): Promise<FeedReactionDocument | undefined> {
-        return this.feedReactionModel.find({
-            feed_id: { $in: feedId },
-            comment_id: commentId,
-            created_by: userId,
+        return this.feedCommentReaction.find({
+            query: {
+                feed_id: feedId,
+                comment_id: { $in: commentIds },
+                created_by: userId,
+            },
         })
     }
 

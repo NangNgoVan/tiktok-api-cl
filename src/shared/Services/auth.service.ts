@@ -100,6 +100,32 @@ export class AuthService {
         }
     }
 
+    async logInAsATrialUser(): Promise<TokenDataResponse> {
+        const uuidNoHyphens = uuidv4().replace(/-/g, '')
+
+        const user: UserDocument = await this.userService.create({
+            full_name: `trial ${uuidNoHyphens}`,
+            nick_name: `trial${uuidNoHyphens}`,
+            is_trial_user: true,
+        })
+
+        await this.userAuthenticationMethodsService.createAuthenticationMethod({
+            user_id: user.id,
+            // FIXME: should store device id or ip
+            data: undefined,
+            authentication_method: AuthenticationMethod.TRIAL,
+        })
+
+        return {
+            token: this.generateAccessToken({
+                userId: user.id,
+            }),
+            refreshToken: this.generateRefreshToken({
+                userId: user.id,
+            }),
+        }
+    }
+
     async logInWithCredential(dto: CredentialDto): Promise<TokenDataResponse> {
         const userAuthenticationMethod =
             await this.userAuthenticationMethodsService.findByUsername(

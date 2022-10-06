@@ -11,7 +11,7 @@ import { UsersService } from 'src/ui/Users/Service/users.service'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
 import { FeedResourcesService } from 'src/ui/Resources/Service/resources.service'
-import { FeedReactionsService } from 'src/ui/Reactions/Service/feed-reaction.service'
+import { ReactionsService } from 'src/ui/Reactions/Service/reaction.service'
 import { BookmarksService } from 'src/ui/Bookmarks/Service/bookmarks.service'
 import _ from 'lodash'
 
@@ -25,7 +25,7 @@ export class FeedsService {
         private readonly userService: UsersService,
         private readonly userFollowService: UserFollowsService,
         private readonly feedResourcesService: FeedResourcesService,
-        private readonly feedReactionService: FeedReactionsService,
+        private readonly feedReactionService: ReactionsService,
         private readonly bookmarkService: BookmarksService,
     ) {}
 
@@ -239,9 +239,10 @@ export class FeedsService {
             const createdUser = await this.userService.findById(feed.created_by)
 
             feedDetailDto.created_user = {
-                nick_name: createdUser.nick_name,
-                full_name: createdUser.full_name,
-                avatar: createdUser.avatar,
+                nick_name: _.get(createdUser, 'nick_name'),
+                full_name: _.get(createdUser, 'full_name'),
+                avatar: _.get(createdUser, 'avatar'),
+                id: _.get(createdUser, 'id'),
                 current_user: {
                     is_followed:
                         await this.userFollowService.checkFollowRelationshipBetween(
@@ -249,7 +250,6 @@ export class FeedsService {
                             feed.created_by,
                         ),
                 },
-                id: createdUser.id,
             }
 
             const feedReaction = await this.feedReactionService.getFeedReaction(
@@ -282,6 +282,7 @@ export class FeedsService {
             feedDetailDto.primary_image_index = feed.primary_image_index
             feedDetailDto.created_at = feed.created_at
             feedDetailDto.thumbnail = feed.thumbnail
+
             feedDetailDto.type = feed.type
 
             const resources = await this.feedResourcesService.getResourceByIds(

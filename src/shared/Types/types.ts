@@ -24,6 +24,7 @@ export enum FeedType {
 export enum AuthenticationMethod {
     METAMASK = 'metamask',
     CREDENTIAL = 'credential',
+    TRIAL = 'trial',
 }
 
 export enum FeedCommentLevel {

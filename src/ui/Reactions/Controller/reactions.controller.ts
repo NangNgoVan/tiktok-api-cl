@@ -8,12 +8,12 @@ import {
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { FeedReaction } from 'src/shared/Schemas/feed-reaction.schema'
 import { CreateFeedReactionDto } from '../Dto/create-feed-reaction.dto'
-import { FeedReactionsService } from '../Service/feed-reaction.service'
+import { ReactionsService } from '../Service/reaction.service'
 
 @Controller('ui/feeds')
 @ApiTags('Feed Reaction APIs')
 export class FeedReactionController {
-    constructor(private readonly feedReactionsService: FeedReactionsService) {}
+    constructor(private readonly reactionsService: ReactionsService) {}
 
     @Post('/:id/reactions')
     @UseGuards(JwtAuthGuard)
@@ -25,15 +25,15 @@ export class FeedReactionController {
     @ApiOperation({ summary: 'create reactions for feed' })
     async createFeedReaction(
         @Req() req,
-        @Body() CreateFeedReactionDto: CreateFeedReactionDto,
+        @Body() createFeedReactionDto: CreateFeedReactionDto,
     ): Promise<any> {
         const feed_id = req.params.id
-        const created_by = req.user.userId
+        const currentUserId = req.user.userId
 
-        return this.feedReactionsService.createReactionByFeedId(
+        return this.reactionsService.createFeedReaction(
             feed_id,
-            created_by,
-            CreateFeedReactionDto,
+            currentUserId,
+            createFeedReactionDto,
         )
     }
 
@@ -53,7 +53,7 @@ export class FeedReactionController {
         const commentId = req.params.commentId
         const created_by = req.user.userId
 
-        return this.feedReactionsService.createReactionByFeedIdAndCommentId(
+        return this.reactionsService.createCommentReaction(
             feed_id,
             commentId,
             created_by,
@@ -71,10 +71,7 @@ export class FeedReactionController {
     async unReactionOfFeed(@Req() req): Promise<any> {
         const feedId = req.params.id
         const currentUserId = req.user.userId
-        return this.feedReactionsService.deleteFeedReaction(
-            feedId,
-            currentUserId,
-        )
+        return this.reactionsService.deleteFeedReaction(feedId, currentUserId)
     }
 
     @Delete('/:id/comments/:commentId/reactions')
@@ -89,7 +86,7 @@ export class FeedReactionController {
         const commentId = req.params.commentId
         const currentUserId = req.user.userId
 
-        return this.feedReactionsService.deleteFeedCommentReaction(
+        return this.reactionsService.deleteFeedCommentReaction(
             feedId,
             commentId,
             currentUserId,
