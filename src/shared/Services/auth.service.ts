@@ -27,6 +27,8 @@ import { UserAuthenticationMethodsService } from 'src/ui/Users/Service/user-auth
 import { UserDocument } from '../Schemas/user.schema'
 import { UserNotFoundException } from '../Exceptions/http.exceptions'
 import { BlacklistService } from './blacklist-redis.service'
+import { SignUpWithAuthenticationMethodCredentialRequestDto } from '../../ui/Auth/Controller/RequestDTO/signup-with-authentication-method-credential-request.dto'
+import _ from 'lodash'
 
 @Injectable()
 export class AuthService {
@@ -88,6 +90,7 @@ export class AuthService {
             user = await this.userService.create({
                 full_name: `user ${uuidNoHyphens}`,
                 nick_name: `user${uuidNoHyphens}`,
+                is_trial_user: false,
             })
 
             await this.userAuthenticationMethodsService.createAuthenticationMethod(
@@ -224,5 +227,58 @@ export class AuthService {
             statusCode: 200,
             message: 'Logged out success!',
         }
+    }
+
+    async signupWithAuthenticationMethodCredential(
+        signupWithAuthenticationMethodCredentialRequestDto: SignUpWithAuthenticationMethodCredentialRequestDto,
+    ) {
+        const { username, password, password_confirmation } =
+            signupWithAuthenticationMethodCredentialRequestDto
+
+        if (password !== password_confirmation) {
+            throw new BadRequestException(
+                'Password confirmation does not match',
+            )
+        }
+
+        const credentialAuthenticationMethod =
+            await this.userAuthenticationMethodsService.findByAuthenticationMethod(
+                AuthenticationMethod.CREDENTIAL,
+            )
+
+        if (credentialAuthenticationMethod) {
+            throw new BadRequestException(
+                'Credential authentication method already exists',
+            )
+        }
+
+        const authenticationMethod =
+            await this.userAuthenticationMethodsService.findByUsername(username)
+
+        if (authenticationMethod) {
+            throw new BadRequestException(`Username ${username} already exists`)
+        }
+
+        const uuidNoHyphens = uuidv4().replace(/-/g, '')
+
+        const user = await this.userService.create({
+            full_name: `user ${uuidNoHyphens}`,
+            nick_name: `user${uuidNoHyphens}`,
+            is_trial_user: false,
+        })
+
+        const salt = await bcrypt.genSalt(10)
+        const hashed = await bcrypt.hash(password, salt)
+
+        await this.userAuthenticationMethodsService.createAuthenticationMethod({
+            authentication_method: AuthenticationMethod.CREDENTIAL,
+            data: {
+                username,
+                password: hashed,
+            },
+            user_id: user.id,
+        })
+
+        return user
     }
 }

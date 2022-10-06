@@ -15,7 +15,7 @@ export class UsersService {
         private readonly userFollowsService: UserFollowsService,
     ) {}
 
-    async create(createUserDto: CreateUserDto): Promise<UserDocument> {
+    async create(createUserDto: CreateUserDto) {
         const createdUser = new this.userModel(createUserDto)
 
         return createdUser.save()

@@ -14,11 +14,26 @@ import {
     ApiTags,
 } from '@nestjs/swagger'
 import { CredentialDto } from '../../../shared/Dto/credential.dto'
+import { SignUpWithAuthenticationMethodCredentialRequestDto } from './RequestDTO/signup-with-authentication-method-credential-request.dto'
+import { UserResponseDto } from '../../Users/ResponseDTO/user-response.dto'
 
 @ApiTags('Authentication APIs')
 @Controller('ui/authentication')
-export class AuthController {
+export class AuthenticationController {
     constructor(private readonly authService: AuthService) {}
+
+    @Get('/signup/authentication-methods/credential')
+    @ApiOperation({
+        summary: 'Signup with authentication method credential',
+    })
+    @ApiOkResponse({
+        type: UserResponseDto,
+    })
+    async signupWithAuthenticationMethodCredential(
+        @Body() dto: SignUpWithAuthenticationMethodCredentialRequestDto,
+    ): Promise<UserResponseDto> {
+        return this.authService.signupWithAuthenticationMethodCredential(dto)
+    }
 
     @Get('/login/authentication-methods/metamask')
     @ApiOperation({ summary: 'Nonce' })
