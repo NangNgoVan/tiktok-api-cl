@@ -109,5 +109,5 @@ export class UpdateUserDto {
     @ApiProperty({
         required: false,
     })
-    is_trail_user?: boolean
+    is_trial_user?: boolean
 }

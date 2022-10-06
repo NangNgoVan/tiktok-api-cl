@@ -121,7 +121,7 @@ export class UserAuthenticationMethodsController {
             })
 
         await this.userService.updateUser(userId, {
-            is_trail_user: false,
+            is_trial_user: false,
         })
 
         return _.omit(createdUserAuthenticationMethod, ['data', 'user_id'])
@@ -193,7 +193,7 @@ export class UserAuthenticationMethodsController {
             })
 
         await this.userService.updateUser(userId, {
-            is_trail_user: false,
+            is_trial_user: false,
         })
 
         return _.omit(createdUserAuthenticationMethod, ['data', 'user_id'])
