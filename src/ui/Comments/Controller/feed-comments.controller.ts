@@ -15,6 +15,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
+import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { FeedComment } from 'src/shared/Schemas/feed-comment.schema'
 import { CreateFeedCommentDto } from '../Dto/create-feed-comment.dto'
@@ -107,7 +108,7 @@ export class FeedCommentsController {
     }
 
     @Get('/:id/comments')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousGuard)
     @ApiBearerAuth()
     @ApiImplicitQuery({
         required: false,
@@ -132,7 +133,7 @@ export class FeedCommentsController {
     }
 
     @Get('/:id/comments/:commentId/replies')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousGuard)
     @ApiBearerAuth()
     @ApiImplicitQuery({
         required: false,
