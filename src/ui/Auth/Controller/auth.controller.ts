@@ -54,6 +54,17 @@ export class AuthController {
         return this.authService.logInWithCredential(dto)
     }
 
+    // FIXME: ratelimit for this
+    @Post('/login/authentication-methods/trial')
+    @ApiOperation({ summary: 'Login as a trial user' })
+    @ApiOkResponse({
+        description: '200',
+        type: TokenDataResponse,
+    })
+    async loginAsAGuest(): Promise<TokenDataResponse> {
+        return this.authService.logInAsATrialUser()
+    }
+
     @Post('/token')
     @ApiOperation({ summary: 'Refresh token' })
     @ApiOkResponse({

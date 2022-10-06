@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 import * as mongoose from 'mongoose'
 import { AuthenticationMethod, UserReactionType } from '../Types/types'
-import { IsEnum } from 'class-validator'
+import { IsEnum, IsOptional } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
 export type UserAuthenticationMethodDocument = UserAuthenticationMethod &
@@ -29,8 +29,9 @@ export class UserAuthenticationMethod {
     authentication_method: AuthenticationMethod
 
     @ApiProperty()
-    @Prop({ type: mongoose.Schema.Types.Mixed })
-    data:
+    @IsOptional()
+    @Prop({ type: mongoose.Schema.Types.Mixed, required: false })
+    data?:
         | {
               address: string
           }

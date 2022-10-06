@@ -7,7 +7,6 @@ import { UpdateUserDto } from '../Dto/update-user.dto'
 import { UserNotFoundException } from 'src/shared/Exceptions/http.exceptions'
 import _ from 'lodash'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
-import { GetUserDto } from '../Dto/get-user.dto'
 
 @Injectable()
 export class UsersService {
