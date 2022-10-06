@@ -47,17 +47,34 @@ export class AuthService {
         return dataResponse
     }
 
-    async logInWithMetamask(
-        dto: VerifySignatureDto,
-    ): Promise<TokenDataResponse> {
-        const { nonce, signature, address } = dto
+    async verifyMetamaskAddress(nonce, signature, address) {
         const web3 = new Web3()
 
         const verifiedAddress = web3.eth.accounts.recover(nonce, signature)
 
-        if (!verifiedAddress) throw new UnauthorizedException()
+        if (!verifiedAddress) {
+            return false
+        }
 
-        if (address !== verifiedAddress) throw new UnauthorizedException()
+        if (address !== verifiedAddress) {
+            return false
+        }
+
+        return verifiedAddress
+    }
+
+    async logInWithMetamask(
+        dto: VerifySignatureDto,
+    ): Promise<TokenDataResponse> {
+        const verifiedAddress = await this.verifyMetamaskAddress(
+            dto.nonce,
+            dto.signature,
+            dto.address,
+        )
+
+        if (!verifiedAddress) {
+            throw new UnauthorizedException()
+        }
 
         const userAuthenticationMethod =
             await this.userAuthenticationMethodsService.findByAddress(

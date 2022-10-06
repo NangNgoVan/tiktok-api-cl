@@ -6,7 +6,7 @@ import {
     UserAuthenticationMethodDocument,
 } from 'src/shared/Schemas/user-authentication-method.schema'
 import { AuthenticationMethod } from '../../../shared/Types/types'
-import { CreateUserAuthenticationMethodDto } from '../Dto/create-user-authentication-method.dto'
+import { CreateUserAuthenticationMethodDto } from '../RequestDTO/create-user-authentication-method.dto'
 
 @Injectable()
 export class UserAuthenticationMethodsService {
@@ -17,7 +17,7 @@ export class UserAuthenticationMethodsService {
 
     async createAuthenticationMethod(
         createUserAuthenticationMethodDto: CreateUserAuthenticationMethodDto,
-    ): Promise<UserAuthenticationMethodDocument> {
+    ) {
         return this.userAuthenticationMethodModel.create(
             createUserAuthenticationMethodDto,
         )
@@ -38,6 +38,14 @@ export class UserAuthenticationMethodsService {
         return this.userAuthenticationMethodModel.findOne({
             authentication_method: AuthenticationMethod.CREDENTIAL,
             'data.username': username,
+        })
+    }
+
+    async findByAuthenticationMethod(
+        authenticationMethod: AuthenticationMethod,
+    ): Promise<UserAuthenticationMethodDocument> {
+        return this.userAuthenticationMethodModel.findOne({
+            authentication_method: authenticationMethod,
         })
     }
 
