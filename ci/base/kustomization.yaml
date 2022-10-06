@@ -10,3 +10,4 @@ resources:
 
 patches: 
 - ./patches/health_check.yaml
+- ./patches/update_strategy.yaml

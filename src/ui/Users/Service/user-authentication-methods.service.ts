@@ -6,7 +6,7 @@ import {
     UserAuthenticationMethodDocument,
 } from 'src/shared/Schemas/user-authentication-method.schema'
 import { AuthenticationMethod } from '../../../shared/Types/types'
-import { CreateUserAuthenticationMethodDto } from '../Dto/create-user-authentication-method.dto'
+import { CreateUserAuthenticationMethodDto } from '../RequestDTO/create-user-authentication-method.dto'
 
 @Injectable()
 export class UserAuthenticationMethodsService {
@@ -17,7 +17,7 @@ export class UserAuthenticationMethodsService {
 
     async createAuthenticationMethod(
         createUserAuthenticationMethodDto: CreateUserAuthenticationMethodDto,
-    ): Promise<UserAuthenticationMethodDocument> {
+    ) {
         return this.userAuthenticationMethodModel.create(
             createUserAuthenticationMethodDto,
         )
@@ -41,12 +41,26 @@ export class UserAuthenticationMethodsService {
         })
     }
 
+    async findByAuthenticationMethod(
+        authenticationMethod: AuthenticationMethod,
+    ): Promise<UserAuthenticationMethodDocument> {
+        return this.userAuthenticationMethodModel.findOne({
+            authentication_method: authenticationMethod,
+        })
+    }
+
     async deleteByUserIdAndMethod(
         userId: string,
         method: AuthenticationMethod,
     ): Promise<void> {
         await this.userAuthenticationMethodModel.deleteOne({
             authentication_method: method,
+            user_id: userId,
+        })
+    }
+
+    async getAllAuthenticationMethodsByUserId(userId: string) {
+        return this.userAuthenticationMethodModel.find({
             user_id: userId,
         })
     }

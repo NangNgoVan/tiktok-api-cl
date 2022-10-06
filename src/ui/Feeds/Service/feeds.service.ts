@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Feed, FeedDocument } from 'src/shared/Schemas/feed.schema'
 import { FeedType } from 'src/shared/Types/types'
-import { CreateFeedDto } from '../Dto/create-feed.dto'
+import { CreateFeedImageDto } from '../Dto/create-feed-image.dto'
 import { FeedDetailDto } from '../Dto/feed-detail.dto'
 import { MongoPaging } from 'mongo-cursor-pagination'
 import { FeedHashTagsService } from 'src/ui/Hashtags/Service/feed-hashtags.service'
@@ -30,7 +30,7 @@ export class FeedsService {
     ) {}
 
     async createFeed(
-        createFeedDto: CreateFeedDto,
+        createFeedDto: CreateFeedImageDto,
         feedType: FeedType,
         resource_ids?: string[],
     ) {
@@ -281,6 +281,7 @@ export class FeedsService {
             feedDetailDto.hashtags = feed.hashtags
             feedDetailDto.primary_image_index = feed.primary_image_index
             feedDetailDto.created_at = feed.created_at
+
             feedDetailDto.type = feed.type
 
             const resources = await this.feedResourcesService.getResourceByIds(

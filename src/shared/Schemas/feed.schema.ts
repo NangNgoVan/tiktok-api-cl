@@ -62,7 +62,9 @@ export class Feed {
     created_by: string
 
     @ApiProperty()
-    @Prop({})
+    @Prop({
+        maxlength: 255,
+    })
     content: string
 
     @ApiProperty()
