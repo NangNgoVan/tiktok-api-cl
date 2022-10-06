@@ -110,6 +110,13 @@ export class User {
     @ApiProperty()
     should_show_tour_guild: boolean
 
+    //is_trial_user
+    @Prop({
+        default: false,
+    })
+    @ApiProperty()
+    is_trial_user: boolean
+
     //should_show_account_setup_flow
     @Prop({
         default: true,

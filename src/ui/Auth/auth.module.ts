@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common'
-import { AuthController } from './Controller/auth.controller'
+import { AuthenticationController } from './Controller/authentication.controller'
 import { AuthService } from 'src/shared/Services/auth.service'
 import { JwtModule, JwtService } from '@nestjs/jwt'
 import { JwtStrategy } from 'src/shared/Strategies/jwt.strategy'
@@ -9,7 +9,7 @@ import { CacheService } from 'src/shared/Services/cache.service'
 
 @Module({
     imports: [UsersModule, JwtModule.register({})],
-    controllers: [AuthController],
+    controllers: [AuthenticationController],
     providers: [
         AuthService,
         JwtService,
@@ -17,5 +17,6 @@ import { CacheService } from 'src/shared/Services/cache.service'
         BlacklistTokenService,
         CacheService,
     ],
+    exports: [AuthService],
 })
 export class AuthModule {}

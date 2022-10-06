@@ -9,20 +9,12 @@ export class AWS3FileUploadService {
     s3() {
         return new aws.S3(configService.AWS3Configuration())
     }
-    async uploadFileToS3Bucket(
-        file,
-        bucket,
-        name,
-        mimeType,
-        ownerId,
-        subfolderPath,
-    ) {
-        const userFolder = `${subfolderPath}/${ownerId}`
-        const ext = name.split('.').pop()
+
+    async uploadFileToS3Bucket(key, mimeType, buffer) {
         const uploadParams = {
-            Bucket: bucket,
-            Key: `${userFolder}/${uuidv4()}.${ext}`,
-            Body: file,
+            Bucket: configService.getEnv('AWS_BUCKET_NAME'),
+            Key: key,
+            Body: buffer,
             ContentType: mimeType,
             ContentDisposition: 'inline',
             CreateBucketConfiguration: {

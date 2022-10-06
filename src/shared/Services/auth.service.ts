@@ -27,6 +27,8 @@ import { UserAuthenticationMethodsService } from 'src/ui/Users/Service/user-auth
 import { UserDocument } from '../Schemas/user.schema'
 import { UserNotFoundException } from '../Exceptions/http.exceptions'
 import { BlacklistTokenService } from './blacklist-token.service'
+import { SignUpWithAuthenticationMethodCredentialRequestDto } from '../../ui/Auth/Controller/RequestDTO/signup-with-authentication-method-credential-request.dto'
+import _ from 'lodash'
 
 @Injectable()
 export class AuthService {
@@ -47,17 +49,34 @@ export class AuthService {
         return dataResponse
     }
 
-    async logInWithMetamask(
-        dto: VerifySignatureDto,
-    ): Promise<TokenDataResponse> {
-        const { nonce, signature, address } = dto
+    async verifyMetamaskAddress(nonce, signature, address) {
         const web3 = new Web3()
 
         const verifiedAddress = web3.eth.accounts.recover(nonce, signature)
 
-        if (!verifiedAddress) throw new UnauthorizedException()
+        if (!verifiedAddress) {
+            return false
+        }
 
-        if (address !== verifiedAddress) throw new UnauthorizedException()
+        if (address !== verifiedAddress) {
+            return false
+        }
+
+        return verifiedAddress
+    }
+
+    async logInWithMetamask(
+        dto: VerifySignatureDto,
+    ): Promise<TokenDataResponse> {
+        const verifiedAddress = await this.verifyMetamaskAddress(
+            dto.nonce,
+            dto.signature,
+            dto.address,
+        )
+
+        if (!verifiedAddress) {
+            throw new UnauthorizedException()
+        }
 
         const userAuthenticationMethod =
             await this.userAuthenticationMethodsService.findByAddress(
@@ -71,6 +90,7 @@ export class AuthService {
             user = await this.userService.create({
                 full_name: `user ${uuidNoHyphens}`,
                 nick_name: `user${uuidNoHyphens}`,
+                is_trial_user: false,
             })
 
             await this.userAuthenticationMethodsService.createAuthenticationMethod(
@@ -89,6 +109,32 @@ export class AuthService {
         if (!user) {
             throw new UserNotFoundException()
         }
+
+        return {
+            token: this.generateAccessToken({
+                userId: user.id,
+            }),
+            refreshToken: this.generateRefreshToken({
+                userId: user.id,
+            }),
+        }
+    }
+
+    async logInAsATrialUser(): Promise<TokenDataResponse> {
+        const uuidNoHyphens = uuidv4().replace(/-/g, '')
+
+        const user: UserDocument = await this.userService.create({
+            full_name: `trial ${uuidNoHyphens}`,
+            nick_name: `trial${uuidNoHyphens}`,
+            is_trial_user: true,
+        })
+
+        await this.userAuthenticationMethodsService.createAuthenticationMethod({
+            user_id: user.id,
+            // FIXME: should store device id or ip
+            data: undefined,
+            authentication_method: AuthenticationMethod.TRIAL,
+        })
 
         return {
             token: this.generateAccessToken({
@@ -181,5 +227,58 @@ export class AuthService {
             statusCode: 200,
             message: 'Logged out success!',
         }
+    }
+
+    async signupWithAuthenticationMethodCredential(
+        signupWithAuthenticationMethodCredentialRequestDto: SignUpWithAuthenticationMethodCredentialRequestDto,
+    ) {
+        const { username, password, password_confirmation } =
+            signupWithAuthenticationMethodCredentialRequestDto
+
+        if (password !== password_confirmation) {
+            throw new BadRequestException(
+                'Password confirmation does not match',
+            )
+        }
+
+        const credentialAuthenticationMethod =
+            await this.userAuthenticationMethodsService.findByAuthenticationMethod(
+                AuthenticationMethod.CREDENTIAL,
+            )
+
+        if (credentialAuthenticationMethod) {
+            throw new BadRequestException(
+                'Credential authentication method already exists',
+            )
+        }
+
+        const authenticationMethod =
+            await this.userAuthenticationMethodsService.findByUsername(username)
+
+        if (authenticationMethod) {
+            throw new BadRequestException(`Username ${username} already exists`)
+        }
+
+        const uuidNoHyphens = uuidv4().replace(/-/g, '')
+
+        const user = await this.userService.create({
+            full_name: `user ${uuidNoHyphens}`,
+            nick_name: `user${uuidNoHyphens}`,
+            is_trial_user: false,
+        })
+
+        const salt = await bcrypt.genSalt(10)
+        const hashed = await bcrypt.hash(password, salt)
+
+        await this.userAuthenticationMethodsService.createAuthenticationMethod({
+            authentication_method: AuthenticationMethod.CREDENTIAL,
+            data: {
+                username,
+                password: hashed,
+            },
+            user_id: user.id,
+        })
+
+        return user
     }
 }

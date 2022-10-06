@@ -21,7 +21,7 @@ import {
 } from 'src/shared/Exceptions/http.exceptions'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { HttpStatusResult } from 'src/shared/Types/types'
-import { UpdateUserDto } from '../Dto/update-user.dto'
+import { UpdateUserDto } from '../RequestDTO/update-user.dto'
 import { UsersService } from '../Service/users.service'
 import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'

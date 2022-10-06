@@ -103,4 +103,11 @@ export class UpdateUserDto {
         required: false,
     })
     interests?: [string]
+
+    @IsBoolean()
+    @IsOptional()
+    @ApiProperty({
+        required: false,
+    })
+    is_trial_user?: boolean
 }

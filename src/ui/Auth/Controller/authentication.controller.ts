@@ -14,16 +14,30 @@ import {
     ApiTags,
 } from '@nestjs/swagger'
 import { CredentialDto } from '../../../shared/Dto/credential.dto'
+import { SignUpWithAuthenticationMethodCredentialRequestDto } from './RequestDTO/signup-with-authentication-method-credential-request.dto'
+import { UserResponseDto } from '../../Users/ResponseDTO/user-response.dto'
 
 @ApiTags('Authentication APIs')
 @Controller('ui/authentication')
-export class AuthController {
+export class AuthenticationController {
     constructor(private readonly authService: AuthService) {}
+
+    @Get('/signup/authentication-methods/credential')
+    @ApiOperation({
+        summary: 'Signup with authentication method credential',
+    })
+    @ApiOkResponse({
+        type: UserResponseDto,
+    })
+    async signupWithAuthenticationMethodCredential(
+        @Body() dto: SignUpWithAuthenticationMethodCredentialRequestDto,
+    ): Promise<UserResponseDto> {
+        return this.authService.signupWithAuthenticationMethodCredential(dto)
+    }
 
     @Get('/login/authentication-methods/metamask')
     @ApiOperation({ summary: 'Nonce' })
     @ApiOkResponse({
-        description: '200',
         type: NonceTokenDataResponse,
     })
     async getNonceToken(): Promise<NonceTokenDataResponse> {
@@ -33,7 +47,6 @@ export class AuthController {
     @Post('/login/authentication-methods/metamask')
     @ApiOperation({ summary: 'Login with metamask' })
     @ApiOkResponse({
-        description: '200',
         type: TokenDataResponse,
     })
     async logInWithMetamask(
@@ -45,7 +58,6 @@ export class AuthController {
     @Post('/login/authentication-methods/credential')
     @ApiOperation({ summary: 'Login with credential' })
     @ApiOkResponse({
-        description: '200',
         type: TokenDataResponse,
     })
     async logInWithCredential(
@@ -54,10 +66,20 @@ export class AuthController {
         return this.authService.logInWithCredential(dto)
     }
 
+    // FIXME: ratelimit for this
+    @Post('/login/authentication-methods/trial')
+    @ApiOperation({ summary: 'Login as a trial user' })
+    @ApiOkResponse({
+        description: '200',
+        type: TokenDataResponse,
+    })
+    async loginAsAGuest(): Promise<TokenDataResponse> {
+        return this.authService.logInAsATrialUser()
+    }
+
     @Post('/token')
     @ApiOperation({ summary: 'Refresh token' })
     @ApiOkResponse({
-        description: '200',
         type: TokenDataResponse,
     })
     @ApiHeader({
@@ -76,9 +98,7 @@ export class AuthController {
         required: true,
     })
     @ApiOperation({ summary: 'Logout' })
-    @ApiOkResponse({
-        description: '200',
-    })
+    @ApiOkResponse({})
     async logOut(@Req() req): Promise<HttpStatusResult> {
         const refreshToken = req.headers['refresh-token'] // read refresh-token from headers
         return this.authService.logOut(refreshToken)

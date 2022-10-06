@@ -1,14 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsString } from 'class-validator'
 
-export class GetFeedResourceDto {
-    @IsString()
-    @ApiProperty()
-    resource_id: string
-    @IsString()
-    @ApiProperty()
-    path: string
+export class CreateUserAuthenticationMethodCredentialRequestDto {
     @ApiProperty()
     @IsString()
-    mimetype: string
+    username: string
+
+    @ApiProperty()
+    @IsString()
+    password: string
+
+    @ApiProperty()
+    @IsString()
+    password_confirmation: string
 }
