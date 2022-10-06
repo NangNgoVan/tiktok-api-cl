@@ -11,7 +11,9 @@ import { TerminusModule } from '@nestjs/terminus'
 import { IndexController } from './shared/Controllers/index.controller'
 import MongoPaging from 'mongo-cursor-pagination'
 import IoRedis from 'ioredis'
-import { useAdapter } from '@type-cacheable/ioredis-adapter'
+import { useAdapter as useIORedisAdapter } from '@type-cacheable/ioredis-adapter'
+import LRUCache from 'lru-cache'
+import { useAdapter as useLruCacheAdapter } from '@type-cacheable/lru-cache-adapter'
 
 @Module({
     imports: [
@@ -32,11 +34,17 @@ import { useAdapter } from '@type-cacheable/ioredis-adapter'
 })
 export class AppModule implements OnModuleInit {
     onModuleInit() {
-        const client = new IoRedis({
-            host: configService.getEnv('REDIS_HOST'),
-            port: configService.getEnv('REDIS_PORT'),
-        })
+        if (process.env.NODE_ENV === 'local') {
+            const client = new LRUCache()
 
-        useAdapter(client)
+            useLruCacheAdapter(client)
+        } else {
+            const client = new IoRedis({
+                host: configService.getEnv('REDIS_HOST'),
+                port: configService.getEnv('REDIS_PORT'),
+            })
+
+            useIORedisAdapter(client)
+        }
     }
 }

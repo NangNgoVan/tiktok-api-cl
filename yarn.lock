@@ -1743,6 +1743,11 @@
   dependencies:
     compare-versions "^4.0.0"
 
+"@type-cacheable/lru-cache-adapter@^11.0.3":
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/@type-cacheable/lru-cache-adapter/-/lru-cache-adapter-11.0.3.tgz#9eb70ff1450beb4873376238d15b041037b5fdd9"
+  integrity sha512-GNJOm3A0EyBxIuw+C68ZDmCebjErekcFvlRKn8f8SmIPTyh+eAXzT54XIUiTXoEkLMujM0Wl0fZ1qr8EnexXvQ==
+
 "@types/babel__core@^7.1.14":
   version "7.1.19"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.19.tgz#7b497495b7d1b4812bdb9d02804d0576f43ee460"
