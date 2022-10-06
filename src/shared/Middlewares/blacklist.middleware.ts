@@ -8,14 +8,13 @@ import {
 import { NextFunction } from 'express'
 import { RefreshTokenInvalidException } from '../Exceptions/http.exceptions'
 import { AuthService } from '../Services/auth.service'
-import { BlacklistService } from '../Services/blacklist-redis.service'
+import { BlacklistTokenService } from '../Services/blacklist-token.service'
 import { configService } from '../Services/config.service'
-import { CacheService } from '../Services/cache.service'
 
 @Injectable()
 export class BlacklistMiddleware implements NestMiddleware {
     constructor(
-        private readonly blackListService: BlacklistService,
+        private readonly blackListTokenService: BlacklistTokenService,
         private readonly authService: AuthService,
     ) {}
 
@@ -32,7 +31,7 @@ export class BlacklistMiddleware implements NestMiddleware {
             throw new UnauthorizedException()
         }
 
-        if (await this.blackListService.getJwtToken(refreshToken)) {
+        if (await this.blackListTokenService.hasToken(refreshToken)) {
             throw new UnauthorizedException()
         }
 

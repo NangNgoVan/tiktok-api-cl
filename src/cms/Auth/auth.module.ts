@@ -3,12 +3,12 @@ import { AuthController } from './Controller/auth.controller'
 import { AuthService } from 'src/shared/Services/auth.service'
 import { JwtService } from '@nestjs/jwt'
 import { UsersModule } from 'src/ui/Users/users.module'
-import { BlacklistService } from 'src/shared/Services/blacklist-redis.service'
+import { BlacklistTokenService } from 'src/shared/Services/blacklist-token.service'
 import { CacheService } from 'src/shared/Services/cache.service'
 
 @Module({
     imports: [UsersModule],
     controllers: [AuthController],
-    providers: [AuthService, JwtService, BlacklistService, CacheService],
+    providers: [AuthService, JwtService, BlacklistTokenService, CacheService],
 })
 export class AuthModule {}
