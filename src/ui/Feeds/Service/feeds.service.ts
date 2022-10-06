@@ -281,6 +281,7 @@ export class FeedsService {
             feedDetailDto.hashtags = feed.hashtags
             feedDetailDto.primary_image_index = feed.primary_image_index
             feedDetailDto.created_at = feed.created_at
+            feedDetailDto.type = feed.type
 
             const resources = await this.feedResourcesService.getResourceByIds(
                 feed.resource_ids,
