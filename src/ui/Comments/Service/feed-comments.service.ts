@@ -101,12 +101,11 @@ export class FeedCommentService {
 
     async getCommentByFeedId(
         feedId: string,
-        currentUserId: string,
+        currentUserId?: string,
         nextCursor?: string,
         perPage = 6,
     ) {
         const feed = await this.feedModel.findById(feedId)
-
         if (!feed) throw new FeedNotFoundException()
 
         const queryOption = {
@@ -119,8 +118,8 @@ export class FeedCommentService {
 
         const results = await this.buildComments(
             feedId,
-            currentUserId,
             paginatedComment,
+            currentUserId,
         )
 
         return {
@@ -132,19 +131,17 @@ export class FeedCommentService {
     async getCommentByFeedIdAndCommentId(
         feedId: string,
         commentId: string,
-        currentUserId: string,
+        currentUserId?: string,
         nextCursor?: string,
         perPage = 6,
     ) {
         const feed = await this.feedModel.findById(feedId)
-
         if (!feed) throw new FeedNotFoundException()
 
         const currentComment = await this.commentModel.find({
             feed_id: feedId,
             _id: commentId,
         })
-
         if (!currentComment) throw new CommentNotFoundException()
 
         const queryOption = {
@@ -156,13 +153,12 @@ export class FeedCommentService {
                 reply_to: commentId,
             },
         }
-
         const paginatedComment = await this.commentModel.paginate(queryOption)
 
         const results = await this.buildComments(
             feedId,
-            currentUserId,
             paginatedComment,
+            currentUserId,
         )
 
         return {
@@ -171,7 +167,11 @@ export class FeedCommentService {
         }
     }
 
-    async buildComments(feedId, currentUserId, paginatedComment) {
+    async buildComments(
+        feedId: string,
+        paginatedComment: any,
+        currentUserId?: string,
+    ) {
         const comments = _.get(paginatedComment, 'results', [])
 
         const createdCommentUsers = await this.userModel.find({
@@ -180,24 +180,18 @@ export class FeedCommentService {
 
         const commentIds: string[] = _.map(comments, (comment) => comment._id)
 
-        const commentReactionsByCurrentUser =
-            await this.feedReactionService.getCommentReactions(
-                feedId,
-                commentIds,
-                currentUserId,
-            )
+        const commentReactionsByCurrentUser = currentUserId
+            ? await this.feedReactionService.getCommentReactions(
+                  feedId,
+                  commentIds,
+                  currentUserId,
+              )
+            : null
 
         return _.map(comments, (comment) => {
             const createdCommentUser = _.find(
                 createdCommentUsers,
                 (user) => user.id === comment.created_by,
-            )
-
-            const currentCommentReaction = _.find(
-                commentReactionsByCurrentUser,
-                (commentReaction) =>
-                    commentReaction.comment_id ===
-                    _.get(comment, '_id').toString(),
             )
 
             return {
@@ -211,10 +205,10 @@ export class FeedCommentService {
                     'created_at',
                     'updated_at',
                 ]),
-                current_user: {
-                    is_reacted: !!currentCommentReaction,
-                    reaction_type: _.get(currentCommentReaction, 'type'),
-                },
+                current_user: this.getCurrentUserComment(
+                    comment,
+                    commentReactionsByCurrentUser,
+                ),
                 created_user: _.pick(createdCommentUser, [
                     '_id',
                     'full_name',
@@ -223,5 +217,20 @@ export class FeedCommentService {
                 ]),
             }
         })
+    }
+
+    getCurrentUserComment(comment, commentReactionsByCurrentUser?) {
+        if (!commentReactionsByCurrentUser) return null
+
+        const currentCommentReaction = _.find(
+            commentReactionsByCurrentUser,
+            (commentReaction) =>
+                commentReaction.comment_id === _.get(comment, '_id').toString(),
+        )
+
+        return {
+            is_reacted: !!currentCommentReaction,
+            reaction_type: _.get(currentCommentReaction, 'type'),
+        }
     }
 }

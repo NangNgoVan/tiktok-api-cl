@@ -15,6 +15,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
+import _ from 'lodash'
 import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { FeedComment } from 'src/shared/Schemas/feed-comment.schema'
@@ -124,7 +125,8 @@ export class FeedCommentsController {
         let next = undefined
         if (req.query) next = req.query['next']
         const feedId = req.params.id
-        const currentUserId = req.user.userId
+        const currentUserId = _.get(req.user, 'userId')
+
         return this.feedCommentService.getCommentByFeedId(
             feedId,
             currentUserId,
@@ -151,7 +153,7 @@ export class FeedCommentsController {
 
         const feedId = req.params.id
         const commentId = req.params.commentId
-        const currentUserId = req.user.userId
+        const currentUserId = _.get(req.user, 'userId')
         return this.feedCommentService.getCommentByFeedIdAndCommentId(
             feedId,
             commentId,
