@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common'
 
 @Injectable()
-export class FeedMetadataValidationPipe implements PipeTransform {
+export class FeedVideoValidationPipe implements PipeTransform {
     transform(value: any, metadata: ArgumentMetadata) {
         const maxImageSize = 5 * 1024 * 1024
         const maxVideoSize = 25 * 1024 * 1024

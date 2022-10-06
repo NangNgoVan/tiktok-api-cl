@@ -10,5 +10,5 @@ export class GetFeedResourceDto {
     path: string
     @ApiProperty()
     @IsString()
-    mime: string
+    mimetype: string
 }

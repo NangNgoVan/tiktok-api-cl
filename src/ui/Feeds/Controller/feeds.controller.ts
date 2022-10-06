@@ -3,17 +3,15 @@ import {
     Controller,
     Get,
     HttpStatus,
-    NotFoundException,
     ParseFilePipeBuilder,
     Post,
     Query,
     Req,
-    UploadedFile,
     UploadedFiles,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common'
-import { ExpressAdapter, FileFieldsInterceptor } from '@nestjs/platform-express'
+import { FileFieldsInterceptor } from '@nestjs/platform-express'
 import {
     ApiBearerAuth,
     ApiBody,
@@ -30,25 +28,21 @@ import {
     UserNotFoundException,
 } from 'src/shared/Exceptions/http.exceptions'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
-import { Feed } from 'src/shared/Schemas/feed.schema'
 import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
-import { configService } from 'src/shared/Services/config.service'
 import { UtilsService } from 'src/shared/Services/utils.service'
 import { FeedType } from 'src/shared/Types/types'
 import { UsersService } from 'src/ui/Users/Service/users.service'
 import { AddFeedResourceDto } from '../../Resources/Dto/add-feed-resource.dto'
-import { CreateFeedDto } from '../Dto/create-feed.dto'
+import { CreateFeedImageDto } from '../Dto/create-feed-image.dto'
 import { FeedResourcesService } from '../../Resources/Service/resources.service'
 import { FeedsService } from '../Service/feeds.service'
 import { FeedDetailDto } from '../Dto/feed-detail.dto'
 import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
-import { FeedCurrentUserDto } from '../Dto/feed-current-user.dto'
-import { CreatedUserDto } from '../../../shared/Dto/created-user.dto'
-import _, { create } from 'lodash'
+import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import { FeedMetadataValidationPipe } from 'src/shared/Pipes/FeedMetadataValidation.pipe'
-import { ParseFormDataJsonPipe } from 'src/shared/Pipes/ParseFormDataJson.pipe'
+import { FeedVideoValidationPipe } from 'src/shared/Pipes/feed-video-validation-pipe.service'
+import { CreateFeedVideoDto } from '../Dto/create-feed-video.dto'
 
 @Controller('ui/feeds')
 @ApiTags('Feed APIs')
@@ -101,7 +95,7 @@ export class FeedsController {
     })
     async uploadFeedImageType(
         @Req() req,
-        @Body(new ParseFormDataJsonPipe()) formData: object,
+        @Body() formData: object,
         @UploadedFiles(
             new ParseFilePipeBuilder()
                 .addFileTypeValidator({
@@ -120,7 +114,7 @@ export class FeedsController {
         const user = await this.userService.findById(userId)
         if (!user) throw new UserNotFoundException()
 
-        let dto = formData['data'] as CreateFeedDto
+        let dto = formData['data'] as CreateFeedImageDto
 
         dto = _.pick(dto, [
             'content',
@@ -144,8 +138,7 @@ export class FeedsController {
 
         const resource_urls = await Promise.all(
             files.resources.map(async (file) => {
-                const { originalname, /*encoding,*/ mimetype, buffer, size } =
-                    file
+                const { originalname, /*encoding,*/ mimetype, buffer } = file
                 const ext = originalname.split('.').pop()
                 const pathToSaveResource = `${aws3FeedResourcePath}/${userId}/${uuidv4()}.${ext}`
 
@@ -170,7 +163,7 @@ export class FeedsController {
                 feed_id: createdFeed.id,
                 type: FeedType.IMAGE,
                 created_by: userId,
-                mime: resource.mimetype,
+                mimetype: resource.mimetype,
             } as AddFeedResourceDto
         })
 
@@ -215,32 +208,24 @@ export class FeedsController {
                     type: 'string',
                     format: 'binary',
                 },
-                data: {
-                    type: 'object',
-                    properties: {
-                        content: {
-                            type: 'string',
-                        },
-                        allowed_comment: {
-                            type: 'boolean',
-                        },
-                    },
+                content: {
+                    type: 'string',
+                },
+                allowed_comment: {
+                    type: 'boolean',
                 },
             },
         },
     })
     async uploadFeedVideoType(
         @Req() req,
-        @Body(new ParseFormDataJsonPipe()) formData: object,
-        @UploadedFiles(new FeedMetadataValidationPipe())
+        @Body() dto: CreateFeedVideoDto,
+        @UploadedFiles(new FeedVideoValidationPipe())
         files: { video: Express.Multer.File; thumbnail: Express.Multer.File },
     ) {
         const { userId } = req.user
         const user = await this.userService.findById(userId)
         if (!user) throw new UserNotFoundException()
-
-        let dto = formData['data'] as CreateFeedDto
-        dto = _.pick(dto, ['content', 'allowed_comment'])
 
         dto.hashtags = this.utilsService.splitHashtagFromString(dto.content)
         dto.created_by = userId
@@ -290,7 +275,7 @@ export class FeedsController {
             feed_id: createdFeed.id,
             type: FeedType.VIDEO,
             created_by: userId,
-            mime: video.mimetype,
+            mimetype: video.mimetype,
         } as AddFeedResourceDto
 
         const thumbnailResource = {
@@ -298,7 +283,7 @@ export class FeedsController {
             feed_id: createdFeed.id,
             type: FeedType.VIDEO,
             created_by: userId,
-            mime: thumbnail.mimetype,
+            mimetype: thumbnail.mimetype,
         } as AddFeedResourceDto
 
         const addedResources = await this.feedResourcesService.addFeedResource([

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 
-import { FeedType, UserReactionType } from '../Types/types'
+import { FeedType } from '../Types/types'
 
 export type FeedResourceDocument = FeedResource & Document
 
@@ -24,7 +24,7 @@ export class FeedResource {
     @Prop()
     created_by: string
     @Prop()
-    mime: string
+    mimetype: string
 }
 
 export const FeedResourceSchema = SchemaFactory.createForClass(FeedResource)
