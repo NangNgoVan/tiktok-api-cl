@@ -104,8 +104,8 @@ export class AuthService {
         const uuidNoHyphens = uuidv4().replace(/-/g, '')
 
         const user: UserDocument = await this.userService.create({
-            full_name: `guest ${uuidNoHyphens}`,
-            nick_name: `guest${uuidNoHyphens}`,
+            full_name: `trial ${uuidNoHyphens}`,
+            nick_name: `trial${uuidNoHyphens}`,
             is_trial_user: true,
         })
 
