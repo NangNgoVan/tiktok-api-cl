@@ -256,12 +256,16 @@ export class FeedsController {
         //Video
         const video = files.video[0]
         const videoExt = video.originalname.split('.').pop()
-        const pathToSaveVideo = `${aws3FeedResourcePath}/${userId}/video-${uuidv4()}.${videoExt}`
+        const pathToSaveVideo = `${aws3FeedResourcePath}/${
+            createdFeed.id
+        }/video-${uuidv4()}.${videoExt}`
 
         //Thumbnail
         const thumbnail = files.thumbnail[0]
         const thumbnailExt = thumbnail.originalname.split('.').pop()
-        const pathToSaveThumbnail = `${aws3FeedResourcePath}/${userId}/thumbnail-${uuidv4()}.${thumbnailExt}`
+        const pathToSaveThumbnail = `${aws3FeedResourcePath}/${
+            createdFeed.id
+        }/thumbnail-${uuidv4()}.${thumbnailExt}`
 
         //Upload files to aws3
         const uploadedVideoUrl =
