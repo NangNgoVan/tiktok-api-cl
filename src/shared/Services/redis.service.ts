@@ -16,6 +16,10 @@ export class RedisService {
         })
     }
 
+    public getRedisInstance() {
+        return this.redisConnection()
+    }
+
     async set(key: string, value: string, expireTime?: number) {
         try {
             if (expireTime) {
