@@ -11,9 +11,9 @@ import { FollowsModule } from '../Follows/follows.module'
 import { UsersController } from './Controller/users.controller'
 import { UserAuthenticationMethodsService } from './Service/user-authentication-methods.service'
 import { UsersService } from './Service/users.service'
-import { UserAuthenticationMethodsController } from './Controller/user-authentication-methods.controller'
 import { UserFollowsController } from './Controller/user-follows.controller'
 import { UserFeedsController } from './Controller/user-feeds.controller'
+import { UserAuthenticationMethodsController } from './Controller/user-authentication-methods.controller'
 
 @Module({
     imports: [

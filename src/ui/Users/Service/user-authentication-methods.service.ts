@@ -50,4 +50,10 @@ export class UserAuthenticationMethodsService {
             user_id: userId,
         })
     }
+
+    async getAllAuthenticationMethodsByUserId(userId: string) {
+        return this.userAuthenticationMethodModel.find({
+            user_id: userId,
+        })
+    }
 }

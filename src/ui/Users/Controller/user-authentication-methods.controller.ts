@@ -3,6 +3,7 @@ import {
     Body,
     Controller,
     Delete,
+    Get,
     Post,
     Req,
     UseGuards,
@@ -19,9 +20,10 @@ import {
 import { UserAuthenticationMethodsService } from '../Service/user-authentication-methods.service'
 import { AuthenticationMethod } from '../../../shared/Types/types'
 import { JwtAuthGuard } from '../../../shared/Guards/jwt.auth.guard'
-import { CreateUserAuthenticationMethodCredentialDto } from '../../Auth/Dto/create-user-authentication-method-credential.dto'
 import bcrypt from 'bcrypt'
 import _ from 'lodash'
+import { CreateUserAuthenticationMethodCredentialDto } from '../../Auth/Dto/create-user-authentication-method-credential.dto'
+import { GetUserAuthenticationMethodResponseDto } from '../Dto/get-user-authentication-method-response.dto'
 
 @ApiTags('User Authentication Method APIs')
 @Controller('ui/users/current/authentication-methods')
@@ -29,6 +31,32 @@ export class UserAuthenticationMethodsController {
     constructor(
         private readonly authenticationMethodsService: UserAuthenticationMethodsService,
     ) {}
+
+    @Get()
+    @UsePipes(new ValidationPipe())
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({
+        summary: 'Get all authentication methods by `current` alias',
+    })
+    @ApiOkResponse({
+        type: GetUserAuthenticationMethodResponseDto,
+        isArray: true,
+    })
+    async getAllAuthenticationMethodsByCurrentUser(
+        @Req() req,
+    ): Promise<GetUserAuthenticationMethodResponseDto[]> {
+        const userId = req.user.userId
+
+        const authenticationMethods =
+            await this.authenticationMethodsService.getAllAuthenticationMethodsByUserId(
+                userId,
+            )
+
+        return _.map(authenticationMethods, (authenticationMethod) =>
+            _.pick(authenticationMethod, ['_id', 'authentication_method']),
+        )
+    }
 
     @Post('credential')
     @UsePipes(new ValidationPipe())

@@ -23,7 +23,6 @@ export class AuthController {
     @Get('/login/authentication-methods/metamask')
     @ApiOperation({ summary: 'Nonce' })
     @ApiOkResponse({
-        description: '200',
         type: NonceTokenDataResponse,
     })
     async getNonceToken(): Promise<NonceTokenDataResponse> {
@@ -33,7 +32,6 @@ export class AuthController {
     @Post('/login/authentication-methods/metamask')
     @ApiOperation({ summary: 'Login with metamask' })
     @ApiOkResponse({
-        description: '200',
         type: TokenDataResponse,
     })
     async logInWithMetamask(
@@ -45,7 +43,6 @@ export class AuthController {
     @Post('/login/authentication-methods/credential')
     @ApiOperation({ summary: 'Login with credential' })
     @ApiOkResponse({
-        description: '200',
         type: TokenDataResponse,
     })
     async logInWithCredential(
@@ -57,7 +54,6 @@ export class AuthController {
     @Post('/token')
     @ApiOperation({ summary: 'Refresh token' })
     @ApiOkResponse({
-        description: '200',
         type: TokenDataResponse,
     })
     @ApiHeader({
@@ -76,9 +72,7 @@ export class AuthController {
         required: true,
     })
     @ApiOperation({ summary: 'Logout' })
-    @ApiOkResponse({
-        description: '200',
-    })
+    @ApiOkResponse({})
     async logOut(@Req() req): Promise<HttpStatusResult> {
         const refreshToken = req.headers['refresh-token'] // read refresh-token from headers
         return this.authService.logOut(refreshToken)
