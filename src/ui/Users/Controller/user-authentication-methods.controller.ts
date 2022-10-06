@@ -28,6 +28,7 @@ import { CreateUserAuthenticationMethodCredentialRequestDto } from '../RequestDT
 import { CreateUserAuthenticationMethodMetamaskRequestDto } from '../RequestDTO/create-user-authentication-method-metamask-request.dto'
 import { AuthService } from '../../../shared/Services/auth.service'
 import { UsersService } from '../Service/users.service'
+import { NonceTokenDataResponse } from '../../../shared/Services/data-serializer.service'
 
 @ApiTags('User Authentication Method APIs')
 @Controller('ui/users/current/authentication-methods')
@@ -36,6 +37,7 @@ export class UserAuthenticationMethodsController {
         private readonly authenticationMethodsService: UserAuthenticationMethodsService,
         private readonly authenticationService: AuthService,
         private readonly userService: UsersService,
+        private readonly authService: AuthService,
     ) {}
 
     @Get()
@@ -199,11 +201,26 @@ export class UserAuthenticationMethodsController {
         return _.omit(createdUserAuthenticationMethod, ['data', 'user_id'])
     }
 
+    @Get('metamask')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({
+        summary:
+            'Get nonce to create authentication method metamask by `current` alias',
+    })
+    @ApiOkResponse({
+        type: NonceTokenDataResponse,
+    })
+    async getNonceToAuthenticationMethodMetamask(): Promise<NonceTokenDataResponse> {
+        return this.authService.createNonce()
+    }
+
     @Delete('metamask')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({
-        summary: 'Delete authentication method metamask by `current` alias',
+        summary:
+            '[Test purpose] Delete authentication method metamask by `current` alias',
     })
     @ApiOkResponse()
     async deleteAuthenticationMethodMetamask(@Req() req) {
