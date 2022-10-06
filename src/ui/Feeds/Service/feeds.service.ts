@@ -281,7 +281,6 @@ export class FeedsService {
             feedDetailDto.hashtags = feed.hashtags
             feedDetailDto.primary_image_index = feed.primary_image_index
             feedDetailDto.created_at = feed.created_at
-            feedDetailDto.thumbnail = feed.thumbnail
 
             feedDetailDto.type = feed.type
 

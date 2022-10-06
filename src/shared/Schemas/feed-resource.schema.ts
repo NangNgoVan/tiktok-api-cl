@@ -23,6 +23,8 @@ export class FeedResource {
     type: FeedType
     @Prop()
     created_by: string
+    @Prop()
+    mime: string
 }
 
 export const FeedResourceSchema = SchemaFactory.createForClass(FeedResource)

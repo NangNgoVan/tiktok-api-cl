@@ -160,16 +160,17 @@ export class FeedsController {
                     //return null
                 }
                 const { /*ETag,*/ /*Location ,*/ Key /*Bucket*/ } = uploadedData
-                return Key
+                return { Key, mimetype }
             }),
         )
 
-        const resourceDtos = resource_urls.map((url) => {
+        const resourceDtos = resource_urls.map((resource) => {
             return {
-                path: url,
+                path: resource.Key,
                 feed_id: createdFeed.id,
                 type: FeedType.IMAGE,
                 created_by: userId,
+                mime: resource.mimetype,
             } as AddFeedResourceDto
         })
 
@@ -285,6 +286,7 @@ export class FeedsController {
             feed_id: createdFeed.id,
             type: FeedType.VIDEO,
             created_by: userId,
+            mime: video.mimetype,
         } as AddFeedResourceDto
 
         const thumbnailResource = {
@@ -292,6 +294,7 @@ export class FeedsController {
             feed_id: createdFeed.id,
             type: FeedType.VIDEO,
             created_by: userId,
+            mime: thumbnail.mimetype,
         } as AddFeedResourceDto
 
         const addedResources = await this.feedResourcesService.addFeedResource([
@@ -301,7 +304,6 @@ export class FeedsController {
         if (!addedResources) return DatabaseUpdateFailException
 
         createdFeed.resource_ids = addedResources
-        createdFeed.thumbnail = addedResources[1]
 
         await createdFeed.save()
 
