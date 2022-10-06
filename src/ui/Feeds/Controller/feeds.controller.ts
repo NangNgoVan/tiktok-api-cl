@@ -39,14 +39,7 @@ import { FeedsService } from '../Service/feeds.service'
 import { FeedDetailDto } from '../Dto/feed-detail.dto'
 import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
-import { FeedCurrentUserDto } from '../Dto/feed-current-user.dto'
-import { CreatedUserDto } from '../../../shared/Dto/created-user.dto'
 import _ from 'lodash'
-import {
-    CacheTtlSeconds,
-    RedisCacheService,
-} from 'src/shared/Services/cache-redis.service'
-import { Cacheable } from 'type-cacheable'
 
 @Controller('ui/feeds')
 @ApiTags('Feed APIs')
@@ -57,8 +50,6 @@ export class FeedsController {
         private readonly userService: UsersService,
         private readonly aws3FileUploadService: AWS3FileUploadService,
         private readonly utilsService: UtilsService,
-        /** Redis cache */
-        private readonly redisCacheService: RedisCacheService,
     ) {}
 
     @Post('/by-type/image')
@@ -189,7 +180,6 @@ export class FeedsController {
         name: 'next',
         type: String,
     })
-    @Cacheable({ cacheKey: 'feeds-newest' })
     async getNewestFeeds(@Query() query, @Req() req) {
         const nextCursor: string | undefined = query['next']
         const currentUserId = req.user.userId
