@@ -14,6 +14,7 @@ import { UsersService } from './Service/users.service'
 import { UserFollowsController } from './Controller/user-follows.controller'
 import { UserFeedsController } from './Controller/user-feeds.controller'
 import { UserAuthenticationMethodsController } from './Controller/user-authentication-methods.controller'
+import { AuthModule } from '../Auth/auth.module'
 
 @Module({
     imports: [
@@ -24,8 +25,9 @@ import { UserAuthenticationMethodsController } from './Controller/user-authentic
                 schema: UserAuthenticationMethodSchema,
             },
         ]),
-        FollowsModule,
         forwardRef(() => FeedsModule),
+        forwardRef(() => FollowsModule),
+        forwardRef(() => AuthModule),
     ],
     controllers: [
         UsersController,

@@ -17,5 +17,6 @@ import { RedisService } from 'src/shared/Services/redis.service'
         BlacklistService,
         RedisService,
     ],
+    exports: [AuthService],
 })
 export class AuthModule {}
