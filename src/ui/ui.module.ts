@@ -5,7 +5,7 @@ import { InterestsModule } from './Interests/interests.module'
 import { FeedsModule } from './Feeds/feeds.module'
 import { CommentsModule } from './Comments/comments.module'
 import { BlacklistMiddleware } from 'src/shared/Middlewares/blacklist.middleware'
-import { RedisService } from 'src/shared/Services/redis.service'
+import { CacheService } from 'src/shared/Services/cache.service'
 import { AuthService } from 'src/shared/Services/auth.service'
 import { JwtService } from '@nestjs/jwt'
 import { ReactionsModule } from './Reactions/reactions.module'
@@ -22,7 +22,7 @@ import { BlacklistService } from 'src/shared/Services/blacklist-redis.service'
         ReactionsModule,
     ],
     controllers: [],
-    providers: [RedisService, AuthService, JwtService, BlacklistService],
+    providers: [CacheService, AuthService, JwtService, BlacklistService],
 })
 export class UIModule {
     configure(consumer: MiddlewareConsumer) {

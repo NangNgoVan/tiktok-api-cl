@@ -5,7 +5,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt'
 import { JwtStrategy } from 'src/shared/Strategies/jwt.strategy'
 import { UsersModule } from '../Users/users.module'
 import { BlacklistService } from 'src/shared/Services/blacklist-redis.service'
-import { RedisService } from 'src/shared/Services/redis.service'
+import { CacheService } from 'src/shared/Services/cache.service'
 
 @Module({
     imports: [UsersModule, JwtModule.register({})],
@@ -15,7 +15,7 @@ import { RedisService } from 'src/shared/Services/redis.service'
         JwtService,
         JwtStrategy,
         BlacklistService,
-        RedisService,
+        CacheService,
     ],
 })
 export class AuthModule {}

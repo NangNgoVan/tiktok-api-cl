@@ -10,7 +10,7 @@ import { RefreshTokenInvalidException } from '../Exceptions/http.exceptions'
 import { AuthService } from '../Services/auth.service'
 import { BlacklistService } from '../Services/blacklist-redis.service'
 import { configService } from '../Services/config.service'
-import { RedisService } from '../Services/redis.service'
+import { CacheService } from '../Services/cache.service'
 
 @Injectable()
 export class BlacklistMiddleware implements NestMiddleware {
