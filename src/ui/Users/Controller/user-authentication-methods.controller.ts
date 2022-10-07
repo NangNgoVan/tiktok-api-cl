@@ -61,9 +61,15 @@ export class UserAuthenticationMethodsController {
                 userId,
             )
 
-        return _.map(authenticationMethods, (authenticationMethod) =>
-            _.pick(authenticationMethod, ['_id', 'authentication_method']),
-        )
+        return _.map(authenticationMethods, (authenticationMethod) => ({
+            ..._.pick(authenticationMethod, ['_id', 'authentication_method']),
+            data:
+                authenticationMethod.authentication_method === 'metamask'
+                    ? {
+                          address: _.get(authenticationMethod, 'data.address'),
+                      }
+                    : undefined,
+        }))
     }
 
     @Post('credential')
