@@ -185,8 +185,8 @@ export class UsersController {
         const uploadedData =
             await this.aws3FileUploadService.uploadFileToS3Bucket(
                 pathToSaveAvatar,
-                buffer,
                 mimetype,
+                buffer,
             )
 
         if (!uploadedData) throw new FileUploadFailException()

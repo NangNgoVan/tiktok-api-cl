@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import * as aws from 'aws-sdk'
-import { v4 as uuidv4 } from 'uuid'
-import { FileUploadFailException } from '../Exceptions/http.exceptions'
 import { configService } from './config.service'
 
 @Injectable()
 export class AWS3FileUploadService {
+    private readonly logger: Logger = new Logger(AWS3FileUploadService.name)
+
     s3() {
         return new aws.S3(configService.AWS3Configuration())
     }
@@ -25,7 +25,11 @@ export class AWS3FileUploadService {
         try {
             const uploadData = await this.s3().upload(uploadParams).promise()
             return uploadData
-        } catch (e) {
+        } catch (error) {
+            this.logger.error({
+                error,
+            })
+
             return null
         }
     }
