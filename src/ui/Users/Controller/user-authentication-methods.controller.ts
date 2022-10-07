@@ -164,6 +164,12 @@ export class UserAuthenticationMethodsController {
                 address,
             )
 
+        if (!verifiedAddress) {
+            throw new BadRequestException(
+                `Metamask address ${address} is invalid`,
+            )
+        }
+
         const metamaskAuthenticationMethod =
             await this.authenticationMethodsService.findByUserIdAndAuthenticationMethod(
                 userId,
@@ -173,12 +179,6 @@ export class UserAuthenticationMethodsController {
         if (metamaskAuthenticationMethod) {
             throw new BadRequestException(
                 'Metamask authentication method already exists',
-            )
-        }
-
-        if (!verifiedAddress) {
-            throw new BadRequestException(
-                `Metamask address ${address} is invalid`,
             )
         }
 
