@@ -10,7 +10,7 @@ export class AWS3FileUploadService {
         return new aws.S3(configService.AWS3Configuration())
     }
 
-    async uploadFileToS3Bucket(key, mimeType, buffer) {
+    async uploadFileToS3Bucket(key: string, mimeType: string, buffer: Buffer) {
         const uploadParams = {
             Bucket: configService.getEnv('AWS_BUCKET_NAME'),
             Key: key,
