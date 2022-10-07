@@ -28,7 +28,6 @@ import { UserDocument } from '../Schemas/user.schema'
 import { UserNotFoundException } from '../Exceptions/http.exceptions'
 import { BlacklistTokenService } from './blacklist-token.service'
 import { SignUpWithAuthenticationMethodCredentialRequestDto } from '../../ui/Auth/Controller/RequestDTO/signup-with-authentication-method-credential-request.dto'
-import _ from 'lodash'
 
 @Injectable()
 export class AuthService {
@@ -268,6 +267,14 @@ export class AuthService {
             user_id: user.id,
         })
 
-        return user
+        // FIXME: move this to a function
+        return {
+            token: this.generateAccessToken({
+                userId: user.id,
+            }),
+            refreshToken: this.generateRefreshToken({
+                userId: user.id,
+            }),
+        }
     }
 }
