@@ -22,7 +22,7 @@ import { UserResponseDto } from '../../Users/ResponseDTO/user-response.dto'
 export class AuthenticationController {
     constructor(private readonly authService: AuthService) {}
 
-    @Get('/signup/authentication-methods/credential')
+    @Post('/signup/authentication-methods/credential')
     @ApiOperation({
         summary: 'Signup with authentication method credential',
     })
