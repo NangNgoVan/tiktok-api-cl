@@ -41,20 +41,22 @@ export class UserAuthenticationMethodsService {
         })
     }
 
-    async findByAuthenticationMethod(
+    async findByUserIdAndAuthenticationMethod(
+        userId: string,
         authenticationMethod: AuthenticationMethod,
     ): Promise<UserAuthenticationMethodDocument> {
         return this.userAuthenticationMethodModel.findOne({
+            user_id: userId,
             authentication_method: authenticationMethod,
         })
     }
 
-    async deleteByUserIdAndMethod(
+    async deleteByUserIdAndAuthenticationMethod(
         userId: string,
-        method: AuthenticationMethod,
+        authenticationMethod: AuthenticationMethod,
     ): Promise<void> {
         await this.userAuthenticationMethodModel.deleteOne({
-            authentication_method: method,
+            authentication_method: authenticationMethod,
             user_id: userId,
         })
     }

@@ -98,7 +98,8 @@ export class UserAuthenticationMethodsController {
         }
 
         const credentialAuthenticationMethod =
-            await this.authenticationMethodsService.findByAuthenticationMethod(
+            await this.authenticationMethodsService.findByUserIdAndAuthenticationMethod(
+                userId,
                 AuthenticationMethod.CREDENTIAL,
             )
 
@@ -164,7 +165,8 @@ export class UserAuthenticationMethodsController {
             )
 
         const metamaskAuthenticationMethod =
-            await this.authenticationMethodsService.findByAuthenticationMethod(
+            await this.authenticationMethodsService.findByUserIdAndAuthenticationMethod(
+                userId,
                 AuthenticationMethod.METAMASK,
             )
 
@@ -231,7 +233,7 @@ export class UserAuthenticationMethodsController {
     @ApiOkResponse()
     async deleteAuthenticationMethodMetamask(@Req() req) {
         const userId = req.user.userId
-        await this.authenticationMethodsService.deleteByUserIdAndMethod(
+        await this.authenticationMethodsService.deleteByUserIdAndAuthenticationMethod(
             userId,
             AuthenticationMethod.METAMASK,
         )

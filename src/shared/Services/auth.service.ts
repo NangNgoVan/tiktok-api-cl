@@ -241,17 +241,6 @@ export class AuthService {
             )
         }
 
-        const credentialAuthenticationMethod =
-            await this.userAuthenticationMethodsService.findByAuthenticationMethod(
-                AuthenticationMethod.CREDENTIAL,
-            )
-
-        if (credentialAuthenticationMethod) {
-            throw new BadRequestException(
-                'Credential authentication method already exists',
-            )
-        }
-
         const authenticationMethod =
             await this.userAuthenticationMethodsService.findByUsername(username)
 
