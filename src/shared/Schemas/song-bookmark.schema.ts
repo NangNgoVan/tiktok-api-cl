@@ -13,6 +13,7 @@ export type SongBookmarkDocument = SongBookmark & Document
 export class SongBookmark {
     @Prop()
     song_id: string
+
     @Prop()
     created_by: string[]
 }

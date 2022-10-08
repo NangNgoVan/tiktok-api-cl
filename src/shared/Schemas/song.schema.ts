@@ -15,18 +15,23 @@ export class Song {
         default: 999,
     })
     display_order: number
+
     @Prop({
         default: 0,
     })
     number_of_use: number
+
     @Prop({
         maxlength: 255,
     })
     name: string
+
     @Prop()
     path: string
+
     @Prop()
     deleted_at: string
+
     @Prop()
     created_by: string
 }

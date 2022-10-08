@@ -15,6 +15,7 @@ export class HashTag {
         default: 1,
     })
     number_of_use: number
+
     @Prop({
         unique: true,
     })

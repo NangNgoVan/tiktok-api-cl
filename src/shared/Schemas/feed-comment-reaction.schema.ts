@@ -15,10 +15,13 @@ export type FeedCommentReactionDocument = FeedCommentReaction & Document
 export class FeedCommentReaction {
     @Prop()
     feed_id: string
+
     @Prop()
     comment_id: string
+
     @Prop()
     created_by: string
+
     @Prop()
     type: UserReactionType
 }
