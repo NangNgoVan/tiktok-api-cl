@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import * as aws from 'aws-sdk'
 import { configService } from './config.service'
 import _ from 'lodash'
+import { Cacheable } from '@type-cacheable/core'
 
 @Injectable()
 export class S3Service {
@@ -34,12 +35,20 @@ export class S3Service {
         }
     }
 
-    // @Cacheable({
-    //     ttlSeconds: 3 * 60,
-    //     cacheKey: (args: any[]) => 'aa',
-    //     // cacheKey: (args: any[]) => `ui:s3:${args[1]}:${args[0]}`,
-    // })
-    async getSignedUrl(objectKey: string, bucket: string) {
+    @Cacheable({
+        hashKey: 'a-hash',
+        cacheKey: (args: any[]) => `ui:s3:${args[1]}:${args[0]}`,
+        noop: (args: any[]) => args[2] as boolean,
+        ttlSeconds: (args: any[]) => args[3] as number,
+    })
+    async getSignedUrl(
+        objectKey: string,
+        bucket: string,
+        /* eslint-disable */
+        disableCache = true,
+        cacheForSeconds = 180,
+        /* eslint-enable */
+    ) {
         const params = { Key: objectKey, Bucket: bucket, Expires: 2 * 60 }
         return this.s3().getSignedUrl('getObject', params)
     }

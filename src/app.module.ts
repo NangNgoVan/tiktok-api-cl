@@ -34,10 +34,10 @@ import { useAdapter as useLruCacheAdapter } from '@type-cacheable/lru-cache-adap
 })
 export class AppModule implements OnModuleInit {
     onModuleInit() {
-        if (process.env.NODE_ENV === 'local') {
-            const client = new LRUCache()
+        const lruCache = new LRUCache()
 
-            useLruCacheAdapter(client)
+        if (process.env.NODE_ENV === 'local') {
+            useLruCacheAdapter(lruCache)
         } else {
             const client = new IoRedis({
                 host: configService.getEnv('REDIS_HOST'),
@@ -45,6 +45,7 @@ export class AppModule implements OnModuleInit {
             })
 
             useIORedisAdapter(client)
+            useLruCacheAdapter(lruCache, true)
         }
     }
 }

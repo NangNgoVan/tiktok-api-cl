@@ -9,12 +9,14 @@ import { configService } from 'src/shared/Services/config.service'
 import { AddFeedResourceDto } from '../Dto/add-feed-resource.dto'
 import { GetFeedResourceDto } from '../Dto/get-feed-resource.dto'
 import _ from 'lodash'
+import { S3Service } from '../../../shared/Services/s3.service'
 
 @Injectable()
 export class FeedResourcesService {
     constructor(
         @InjectModel(FeedResource.name)
         private feedResourcesModel: Model<FeedResourceDocument>,
+        private s3Service: S3Service,
     ) {}
 
     async addFeedResource(dtos: AddFeedResourceDto[]) {
@@ -29,15 +31,20 @@ export class FeedResourcesService {
             _id: { $in: resourceIds },
         })
 
-        return _.map(resources, (resource) => {
-            return {
-                resource_id: resource.id,
-                path:
-                    configService.getEnv('AWS_IMAGE_BASE_URL') +
-                    '/' +
+        return Promise.all(
+            _.map(resources, async (resource) => {
+                const path = await this.s3Service.getSignedUrl(
                     resource.path,
-                mimetype: resource.mimetype,
-            }
-        })
+                    configService.getEnv('AWS_BUCKET_NAME'),
+                    false,
+                )
+
+                return {
+                    resource_id: resource.id,
+                    path,
+                    mimetype: resource.mimetype,
+                }
+            }),
+        )
     }
 }
