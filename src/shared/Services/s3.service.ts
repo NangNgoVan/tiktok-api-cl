@@ -38,19 +38,18 @@ export class S3Service {
     @Cacheable({
         hashKey: 'ui:s3:',
         cacheKey: (args: any[]) => `${args[1]}:${args[0]}`,
-        noop: (args: any[]) => args[2],
-        // ttlSeconds: (args: any[]) => args[3],
-        ttlSeconds: 120,
+        noop: (args: any[]) => _.defaultTo(args[2], true),
+        ttlSeconds: (args: any[]) => _.defaultTo(args[3], 2 + 60),
     })
     async getSignedUrl(
         objectKey: string,
         bucket: string,
         /* eslint-disable */
-        disableCache = true,
-        cacheForSeconds = 120,
+        disableCache? : boolean,
+        cacheForSeconds? : number,
         /* eslint-enable */
     ) {
-        const params = { Key: objectKey, Bucket: bucket, Expires: 180 }
+        const params = { Key: objectKey, Bucket: bucket, Expires: 3 * 60 }
         return this.s3().getSignedUrl('getObject', params)
     }
 
