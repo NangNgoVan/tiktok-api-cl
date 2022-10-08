@@ -4,6 +4,7 @@ import {
     UnauthorizedException,
     Request,
     Response,
+    Logger,
 } from '@nestjs/common'
 import { NextFunction } from 'express'
 import { RefreshTokenInvalidException } from '../Exceptions/http.exceptions'
@@ -13,6 +14,10 @@ import { JwtService } from '@nestjs/jwt'
 
 @Injectable()
 export class RefreshTokenBlacklistMiddleware implements NestMiddleware {
+    private readonly logger: Logger = new Logger(
+        RefreshTokenBlacklistMiddleware.name,
+    )
+
     constructor(
         private readonly refreshTokenBlacklistService: RefreshTokenBlacklistService,
         private readonly jwtService: JwtService,
@@ -25,11 +30,17 @@ export class RefreshTokenBlacklistMiddleware implements NestMiddleware {
             throw new UnauthorizedException()
         }
 
-        const data = this.jwtService
-            .verify(refreshToken, {
+        let data
+
+        try {
+            data = this.jwtService.verify(refreshToken, {
                 secret: configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
             })
-            .cacth(() => undefined)
+        } catch (error) {
+            this.logger.error({
+                error,
+            })
+        }
 
         if (!data) {
             throw new RefreshTokenInvalidException()
