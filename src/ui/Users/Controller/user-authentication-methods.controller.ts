@@ -28,7 +28,7 @@ import { CreateUserAuthenticationMethodCredentialRequestDto } from '../RequestDT
 import { CreateUserAuthenticationMethodMetamaskRequestDto } from '../RequestDTO/create-user-authentication-method-metamask-request.dto'
 import { AuthenticationService } from '../../Authentication/Service/authentication.service'
 import { UsersService } from '../Service/users.service'
-import { NonceTokenDataResponse } from '../../../shared/Services/data-serializer.service'
+import { NonceResponseDto } from '../../../shared/ResponseDTO/nonce-response.dto'
 
 @ApiTags('User Authentication Method APIs')
 @Controller('ui/users/current/authentication-methods')
@@ -217,9 +217,9 @@ export class UserAuthenticationMethodsController {
             'Get nonce to create authentication method metamask by `current` alias',
     })
     @ApiOkResponse({
-        type: NonceTokenDataResponse,
+        type: NonceResponseDto,
     })
-    async getNonceToAuthenticationMethodMetamask(): Promise<NonceTokenDataResponse> {
+    async getNonceToAuthenticationMethodMetamask(): Promise<NonceResponseDto> {
         return this.authService.createNonce()
     }
 

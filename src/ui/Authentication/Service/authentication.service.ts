@@ -1,4 +1,3 @@
-// Nest dependencies
 import bcrypt from 'bcrypt'
 import { v4 as uuidv4 } from 'uuid'
 import {
@@ -10,27 +9,23 @@ import {
 
 import { JwtService } from '@nestjs/jwt'
 import { configService } from 'src/shared/Services/config.service'
-import {
-    TokenDataResponse,
-    NonceTokenDataResponse,
-} from 'src/shared/Services/data-serializer.service'
 
 import Web3 from 'web3'
 import * as crypto from 'crypto'
 
-import { VerifySignatureDto } from '../../../shared/Dto/verify-signature.dto'
-import { CredentialDto } from '../../../shared/Dto/credential.dto'
-import {
-    AuthenticationMethod,
-    HttpStatusResult,
-} from '../../../shared/Types/types'
+import { LoginWithAuthenticationMethodMetamaskRequestDto } from '../../../shared/RequestDTO/login-with-authentication-method-metamask-request.dto'
+import { LoginWithAuthenticationMethodCredentialRequestDto } from '../../../shared/RequestDTO/login-with-authentication-method-credential-request.dto'
+import { AuthenticationMethod } from '../../../shared/Types/types'
 import { UsersService } from 'src/ui/Users/Service/users.service'
 
 import { UserAuthenticationMethodsService } from 'src/ui/Users/Service/user-authentication-methods.service'
 import { UserDocument } from '../../../shared/Schemas/user.schema'
 import { UserNotFoundException } from '../../../shared/Exceptions/http.exceptions'
-import { BlacklistTokenService } from '../../../shared/Services/blacklist-token.service'
+import { RefreshTokenBlacklistService } from '../../../shared/Services/refresh-token-blacklist.service'
 import { SignUpWithAuthenticationMethodCredentialRequestDto } from '../Controller/RequestDTO/signup-with-authentication-method-credential-request.dto'
+import { AuthenticateResponseDto } from '../../../shared/ResponseDTO/authenticate-response.dto'
+import { RefreshAccessTokenResponseDto } from '../../../shared/ResponseDTO/refresh-token-response.dto'
+import { NonceResponseDto } from '../../../shared/ResponseDTO/nonce-response.dto'
 
 @Injectable()
 export class AuthenticationService {
@@ -38,17 +33,14 @@ export class AuthenticationService {
         private readonly jwtService: JwtService,
         private userService: UsersService,
         private userAuthenticationMethodsService: UserAuthenticationMethodsService,
-        private blackListTokenService: BlacklistTokenService,
+        private refreshTokenBlackListService: RefreshTokenBlacklistService,
     ) {}
 
-    async createNonce(): Promise<NonceTokenDataResponse> {
-        const nonceCreatedByCrypto = crypto.randomBytes(16).toString('base64')
-
-        const dataResponse = {
-            nonce: nonceCreatedByCrypto,
+    async createNonce(): Promise<NonceResponseDto> {
+        const nonce = crypto.randomBytes(16).toString('base64')
+        return {
+            nonce,
         }
-
-        return dataResponse
     }
 
     async verifyMetamaskAddress(nonce, signature, address) {
@@ -68,8 +60,8 @@ export class AuthenticationService {
     }
 
     async logInWithMetamask(
-        dto: VerifySignatureDto,
-    ): Promise<TokenDataResponse> {
+        dto: LoginWithAuthenticationMethodMetamaskRequestDto,
+    ): Promise<AuthenticateResponseDto> {
         const verifiedAddress = await this.verifyMetamaskAddress(
             dto.nonce,
             dto.signature,
@@ -122,7 +114,7 @@ export class AuthenticationService {
         }
     }
 
-    async logInAsATrialUser(): Promise<TokenDataResponse> {
+    async logInAsATrialUser(): Promise<AuthenticateResponseDto> {
         const uuidNoHyphens = uuidv4().replace(/-/g, '')
 
         const user: UserDocument = await this.userService.create({
@@ -148,7 +140,9 @@ export class AuthenticationService {
         }
     }
 
-    async logInWithCredential(dto: CredentialDto): Promise<TokenDataResponse> {
+    async logInWithCredential(
+        dto: LoginWithAuthenticationMethodCredentialRequestDto,
+    ): Promise<AuthenticateResponseDto> {
         const userAuthenticationMethod =
             await this.userAuthenticationMethodsService.findByUsername(
                 dto.username,
@@ -215,7 +209,9 @@ export class AuthenticationService {
         }
     }
 
-    async refreshAccessToken(userId: string): Promise<TokenDataResponse> {
+    async refreshAccessToken(
+        userId: string,
+    ): Promise<RefreshAccessTokenResponseDto> {
         return {
             token: this.generateAccessToken({
                 userId,
@@ -223,12 +219,10 @@ export class AuthenticationService {
         }
     }
 
-    async logOut(refreshToken: string): Promise<HttpStatusResult> {
-        this.blackListTokenService.addTokenToBlacklist(refreshToken)
-        return {
-            statusCode: 200,
-            message: 'Logged out success!',
-        }
+    async logOut(refreshToken: string): Promise<void> {
+        await this.refreshTokenBlackListService.addRefreshTokenToBlacklist(
+            refreshToken,
+        )
     }
 
     async signupWithAuthenticationMethodCredential(

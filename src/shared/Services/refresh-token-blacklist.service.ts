@@ -4,28 +4,30 @@ import { configService } from './config.service'
 import { CacheService } from './cache.service'
 
 @Injectable()
-export class BlacklistTokenService {
-    private readonly logger: Logger = new Logger(BlacklistTokenService.name)
-    private prefixKey = 'blacklist-key-'
+export class RefreshTokenBlacklistService {
+    private readonly logger: Logger = new Logger(
+        RefreshTokenBlacklistService.name,
+    )
+    private prefixKey = 'refresh-token-blacklist-'
     constructor(
         @Inject(CacheService)
         private readonly cacheService: CacheService,
         private readonly jwtService: JwtService,
     ) {}
-    async addTokenToBlacklist(value: string): Promise<boolean> {
+
+    async addRefreshTokenToBlacklist(value: string): Promise<void> {
         try {
             const verify = this.jwtService.verify(value, {
                 secret: configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
             })
+
             if (verify) {
                 const exp = verify.exp
                 const key = this.prefixKey + value
                 await this.cacheService.set(key, value, exp)
-                return true
             }
         } catch (error) {
             this.logger.error({ error })
-            return false
         }
     }
 

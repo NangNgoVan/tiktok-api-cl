@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { IsNumber, IsString } from 'class-validator'
-import { CurrentFollowedUser } from 'src/shared/Dto/created-user.dto'
+import { CurrentFollowedUser } from 'src/shared/ResponseDTO/created-user.dto'
 
 export class GetUserFollowDto {
     @ApiProperty()

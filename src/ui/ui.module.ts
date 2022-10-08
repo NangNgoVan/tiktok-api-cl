@@ -10,7 +10,7 @@ import { AuthenticationService } from 'src/ui/Authentication/Service/authenticat
 import { JwtService } from '@nestjs/jwt'
 import { ReactionsModule } from './Reactions/reactions.module'
 import { BookmarksModule } from './Bookmarks/bookmarks.module'
-import { BlacklistTokenService } from 'src/shared/Services/blacklist-token.service'
+import { RefreshTokenBlacklistService } from 'src/shared/Services/refresh-token-blacklist.service'
 @Module({
     imports: [
         AuthenticationModule,
@@ -26,7 +26,7 @@ import { BlacklistTokenService } from 'src/shared/Services/blacklist-token.servi
         CacheService,
         AuthenticationService,
         JwtService,
-        BlacklistTokenService,
+        RefreshTokenBlacklistService,
     ],
 })
 export class UIModule {

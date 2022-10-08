@@ -129,7 +129,7 @@ export class User {
         default: [],
     })
     @ApiProperty()
-    roles: [string]
+    roles: string[]
 
     //interest
     @Prop({

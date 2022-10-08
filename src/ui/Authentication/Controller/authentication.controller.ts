@@ -1,10 +1,5 @@
 import { Body, Controller, Get, Post, Req } from '@nestjs/common'
-import {
-    TokenDataResponse,
-    NonceTokenDataResponse,
-} from 'src/shared/Services/data-serializer.service'
-import { HttpStatusResult } from 'src/shared/Types/types'
-import { VerifySignatureDto } from 'src/shared/Dto/verify-signature.dto'
+import { LoginWithAuthenticationMethodMetamaskRequestDto } from 'src/shared/RequestDTO/login-with-authentication-method-metamask-request.dto'
 
 import { AuthenticationService } from 'src/ui/Authentication/Service/authentication.service'
 import {
@@ -13,56 +8,63 @@ import {
     ApiOperation,
     ApiTags,
 } from '@nestjs/swagger'
-import { CredentialDto } from '../../../shared/Dto/credential.dto'
+import { LoginWithAuthenticationMethodCredentialRequestDto } from '../../../shared/RequestDTO/login-with-authentication-method-credential-request.dto'
 import { SignUpWithAuthenticationMethodCredentialRequestDto } from './RequestDTO/signup-with-authentication-method-credential-request.dto'
+import { AuthenticateResponseDto } from '../../../shared/ResponseDTO/authenticate-response.dto'
+import { RefreshAccessTokenResponseDto } from '../../../shared/ResponseDTO/refresh-token-response.dto'
+import { NonceResponseDto } from '../../../shared/ResponseDTO/nonce-response.dto'
 
 @ApiTags('Authentication APIs')
 @Controller('ui/authentication')
 export class AuthenticationController {
-    constructor(private readonly authService: AuthenticationService) {}
+    constructor(
+        private readonly authenticationService: AuthenticationService,
+    ) {}
 
     @Post('/signup/authentication-methods/credential')
     @ApiOperation({
         summary: 'Signup with authentication method credential',
     })
     @ApiOkResponse({
-        type: TokenDataResponse,
+        type: AuthenticateResponseDto,
     })
     async signupWithAuthenticationMethodCredential(
         @Body() dto: SignUpWithAuthenticationMethodCredentialRequestDto,
-    ): Promise<TokenDataResponse> {
-        return this.authService.signupWithAuthenticationMethodCredential(dto)
+    ): Promise<AuthenticateResponseDto> {
+        return this.authenticationService.signupWithAuthenticationMethodCredential(
+            dto,
+        )
     }
 
     @Get('/login/authentication-methods/metamask')
     @ApiOperation({ summary: 'Nonce' })
     @ApiOkResponse({
-        type: NonceTokenDataResponse,
+        type: AuthenticateResponseDto,
     })
-    async getNonceToken(): Promise<NonceTokenDataResponse> {
-        return this.authService.createNonce()
+    async getNonceToken(): Promise<NonceResponseDto> {
+        return this.authenticationService.createNonce()
     }
 
     @Post('/login/authentication-methods/metamask')
     @ApiOperation({ summary: 'Login with metamask' })
     @ApiOkResponse({
-        type: TokenDataResponse,
+        type: AuthenticateResponseDto,
     })
     async logInWithMetamask(
-        @Body() dto: VerifySignatureDto,
-    ): Promise<TokenDataResponse> {
-        return this.authService.logInWithMetamask(dto)
+        @Body() dto: LoginWithAuthenticationMethodMetamaskRequestDto,
+    ): Promise<AuthenticateResponseDto> {
+        return this.authenticationService.logInWithMetamask(dto)
     }
 
     @Post('/login/authentication-methods/credential')
     @ApiOperation({ summary: 'Login with credential' })
     @ApiOkResponse({
-        type: TokenDataResponse,
+        type: AuthenticateResponseDto,
     })
     async logInWithCredential(
-        @Body() dto: CredentialDto,
-    ): Promise<TokenDataResponse> {
-        return this.authService.logInWithCredential(dto)
+        @Body() dto: LoginWithAuthenticationMethodCredentialRequestDto,
+    ): Promise<AuthenticateResponseDto> {
+        return this.authenticationService.logInWithCredential(dto)
     }
 
     // FIXME: ratelimit for this
@@ -70,24 +72,24 @@ export class AuthenticationController {
     @ApiOperation({ summary: 'Login as a trial user' })
     @ApiOkResponse({
         description: '200',
-        type: TokenDataResponse,
+        type: AuthenticateResponseDto,
     })
-    async loginAsAGuest(): Promise<TokenDataResponse> {
-        return this.authService.logInAsATrialUser()
+    async loginAsAGuest(): Promise<AuthenticateResponseDto> {
+        return this.authenticationService.logInAsATrialUser()
     }
 
     @Post('/token')
     @ApiOperation({ summary: 'Refresh token' })
     @ApiOkResponse({
-        type: TokenDataResponse,
+        type: RefreshAccessTokenResponseDto,
     })
     @ApiHeader({
         name: 'refresh-token',
         description: 'refresh token',
         required: true,
     })
-    async refreshToken(@Req() req): Promise<TokenDataResponse> {
-        return this.authService.refreshAccessToken(req.userId)
+    async refreshToken(@Req() req): Promise<RefreshAccessTokenResponseDto> {
+        return this.authenticationService.refreshAccessToken(req.userId)
     }
 
     @Post('/logout')
@@ -97,9 +99,9 @@ export class AuthenticationController {
         required: true,
     })
     @ApiOperation({ summary: 'Logout' })
-    @ApiOkResponse({})
-    async logOut(@Req() req): Promise<HttpStatusResult> {
-        const refreshToken = req.headers['refresh-token'] // read refresh-token from headers
-        return this.authService.logOut(refreshToken)
+    @ApiOkResponse()
+    async logOut(@Req() req): Promise<void> {
+        const refreshToken = req.headers['refresh-token']
+        await this.authenticationService.logOut(refreshToken)
     }
 }

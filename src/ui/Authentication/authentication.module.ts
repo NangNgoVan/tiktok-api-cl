@@ -4,7 +4,7 @@ import { AuthenticationService } from 'src/ui/Authentication/Service/authenticat
 import { JwtModule, JwtService } from '@nestjs/jwt'
 import { JwtStrategy } from 'src/shared/Strategies/jwt.strategy'
 import { UsersModule } from '../Users/users.module'
-import { BlacklistTokenService } from 'src/shared/Services/blacklist-token.service'
+import { RefreshTokenBlacklistService } from 'src/shared/Services/refresh-token-blacklist.service'
 import { CacheService } from 'src/shared/Services/cache.service'
 
 @Module({
@@ -14,7 +14,7 @@ import { CacheService } from 'src/shared/Services/cache.service'
         AuthenticationService,
         JwtService,
         JwtStrategy,
-        BlacklistTokenService,
+        RefreshTokenBlacklistService,
         CacheService,
     ],
     exports: [AuthenticationService],

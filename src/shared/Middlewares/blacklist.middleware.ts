@@ -8,13 +8,13 @@ import {
 import { NextFunction } from 'express'
 import { RefreshTokenInvalidException } from '../Exceptions/http.exceptions'
 import { AuthenticationService } from '../../ui/Authentication/Service/authentication.service'
-import { BlacklistTokenService } from '../Services/blacklist-token.service'
+import { RefreshTokenBlacklistService } from '../Services/refresh-token-blacklist.service'
 import { configService } from '../Services/config.service'
 
 @Injectable()
 export class BlacklistMiddleware implements NestMiddleware {
     constructor(
-        private readonly blackListTokenService: BlacklistTokenService,
+        private readonly blackListTokenService: RefreshTokenBlacklistService,
         private readonly authService: AuthenticationService,
     ) {}
 
