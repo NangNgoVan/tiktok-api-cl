@@ -46,10 +46,10 @@ export class S3Service {
         bucket: string,
         /* eslint-disable */
         disableCache = true,
-        cacheForSeconds = 180,
+        cacheForSeconds = 2 * 60,
         /* eslint-enable */
     ) {
-        const params = { Key: objectKey, Bucket: bucket, Expires: 2 * 60 }
+        const params = { Key: objectKey, Bucket: bucket, Expires: 3 * 60 }
         return this.s3().getSignedUrl('getObject', params)
     }
 
