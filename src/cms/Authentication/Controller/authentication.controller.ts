@@ -12,6 +12,10 @@ export class AuthenticationController {
     ) {}
 
     @Post('/authentication-methods/credential')
+    @ApiOperation({ summary: 'Login with credential' })
+    @ApiOkResponse({
+        type: RefreshAccessTokenResponseDto,
+    })
     async logInWithCredential(
         @Body()
         loginWithAuthenticationMethodCredentialRequestDto: LoginWithAuthenticationMethodCredentialRequestDto,
