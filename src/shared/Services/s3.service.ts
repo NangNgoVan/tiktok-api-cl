@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common'
 import * as aws from 'aws-sdk'
 import { configService } from './config.service'
+import _ from 'lodash'
 
 @Injectable()
-export class AWS3FileUploadService {
-    private readonly logger: Logger = new Logger(AWS3FileUploadService.name)
+export class S3Service {
+    private readonly logger: Logger = new Logger(S3Service.name)
 
     s3() {
         return new aws.S3(configService.AWS3Configuration())
@@ -21,10 +22,9 @@ export class AWS3FileUploadService {
                 LocationConstraint: configService.getEnv('AWS_REGION'),
             },
         }
-        //
+
         try {
-            const uploadData = await this.s3().upload(uploadParams).promise()
-            return uploadData
+            return await this.s3().upload(uploadParams).promise()
         } catch (error) {
             this.logger.error({
                 error,
@@ -32,5 +32,23 @@ export class AWS3FileUploadService {
 
             return null
         }
+    }
+
+    // @Cacheable({
+    //     ttlSeconds: 3 * 60,
+    //     cacheKey: (args: any[]) => 'aa',
+    //     // cacheKey: (args: any[]) => `ui:s3:${args[1]}:${args[0]}`,
+    // })
+    async getSignedUrl(objectKey: string, bucket: string) {
+        const params = { Key: objectKey, Bucket: bucket, Expires: 2 * 60 }
+        return this.s3().getSignedUrl('getObject', params)
+    }
+
+    async getSignedUrls(objectKeys: string[], bucket: string) {
+        return Promise.all(
+            _.map(objectKeys, (objectKey) =>
+                this.getSignedUrl(objectKey, bucket),
+            ),
+        )
     }
 }

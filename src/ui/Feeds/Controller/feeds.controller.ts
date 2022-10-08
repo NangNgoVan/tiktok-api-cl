@@ -28,7 +28,7 @@ import {
     UserNotFoundException,
 } from 'src/shared/Exceptions/http.exceptions'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
-import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
+import { S3Service } from 'src/shared/Services/s3.service'
 import { UtilsService } from 'src/shared/Services/utils.service'
 import { FeedType } from 'src/shared/Types/types'
 import { UsersService } from 'src/ui/Users/Service/users.service'
@@ -51,7 +51,7 @@ export class FeedsController {
         private readonly feedsService: FeedsService,
         private readonly feedResourcesService: FeedResourcesService,
         private readonly userService: UsersService,
-        private readonly aws3FileUploadService: AWS3FileUploadService,
+        private readonly aws3FileUploadService: S3Service,
         private readonly utilsService: UtilsService,
     ) {}
 

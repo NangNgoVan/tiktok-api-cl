@@ -25,9 +25,11 @@ export class RefreshTokenBlacklistMiddleware implements NestMiddleware {
             throw new UnauthorizedException()
         }
 
-        const data = this.jwtService.verify(refreshToken, {
-            secret: configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
-        })
+        const data = this.jwtService
+            .verify(refreshToken, {
+                secret: configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
+            })
+            .cacth(() => undefined)
 
         if (!data) {
             throw new RefreshTokenInvalidException()

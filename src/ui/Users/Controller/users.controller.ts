@@ -36,7 +36,7 @@ import { UpdateUserDto } from '../RequestDTO/update-user.dto'
 import { UsersService } from '../Service/users.service'
 import { User } from '../../../shared/Schemas/user.schema'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
+import { S3Service } from 'src/shared/Services/s3.service'
 import { configService } from 'src/shared/Services/config.service'
 import { UploadMetaDataDto } from '../RequestDTO/upload-metadata.dto'
 import moment from 'moment'
@@ -51,7 +51,7 @@ export class UsersController {
 
     constructor(
         private readonly userService: UsersService,
-        private readonly aws3FileUploadService: AWS3FileUploadService,
+        private readonly aws3FileUploadService: S3Service,
         private readonly userFollowsService: UserFollowsService,
     ) {}
 

@@ -5,7 +5,7 @@ import {
     UserAuthenticationMethodSchema,
 } from 'src/shared/Schemas/user-authentication-method.schema'
 import { User, UserSchema } from 'src/shared/Schemas/user.schema'
-import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
+import { S3Service } from 'src/shared/Services/s3.service'
 import { FeedsModule } from '../Feeds/feeds.module'
 import { FollowsModule } from '../Follows/follows.module'
 import { UsersController } from './Controller/users.controller'
@@ -35,11 +35,7 @@ import { AuthenticationModule } from '../Authentication/authentication.module'
         UserFeedsController,
         UserAuthenticationMethodsController,
     ],
-    providers: [
-        UsersService,
-        UserAuthenticationMethodsService,
-        AWS3FileUploadService,
-    ],
+    providers: [UsersService, UserAuthenticationMethodsService, S3Service],
     exports: [UsersService, UserAuthenticationMethodsService],
 })
 export class UsersModule {}

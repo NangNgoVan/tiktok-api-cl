@@ -23,7 +23,7 @@ import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { HttpStatusResult } from 'src/shared/Types/types'
 import { UpdateUserDto } from '../RequestDTO/update-user.dto'
 import { UsersService } from '../Service/users.service'
-import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
+import { S3Service } from 'src/shared/Services/s3.service'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 import { PaginateUserFollowsDto } from 'src/ui/Follows/Dto/paginate-user-follows.dto'
@@ -33,7 +33,7 @@ import { PaginateUserFollowsDto } from 'src/ui/Follows/Dto/paginate-user-follows
 export class UserFollowsController {
     constructor(
         private readonly userService: UsersService,
-        private readonly aws3FileUploadService: AWS3FileUploadService,
+        private readonly aws3FileUploadService: S3Service,
         private readonly userFollowsService: UserFollowsService,
     ) {}
 
