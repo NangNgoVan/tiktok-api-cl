@@ -39,7 +39,8 @@ export class S3Service {
         hashKey: 'ui:s3',
         cacheKey: (args: any[]) => `${args[1]}:${args[0]}`,
         noop: (args: any[]) => args[2],
-        ttlSeconds: (args: any[]) => args[3],
+        // ttlSeconds: (args: any[]) => args[3],
+        ttlSeconds: 120,
     })
     async getSignedUrl(
         objectKey: string,
