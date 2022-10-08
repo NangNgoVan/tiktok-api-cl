@@ -11,6 +11,6 @@ export class CMSModule {
     configure(consumer: MiddlewareConsumer) {
         consumer
             .apply(RefreshTokenBlacklistMiddleware)
-            .forRoutes('cms/authentication/token', 'cms/authentication/logout')
+            .forRoutes('cms/authentication/token')
     }
 }

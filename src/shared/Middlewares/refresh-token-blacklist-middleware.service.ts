@@ -7,7 +7,6 @@ import {
     Logger,
 } from '@nestjs/common'
 import { NextFunction } from 'express'
-import { RefreshTokenInvalidException } from '../Exceptions/http.exceptions'
 import { RefreshTokenBlacklistService } from '../Services/refresh-token-blacklist.service'
 import { configService } from '../Services/config.service'
 import { JwtService } from '@nestjs/jwt'
@@ -43,7 +42,7 @@ export class RefreshTokenBlacklistMiddleware implements NestMiddleware {
         }
 
         if (!data) {
-            throw new RefreshTokenInvalidException()
+            throw new UnauthorizedException()
         }
 
         const isRefreshTokenInBlackList =

@@ -24,6 +24,6 @@ export class UIModule {
     configure(consumer: MiddlewareConsumer) {
         consumer
             .apply(RefreshTokenBlacklistMiddleware)
-            .forRoutes('ui/authentication/token', 'ui/authentication/logout')
+            .forRoutes('ui/authentication/token')
     }
 }
