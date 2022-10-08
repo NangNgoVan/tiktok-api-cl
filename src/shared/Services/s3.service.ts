@@ -36,7 +36,7 @@ export class S3Service {
     }
 
     @Cacheable({
-        hashKey: 'ui:s3',
+        hashKey: 'ui:s3:',
         cacheKey: (args: any[]) => `${args[1]}:${args[0]}`,
         noop: (args: any[]) => args[2],
         // ttlSeconds: (args: any[]) => args[3],
