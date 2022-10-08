@@ -6,7 +6,7 @@ import {
 import { HttpStatusResult } from 'src/shared/Types/types'
 import { VerifySignatureDto } from 'src/shared/Dto/verify-signature.dto'
 
-import { AuthService } from 'src/shared/Services/auth.service'
+import { AuthenticationService } from 'src/ui/Authentication/Service/authentication.service'
 import {
     ApiHeader,
     ApiOkResponse,
@@ -19,7 +19,7 @@ import { SignUpWithAuthenticationMethodCredentialRequestDto } from './RequestDTO
 @ApiTags('Authentication APIs')
 @Controller('ui/authentication')
 export class AuthenticationController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(private readonly authService: AuthenticationService) {}
 
     @Post('/signup/authentication-methods/credential')
     @ApiOperation({

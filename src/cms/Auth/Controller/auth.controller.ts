@@ -7,11 +7,11 @@ import {
 import { HttpStatusResult } from 'src/shared/Types/types'
 import { CredentialDto } from 'src/shared/Dto/credential.dto'
 
-import { AuthService } from 'src/shared/Services/auth.service'
+import { AuthenticationService } from 'src/ui/Authentication/Service/authentication.service'
 
 @Controller('cms/authentication')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(private readonly authService: AuthenticationService) {}
 
     @Post('/authentication-methods/credential')
     async logInWithCredential(

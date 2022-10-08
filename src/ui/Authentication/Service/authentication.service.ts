@@ -18,19 +18,22 @@ import {
 import Web3 from 'web3'
 import * as crypto from 'crypto'
 
-import { VerifySignatureDto } from '../Dto/verify-signature.dto'
-import { CredentialDto } from '../Dto/credential.dto'
-import { AuthenticationMethod, HttpStatusResult } from '../Types/types'
+import { VerifySignatureDto } from '../../../shared/Dto/verify-signature.dto'
+import { CredentialDto } from '../../../shared/Dto/credential.dto'
+import {
+    AuthenticationMethod,
+    HttpStatusResult,
+} from '../../../shared/Types/types'
 import { UsersService } from 'src/ui/Users/Service/users.service'
 
 import { UserAuthenticationMethodsService } from 'src/ui/Users/Service/user-authentication-methods.service'
-import { UserDocument } from '../Schemas/user.schema'
-import { UserNotFoundException } from '../Exceptions/http.exceptions'
-import { BlacklistTokenService } from './blacklist-token.service'
-import { SignUpWithAuthenticationMethodCredentialRequestDto } from '../../ui/Auth/Controller/RequestDTO/signup-with-authentication-method-credential-request.dto'
+import { UserDocument } from '../../../shared/Schemas/user.schema'
+import { UserNotFoundException } from '../../../shared/Exceptions/http.exceptions'
+import { BlacklistTokenService } from '../../../shared/Services/blacklist-token.service'
+import { SignUpWithAuthenticationMethodCredentialRequestDto } from '../Controller/RequestDTO/signup-with-authentication-method-credential-request.dto'
 
 @Injectable()
-export class AuthService {
+export class AuthenticationService {
     constructor(
         private readonly jwtService: JwtService,
         private userService: UsersService,

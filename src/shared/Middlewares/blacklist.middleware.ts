@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common'
 import { NextFunction } from 'express'
 import { RefreshTokenInvalidException } from '../Exceptions/http.exceptions'
-import { AuthService } from '../Services/auth.service'
+import { AuthenticationService } from '../../ui/Authentication/Service/authentication.service'
 import { BlacklistTokenService } from '../Services/blacklist-token.service'
 import { configService } from '../Services/config.service'
 
@@ -15,7 +15,7 @@ import { configService } from '../Services/config.service'
 export class BlacklistMiddleware implements NestMiddleware {
     constructor(
         private readonly blackListTokenService: BlacklistTokenService,
-        private readonly authService: AuthService,
+        private readonly authService: AuthenticationService,
     ) {}
 
     async use(req: Request, res: Response, next: NextFunction) {

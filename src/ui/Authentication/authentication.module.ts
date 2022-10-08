@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { AuthenticationController } from './Controller/authentication.controller'
-import { AuthService } from 'src/shared/Services/auth.service'
+import { AuthenticationService } from 'src/ui/Authentication/Service/authentication.service'
 import { JwtModule, JwtService } from '@nestjs/jwt'
 import { JwtStrategy } from 'src/shared/Strategies/jwt.strategy'
 import { UsersModule } from '../Users/users.module'
@@ -11,12 +11,12 @@ import { CacheService } from 'src/shared/Services/cache.service'
     imports: [UsersModule, JwtModule.register({})],
     controllers: [AuthenticationController],
     providers: [
-        AuthService,
+        AuthenticationService,
         JwtService,
         JwtStrategy,
         BlacklistTokenService,
         CacheService,
     ],
-    exports: [AuthService],
+    exports: [AuthenticationService],
 })
-export class AuthModule {}
+export class AuthenticationModule {}

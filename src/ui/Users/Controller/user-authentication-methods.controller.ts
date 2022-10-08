@@ -26,7 +26,7 @@ import { GetUserAuthenticationMethodResponseDto } from '../ResponseDTO/get-user-
 import { CreateUserAuthenticationMethodResponseDto } from '../ResponseDTO/create-user-authentication-method-response.dto'
 import { CreateUserAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-authentication-method-credential-request.dto'
 import { CreateUserAuthenticationMethodMetamaskRequestDto } from '../RequestDTO/create-user-authentication-method-metamask-request.dto'
-import { AuthService } from '../../../shared/Services/auth.service'
+import { AuthenticationService } from '../../Authentication/Service/authentication.service'
 import { UsersService } from '../Service/users.service'
 import { NonceTokenDataResponse } from '../../../shared/Services/data-serializer.service'
 
@@ -35,9 +35,9 @@ import { NonceTokenDataResponse } from '../../../shared/Services/data-serializer
 export class UserAuthenticationMethodsController {
     constructor(
         private readonly authenticationMethodsService: UserAuthenticationMethodsService,
-        private readonly authenticationService: AuthService,
+        private readonly authenticationService: AuthenticationService,
         private readonly userService: UsersService,
-        private readonly authService: AuthService,
+        private readonly authService: AuthenticationService,
     ) {}
 
     @Get()
