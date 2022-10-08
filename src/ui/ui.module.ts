@@ -4,7 +4,7 @@ import { UsersModule } from './Users/users.module'
 import { InterestsModule } from './Interests/interests.module'
 import { FeedsModule } from './Feeds/feeds.module'
 import { CommentsModule } from './Comments/comments.module'
-import { BlacklistMiddleware } from 'src/shared/Middlewares/blacklist.middleware'
+import { RefreshTokenBlacklistMiddleware } from 'src/shared/Middlewares/refresh-token-blacklist-middleware.service'
 import { CacheService } from 'src/shared/Services/cache.service'
 import { AuthenticationService } from 'src/ui/Authentication/Service/authentication.service'
 import { JwtService } from '@nestjs/jwt'
@@ -22,17 +22,12 @@ import { RefreshTokenBlacklistService } from 'src/shared/Services/refresh-token-
         ReactionsModule,
     ],
     controllers: [],
-    providers: [
-        CacheService,
-        AuthenticationService,
-        JwtService,
-        RefreshTokenBlacklistService,
-    ],
+    providers: [],
 })
 export class UIModule {
     configure(consumer: MiddlewareConsumer) {
         consumer
-            .apply(BlacklistMiddleware)
+            .apply(RefreshTokenBlacklistMiddleware)
             .forRoutes('ui/authentication/token', 'ui/authentication/logout')
     }
 }

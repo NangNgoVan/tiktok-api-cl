@@ -37,5 +37,6 @@ import {
         CacheService,
         AuthenticationService,
     ],
+    exports: [JwtService, RefreshTokenBlacklistService, CacheService],
 })
 export class AuthenticationModule {}
