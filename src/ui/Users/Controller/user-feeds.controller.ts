@@ -8,6 +8,8 @@ import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 import { PaginateFeedResultsDto } from 'src/ui/Feeds/Dto/paginate-feed-results.dto'
 import { FeedsService } from 'src/ui/Feeds/Service/feeds.service'
+import _ from 'lodash'
+import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
 
 @Controller('ui/users')
 @ApiTags('User Feed APIs')
@@ -35,8 +37,8 @@ export class UserFeedsController {
     async getFeedsPostedByCurrentUser(
         @Req() req,
     ): Promise<PaginateFeedResultsDto> {
-        const createdBy = req.user.userId
-        const currentUserId = req.user.userId
+        const createdBy = _.get(req.user, 'userId')
+        const currentUserId = _.get(req.user, 'userId')
         const nextCursor: string | undefined = req.query['next']
 
         return this.feedsService.getPostedFeeds(
@@ -52,7 +54,7 @@ export class UserFeedsController {
         type: 'string',
         required: false,
     })
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousGuard)
     @ApiOperation({
         summary: 'Get posted feeds by user',
     })
@@ -88,7 +90,7 @@ export class UserFeedsController {
         @Req() req,
     ): Promise<PaginateFeedResultsDto> {
         const bookmarkedBy = req.user.userId
-        const currentUserId = req.user.userId
+        const currentUserId = _.get(req.user, 'userId')
         const nextCursor: string | undefined = req.query['next']
 
         return this.feedsService.getBookmarkedFeeds(
@@ -104,7 +106,7 @@ export class UserFeedsController {
         type: 'string',
         required: false,
     })
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousGuard)
     @ApiOperation({
         summary: 'Get feeds bookmarked by user',
     })
@@ -114,8 +116,8 @@ export class UserFeedsController {
     async getBookmarkedFeedsByUser(
         @Req() req,
     ): Promise<PaginateFeedResultsDto> {
-        const bookmarkedBy = req.params.userId
-        const currentUserId = req.user.userId
+        const bookmarkedBy = _.get(req.params, 'userId')
+        const currentUserId = _.get(req.user, 'userId')
         const nextCursor: string | undefined = req.query['next']
 
         return this.feedsService.getBookmarkedFeeds(
@@ -158,7 +160,7 @@ export class UserFeedsController {
         type: 'string',
         required: false,
     })
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousGuard)
     @ApiOperation({
         summary: 'Get reacted feeds by user',
     })
@@ -166,8 +168,8 @@ export class UserFeedsController {
         type: PaginateFeedResultsDto,
     })
     async getReactedFeedsByUser(@Req() req): Promise<PaginateFeedResultsDto> {
-        const reactedBy = req.params.userId
-        const currentUserId = req.user.userId
+        const reactedBy = _.get(req.params, 'userId')
+        const currentUserId = _.get(req.user, 'userId')
         const nextCursor: string | undefined = req.query['next']
 
         return this.feedsService.getReactedFeeds(

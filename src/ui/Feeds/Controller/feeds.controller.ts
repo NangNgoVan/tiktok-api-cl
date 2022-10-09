@@ -43,6 +43,7 @@ import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { FeedVideoValidationPipe } from 'src/shared/Pipes/feed-video-validation-pipe.service'
 import { CreateFeedVideoDto } from '../Dto/create-feed-video.dto'
+import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
 
 @Controller('ui/feeds')
 @ApiTags('Feed APIs')
@@ -297,13 +298,13 @@ export class FeedsController {
         await createdFeed.save()
 
         user.$inc('number_of_feed', 1)
-        user.save()
+        await user.save()
 
         return await this.feedsService.getFeedById(createdFeed.id, userId)
     }
 
     @Get('/newest')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousGuard)
     @ApiQuery({
         name: 'next',
         type: 'string',
@@ -321,12 +322,12 @@ export class FeedsController {
     })
     async getNewestFeeds(@Query() query, @Req() req) {
         const nextCursor: string | undefined = query['next']
-        const currentUserId = req.user.userId
+        const currentUserId = _.get(req.user, 'userId')
         return this.feedsService.getNewestFeeds(currentUserId, nextCursor)
     }
 
     @Get('/trending')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousGuard)
     @ApiQuery({
         name: 'next',
         type: 'string',
@@ -344,12 +345,12 @@ export class FeedsController {
     })
     async getTrendingFeeds(@Query() query, @Req() req) {
         const nextCursor: string | undefined = query['next']
-        const currentUserId = req.user.userId
+        const currentUserId = _.get(req.user, 'userId')
         return this.feedsService.getNewestFeeds(currentUserId, nextCursor)
     }
 
     @Get('/by-song/:songId')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousGuard)
     @ApiQuery({
         name: 'next',
         type: 'string',
@@ -367,7 +368,7 @@ export class FeedsController {
     })
     async getFeedsBySongId(@Query() query, @Req() req) {
         const nextCursor: string | undefined = query['next']
-        const currentUserId = req.user.userId
+        const currentUserId = _.get(req.user, 'userId')
         const songId = req.params.songId
 
         return this.feedsService.getFeedsBySongId(
@@ -378,7 +379,7 @@ export class FeedsController {
     }
 
     @Get('/:id')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousGuard)
     @ApiOperation({ summary: 'Get feed by id' })
     @ApiBearerAuth()
     @ApiOkResponse({
@@ -386,8 +387,8 @@ export class FeedsController {
         type: FeedDetailDto,
     })
     async getFeedById(@Req() req): Promise<any> {
-        const feedId = req.params.id
-        const currentUserId = req.user.userId
+        const feedId = _.get(req.params, 'id')
+        const currentUserId = _.get(req.user, 'userId')
         return this.feedsService.getFeedById(feedId, currentUserId)
     }
 }

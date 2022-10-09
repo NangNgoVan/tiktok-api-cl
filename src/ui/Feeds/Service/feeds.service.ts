@@ -51,7 +51,7 @@ export class FeedsService {
     }
 
     async getNewestFeeds(
-        currentUserId: string,
+        currentUserId?: string,
         nextCursor?: string,
         perPage = 6,
     ): Promise<PaginateFeedResultsDto> {
@@ -76,7 +76,7 @@ export class FeedsService {
 
     async getFeedById(
         feedId: string,
-        currentUserId: string,
+        currentUserId?: string,
     ): Promise<FeedDetailDto> {
         const transformedFeeds = await this.buildFeeds([feedId], currentUserId)
 
@@ -89,7 +89,7 @@ export class FeedsService {
 
     async getPostedFeeds(
         createdBy: string,
-        currentUserId: string,
+        currentUserId?: string,
         nextCursor?: string,
         perPage = 6,
     ) {
@@ -117,7 +117,7 @@ export class FeedsService {
 
     async getFeedsBySongId(
         songId: string,
-        currentUserId: string,
+        currentUserId?: string,
         nextCursor?: string,
         perPage = 6,
     ) {
@@ -145,7 +145,7 @@ export class FeedsService {
 
     async getBookmarkedFeeds(
         bookmarkedBy: string,
-        currentUserId: string,
+        currentUserId?: string,
         nextCursor?: string,
         perPage = 6,
     ) {
@@ -162,12 +162,15 @@ export class FeedsService {
 
         const transformedFeeds = await this.buildFeeds(feedIds, currentUserId)
 
-        return { ...feedBookmarks, results: transformedFeeds }
+        return {
+            ...feedBookmarks,
+            results: currentUserId ? transformedFeeds : null,
+        }
     }
 
     async getReactedFeeds(
         reactedBy: string,
-        currentUserId: string,
+        currentUserId?: string,
         nextCursor?: string,
         perPage = 6,
     ) {
@@ -223,7 +226,7 @@ export class FeedsService {
 
     private async buildFeeds(
         feedIds: string[],
-        currentUserId: string,
+        currentUserId?: string,
     ): Promise<FeedDetailDto[]> {
         const feeds = await this.feedModel
             .find({
@@ -243,30 +246,21 @@ export class FeedsService {
                 full_name: _.get(createdUser, 'full_name'),
                 avatar: _.get(createdUser, 'avatar'),
                 id: _.get(createdUser, 'id'),
-                current_user: {
-                    is_followed:
-                        await this.userFollowService.checkFollowRelationshipBetween(
-                            currentUserId,
-                            feed.created_by,
-                        ),
-                },
+                current_user: currentUserId
+                    ? {
+                          is_followed:
+                              await this.userFollowService.checkFollowRelationshipBetween(
+                                  currentUserId,
+                                  feed.created_by,
+                              ),
+                      }
+                    : null,
             }
 
-            const feedReaction = await this.feedReactionService.getFeedReaction(
+            feedDetailDto.current_user = await this.getCurrentUser(
                 feed._id,
                 currentUserId,
             )
-
-            const feedBookmark = await this.bookmarkService.getFeedBookmark(
-                feed._id,
-                currentUserId,
-            )
-
-            feedDetailDto.current_user = {
-                is_reacted: !!feedReaction,
-                is_bookmarked: !!feedBookmark,
-                reaction_type: _.get(feedReaction, 'type'),
-            }
 
             feedDetailDto.id = feed._id
             feedDetailDto.allowed_comment = feed.allowed_comment
@@ -295,5 +289,25 @@ export class FeedsService {
         })
 
         return Promise.all(promises)
+    }
+
+    async getCurrentUser(feedId: string, currentUserId?: string) {
+        if (!currentUserId) return null
+
+        const feedReaction = await this.feedReactionService.getFeedReaction(
+            feedId,
+            currentUserId,
+        )
+
+        const feedBookmark = await this.bookmarkService.getFeedBookmark(
+            feedId,
+            currentUserId,
+        )
+
+        return {
+            is_reacted: !!feedReaction,
+            is_bookmarked: !!feedBookmark,
+            reaction_type: _.get(feedReaction, 'type'),
+        }
     }
 }
