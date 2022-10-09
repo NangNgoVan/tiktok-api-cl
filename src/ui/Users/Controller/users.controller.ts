@@ -25,11 +25,7 @@ import {
     ApiOperation,
     ApiTags,
 } from '@nestjs/swagger'
-import {
-    DatabaseUpdateFailException,
-    FileUploadFailException,
-    UserNotFoundException,
-} from 'src/shared/Exceptions/http.exceptions'
+import { UserNotFoundException } from 'src/shared/Exceptions/http.exceptions'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { HttpStatusResult } from 'src/shared/Types/types'
 import { UserResponseDto } from '../ResponseDTO/user-response.dto'
@@ -67,8 +63,16 @@ export class UsersController {
     })
     async getCurrentUser(@Req() req): Promise<User> {
         const { userId } = req.user
+
         const user = await this.userService.findById(userId)
-        return user
+
+        const avatar: string = await this.s3.getSignedUrl(
+            user.avatar,
+            configService.getEnv('AWS_BUCKET_NAME'),
+            false,
+        )
+
+        return { ...user, avatar }
     }
 
     //Update current user
@@ -111,8 +115,14 @@ export class UsersController {
         const user = await this.userService.findById(id)
         if (!user) throw new UserNotFoundException()
 
-        if (id === userId) return user
-        //
+        const avatar: string = await this.s3.getSignedUrl(
+            user.avatar,
+            configService.getEnv('AWS_BUCKET_NAME'),
+            false,
+        )
+
+        if (id === userId) return { ...user, avatar }
+
         const followed =
             await this.userFollowsService.checkFollowRelationshipBetween(
                 userId,
@@ -128,7 +138,7 @@ export class UsersController {
         getUserDto.full_name = user.full_name
         getUserDto.nick_name = user.nick_name
         getUserDto.email = user.email
-        getUserDto.avatar = user.avatar
+        getUserDto.avatar = avatar
         getUserDto.current_user = {
             is_followed: followed,
         }
