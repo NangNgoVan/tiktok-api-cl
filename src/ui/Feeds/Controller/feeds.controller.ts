@@ -28,7 +28,7 @@ import {
     UserNotFoundException,
 } from 'src/shared/Exceptions/http.exceptions'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
-import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
+import { S3Service } from 'src/shared/Services/s3.service'
 import { UtilsService } from 'src/shared/Services/utils.service'
 import { FeedType } from 'src/shared/Types/types'
 import { UsersService } from 'src/ui/Users/Service/users.service'
@@ -52,7 +52,7 @@ export class FeedsController {
         private readonly feedsService: FeedsService,
         private readonly feedResourcesService: FeedResourcesService,
         private readonly userService: UsersService,
-        private readonly aws3FileUploadService: AWS3FileUploadService,
+        private readonly aws3FileUploadService: S3Service,
         private readonly utilsService: UtilsService,
     ) {}
 
@@ -135,13 +135,13 @@ export class FeedsController {
         )
         if (!createdFeed) return DatabaseUpdateFailException
 
-        const aws3FeedResourcePath = 'feeds/' + moment().format('yyyy-MM-DD')
+        const objectKeyPrefix = 'feed-images/' + moment().format('yyyy-MM-DD')
 
         const resource_urls = await Promise.all(
             files.resources.map(async (file) => {
                 const { originalname, /*encoding,*/ mimetype, buffer } = file
                 const ext = originalname.split('.').pop()
-                const pathToSaveResource = `${aws3FeedResourcePath}/${userId}/${uuidv4()}.${ext}`
+                const pathToSaveResource = `${objectKeyPrefix}/${userId}/${uuidv4()}.${ext}`
 
                 const uploadedData =
                     await this.aws3FileUploadService.uploadFileToS3Bucket(
@@ -237,42 +237,39 @@ export class FeedsController {
         )
         if (!createdFeed) return DatabaseUpdateFailException
 
-        const aws3FeedResourcePath =
-            'videos/feeds/' + moment().format('yyyy-MM-DD')
+        const objectKeyPrefix = 'feed-videos/' + moment().format('yyyy-MM-DD')
         //Video
         const video = files.video[0]
         const videoExt = video.originalname.split('.').pop()
-        const pathToSaveVideo = `${aws3FeedResourcePath}/${
+        const videoObjectKey = `${objectKeyPrefix}/${
             createdFeed.id
         }/video-${uuidv4()}.${videoExt}`
 
         //Thumbnail
         const thumbnail = files.thumbnail[0]
         const thumbnailExt = thumbnail.originalname.split('.').pop()
-        const pathToSaveThumbnail = `${aws3FeedResourcePath}/${
+        const thumbnailObjectKey = `${objectKeyPrefix}/${
             createdFeed.id
         }/thumbnail-${uuidv4()}.${thumbnailExt}`
 
-        //Upload files to aws3
-        const uploadedVideoUrl =
-            await this.aws3FileUploadService.uploadFileToS3Bucket(
-                pathToSaveVideo,
+        const [uploadedVideo, uploadedThumbnail] = await Promise.all([
+            this.aws3FileUploadService.uploadFileToS3Bucket(
+                videoObjectKey,
                 video.mimetype,
                 video.buffer,
-            )
-
-        const uploadedThumbnailUrl =
-            await this.aws3FileUploadService.uploadFileToS3Bucket(
-                pathToSaveThumbnail,
+            ),
+            this.aws3FileUploadService.uploadFileToS3Bucket(
+                thumbnailObjectKey,
                 thumbnail.mimetype,
                 thumbnail.buffer,
-            )
+            ),
+        ])
 
-        if (!uploadedVideoUrl || !uploadedThumbnailUrl)
+        if (!uploadedVideo || !uploadedThumbnail)
             throw new FileUploadFailException()
 
         const videoResource = {
-            path: uploadedVideoUrl.Key,
+            path: uploadedVideo.Key,
             feed_id: createdFeed.id,
             type: FeedType.VIDEO,
             created_by: userId,
@@ -280,7 +277,7 @@ export class FeedsController {
         } as AddFeedResourceDto
 
         const thumbnailResource = {
-            path: uploadedThumbnailUrl.Key,
+            path: uploadedThumbnail.Key,
             feed_id: createdFeed.id,
             type: FeedType.VIDEO,
             created_by: userId,

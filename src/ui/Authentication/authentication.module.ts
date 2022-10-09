@@ -17,6 +17,6 @@ import { CacheService } from 'src/shared/Services/cache.service'
         RefreshTokenBlacklistService,
         CacheService,
     ],
-    exports: [AuthenticationService],
+    exports: [AuthenticationService, JwtService, RefreshTokenBlacklistService],
 })
 export class AuthenticationModule {}

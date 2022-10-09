@@ -3,7 +3,7 @@ import { Controller, Get, Req, UseGuards } from '@nestjs/common'
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { UsersService } from '../Service/users.service'
-import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
+import { S3Service } from 'src/shared/Services/s3.service'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 import { PaginateFeedResultsDto } from 'src/ui/Feeds/Dto/paginate-feed-results.dto'
@@ -16,7 +16,7 @@ import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
 export class UserFeedsController {
     constructor(
         private readonly userService: UsersService,
-        private readonly aws3FileUploadService: AWS3FileUploadService,
+        private readonly aws3FileUploadService: S3Service,
         private readonly userFollowsService: UserFollowsService,
         private readonly feedsService: FeedsService,
     ) {}

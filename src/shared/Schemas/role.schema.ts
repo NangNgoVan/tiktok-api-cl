@@ -13,6 +13,7 @@ export type RoleDocument = Role & Document
 export class Role {
     @Prop()
     name: string
+
     @Prop()
     permissions: string[]
 }

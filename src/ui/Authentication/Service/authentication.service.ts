@@ -197,18 +197,6 @@ export class AuthenticationService {
         })
     }
 
-    verifyJWTToken(token: any, secretKey: string): string {
-        try {
-            const verifyToken = this.jwtService.verify(token, {
-                secret: secretKey,
-            })
-
-            return verifyToken
-        } catch (error) {
-            return null
-        }
-    }
-
     async refreshAccessToken(
         userId: string,
     ): Promise<RefreshAccessTokenResponseDto> {

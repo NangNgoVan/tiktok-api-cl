@@ -14,6 +14,7 @@ export type FeedBookmarkDocument = FeedBookmark & Document
 export class FeedBookmark {
     @Prop()
     feed_id: string
+
     @Prop()
     created_by: string
 }

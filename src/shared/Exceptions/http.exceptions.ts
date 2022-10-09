@@ -18,12 +18,6 @@ export class DatabaseUpdateFailException extends HttpException {
     }
 }
 
-export class RefreshTokenInvalidException extends HttpException {
-    constructor() {
-        super('Refresh token invalid', HttpStatus.BAD_REQUEST)
-    }
-}
-
 export class FeedNotFoundException extends HttpException {
     constructor() {
         super('Feed Not Found', HttpStatus.BAD_REQUEST)

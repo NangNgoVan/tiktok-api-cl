@@ -17,6 +17,7 @@ import moment from 'moment'
 import morgan from 'morgan'
 import rTracer from 'cls-rtracer'
 import { ValidationPipe } from '@nestjs/common'
+import compression from 'compression'
 
 const createLogger = (logGroupName: string) => {
     const transports: winston.transport[] = []
@@ -66,9 +67,14 @@ async function bootstrap() {
         logger: applicationLogger,
     })
 
+    // compression
+    app.use(compression())
+
+    // cors
     app.enableCors({
         origin: [
             // FIXME: using regex instead
+            // FIXME: this should be difference between prod and dev
             'http://pavsocial.com',
             'https://pavsocial.com',
             'http://ui-dev.pavsocial.com',
@@ -148,7 +154,8 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe())
 
     // Start application
-    await app.listen(configService.getHostPort())
+    const server = await app.listen(configService.getHostPort())
+    server.setTimeout(10 * 60 * 1000)
 }
 
 bootstrap()

@@ -6,7 +6,7 @@ import {
     FeedResourceSchema,
 } from 'src/shared/Schemas/feed-resource.schema'
 import { Feed, FeedSchema } from 'src/shared/Schemas/feed.schema'
-import { AWS3FileUploadService } from 'src/shared/Services/aws-upload.service'
+import { S3Service } from 'src/shared/Services/s3.service'
 import { UtilsService } from 'src/shared/Services/utils.service'
 import { UsersModule } from '../Users/users.module'
 import { FeedsController } from './Controller/feeds.controller'
@@ -30,12 +30,7 @@ import { BookmarksModule } from '../Bookmarks/bookmarks.module'
         BookmarksModule,
     ],
     controllers: [FeedsController],
-    providers: [
-        FeedsService,
-        FeedResourcesService,
-        AWS3FileUploadService,
-        UtilsService,
-    ],
+    providers: [FeedsService, FeedResourcesService, S3Service, UtilsService],
     exports: [FeedsService],
 })
 export class FeedsModule {}

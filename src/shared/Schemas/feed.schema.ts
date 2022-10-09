@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
-import { IsBoolean, IsEnum, IsNumber } from 'class-validator'
+import { IsEnum, IsNumber } from 'class-validator'
 import { Document } from 'mongoose'
 import { FeedType } from '../Types/types'
 
