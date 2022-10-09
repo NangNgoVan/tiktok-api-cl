@@ -154,7 +154,8 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe())
 
     // Start application
-    await app.listen(configService.getHostPort())
+    const server = await app.listen(configService.getHostPort())
+    server.setTimeout(10 * 60 * 1000)
 }
 
 bootstrap()
