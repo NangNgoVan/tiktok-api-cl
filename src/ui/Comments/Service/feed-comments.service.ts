@@ -17,6 +17,8 @@ import { CreateFeedCommentDto } from '../Dto/create-feed-comment.dto'
 import { MongoPaging } from 'mongo-cursor-pagination'
 import _ from 'lodash'
 import { ReactionsService } from 'src/ui/Reactions/Service/reaction.service'
+import { S3Service } from '../../../shared/Services/s3.service'
+import { configService } from '../../../shared/Services/config.service'
 
 @Injectable()
 export class FeedCommentService {
@@ -31,6 +33,8 @@ export class FeedCommentService {
         private userModel: Model<UserDocument>,
 
         private readonly feedReactionService: ReactionsService,
+
+        private readonly s3: S3Service,
     ) {}
 
     async createFeedComment(payload: CreateFeedCommentDto) {
@@ -175,8 +179,21 @@ export class FeedCommentService {
         const comments = _.get(paginatedComment, 'results', [])
 
         const createdCommentUsers = await this.userModel.find({
-            _id: _.uniq(_.map(comments, (comment) => comment.created_by)),
+            _id: _.uniq(
+                _.compact(_.map(comments, (comment) => comment.created_by)),
+            ),
         })
+
+        const createdCommentUserAvatarObjectKeys: string[] = _.uniq(
+            _.compact(_.map(createdCommentUsers, 'avatar')),
+        )
+
+        const avatarHashMap: Record<string, string | undefined> =
+            await this.s3.getSignedUrls(
+                createdCommentUserAvatarObjectKeys,
+                configService.getEnv('AWS_BUCKET_NAME'),
+                false,
+            )
 
         const commentIds: string[] = _.map(comments, (comment) => comment._id)
 
@@ -189,10 +206,17 @@ export class FeedCommentService {
             : null
 
         return _.map(comments, (comment) => {
-            const createdCommentUser = _.find(
+            const createdCommentUser: UserDocument | undefined = _.find(
                 createdCommentUsers,
                 (user) => user.id === comment.created_by,
             )
+
+            const avatarKey: string | undefined = _.get(
+                createdCommentUser,
+                'avatar',
+            )
+
+            const avatar: string | undefined = _.get(avatarHashMap, avatarKey)
 
             return {
                 ..._.pick(comment, [
@@ -209,12 +233,10 @@ export class FeedCommentService {
                     comment,
                     commentReactionsByCurrentUser,
                 ),
-                created_user: _.pick(createdCommentUser, [
-                    '_id',
-                    'full_name',
-                    'nick_name',
-                    'avatar',
-                ]),
+                created_user: _.pick(
+                    _.merge({}, createdCommentUser, { avatar }),
+                    ['_id', 'full_name', 'nick_name', 'avatar'],
+                ),
             }
         })
     }

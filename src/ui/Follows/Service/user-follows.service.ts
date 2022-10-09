@@ -11,6 +11,8 @@ import { GetUserFollowDto } from '../Dto/get-user-follow.dto'
 import { PaginateUserFollowsDto } from '../Dto/paginate-user-follows.dto'
 import { UserNotFoundException } from 'src/shared/Exceptions/http.exceptions'
 import _ from 'lodash'
+import { configService } from '../../../shared/Services/config.service'
+import { S3Service } from '../../../shared/Services/s3.service'
 
 @Injectable()
 export class UserFollowsService {
@@ -19,6 +21,7 @@ export class UserFollowsService {
         private readonly userFollowModel: MongoPaging<UserFollowDocument>,
         @InjectModel(User.name)
         private readonly userModel: Model<UserDocument>,
+        private readonly s3: S3Service,
     ) {}
 
     async addFollowerForUser(userId: string, followerId: string) {
@@ -69,111 +72,85 @@ export class UserFollowsService {
         return unfollowedData
     }
 
-    async getAllFollowersForUser(
+    async getPaginatedFollowersByUserId(
         userId: string,
         currentUserId?: string,
         nextCursor?: string,
         perPage = 6,
     ): Promise<PaginateUserFollowsDto> {
-        try {
-            const options = {
-                limit: perPage,
-                next: nextCursor,
-                query: {
-                    query: { user_id: userId },
-                },
-            }
+        const paginatedUserFollow = await this.userFollowModel.paginate({
+            limit: perPage,
+            next: nextCursor,
+            query: {
+                query: { user_id: userId },
+            },
+        })
 
-            const followers = await this.userFollowModel.paginate(options)
+        const userFollows = _.get(paginatedUserFollow, 'results', [])
 
-            const followerIds = followers.results.map(
-                (follower) => follower.created_by,
-            )
+        const createdByUserIds = userFollows.map(
+            (userFollow) => userFollow.created_by,
+        )
 
-            const followerDetails = await this.userModel.find(
-                { _id: { $in: followerIds } },
-                ['_id', 'nick_name', 'full_name', 'avatar'],
-            )
+        const results = await this.buildUsers(createdByUserIds, currentUserId)
 
-            const followerDetailsWithCurrentUserData = await Promise.all(
-                followerDetails.map(async (data) => {
-                    const dto = new GetUserFollowDto()
-                    dto._id = data._id
-                    dto.nick_name = data.nick_name
-                    dto.full_name = data.full_name
-                    dto.avatar = data.avatar
-                    dto.current_user = currentUserId
-                        ? {
-                              is_followed:
-                                  await this.checkFollowRelationshipBetween(
-                                      currentUserId,
-                                      data._id,
-                                  ),
-                          }
-                        : null
-                    return dto
-                }),
-            )
-
-            followers.results = followerDetailsWithCurrentUserData
-
-            return followers
-        } catch {
-            return new PaginateUserFollowsDto()
-        }
+        return { ...paginatedUserFollow, results }
     }
 
-    async getAllFollowingsForUser(
+    async getPaginatedFollowingByUserId(
         userId: string,
         currentUserId?: string,
         nextCursor?: string,
         perPage = 5,
     ): Promise<PaginateUserFollowsDto> {
-        try {
-            const options = {
-                limit: perPage,
-                next: nextCursor,
-                query: {
-                    query: { created_by: userId },
-                },
-            }
-            const followings = await this.userFollowModel.paginate(options)
+        const paginatedUserFollow = await this.userFollowModel.paginate({
+            limit: perPage,
+            next: nextCursor,
+            query: {
+                query: { created_by: userId },
+            },
+        })
 
-            const followingIds = followings.results.map(
-                (following) => following.user_id,
-            )
+        const userFollows = _.get(paginatedUserFollow, 'results', [])
 
-            const followingDetails = await this.userModel.find(
-                { _id: { $in: followingIds } },
-                ['_id', 'nick_name', 'full_name', 'avatar'],
-            )
+        const userIds = userFollows.map((userFollow) => userFollow.user_id)
 
-            const followingDetailsWithCurrentUserData = await Promise.all(
-                followingDetails.map(async (data) => {
-                    const dto = new GetUserFollowDto()
-                    dto._id = data._id
-                    dto.nick_name = data.nick_name
-                    dto.full_name = data.full_name
-                    dto.avatar = data.avatar
-                    dto.current_user = currentUserId
-                        ? {
-                              is_followed:
-                                  await this.checkFollowRelationshipBetween(
-                                      currentUserId,
-                                      data._id,
-                                  ),
-                          }
-                        : null
-                    return dto
-                }),
-            )
+        const results = await this.buildUsers(userIds, currentUserId)
 
-            followings.results = followingDetailsWithCurrentUserData
+        return { ...paginatedUserFollow, results }
+    }
 
-            return followings
-        } catch {
-            return new PaginateUserFollowsDto()
-        }
+    async buildUsers(userIds: string[], currentUserId?: string) {
+        const createdByUsers = await this.userModel.find(
+            { _id: { $in: userIds } },
+            ['_id', 'nick_name', 'full_name', 'avatar'],
+        )
+
+        return Promise.all(
+            _.map(createdByUsers, async (user) => {
+                const avatar = await this.s3.getSignedUrl(
+                    user.avatar,
+                    configService.getEnv('AWS_BUCKET_NAME'),
+                    false,
+                )
+
+                const dto = new GetUserFollowDto()
+                dto._id = user._id
+                dto.nick_name = user.nick_name
+                dto.full_name = user.full_name
+                dto.avatar = avatar
+                dto.current_user = currentUserId
+                    ? {
+                          is_followed:
+                              await this.checkFollowRelationshipBetween(
+                                  currentUserId,
+                                  user._id,
+                              ),
+                      }
+                    : null
+                return dto
+            }),
+        )
     }
 
     async getAllFollowingIdsByUserId(userId: string): Promise<string[]> {

@@ -124,7 +124,7 @@ export class UserFollowsController {
         const currentUserId = _.get(req.user, 'userId')
         let next = undefined
         if (req.query) next = req.query['next']
-        return await this.userFollowsService.getAllFollowingsForUser(
+        return await this.userFollowsService.getPaginatedFollowingByUserId(
             currentUserId,
             currentUserId,
             next,
@@ -149,7 +149,7 @@ export class UserFollowsController {
         const currentUserId = _.get(req.user, 'userId')
         let next = undefined
         if (req.query) next = req.query['next']
-        return await this.userFollowsService.getAllFollowersForUser(
+        return await this.userFollowsService.getPaginatedFollowersByUserId(
             currentUserId,
             currentUserId,
             next,
@@ -176,7 +176,7 @@ export class UserFollowsController {
         const currentUserId = _.get(req.user, 'userId')
         const nextCursor: string | undefined = req.query['next']
 
-        return await this.userFollowsService.getAllFollowingsForUser(
+        return await this.userFollowsService.getPaginatedFollowingByUserId(
             userId,
             currentUserId,
             nextCursor,
@@ -202,7 +202,7 @@ export class UserFollowsController {
         const currentUserId = _.get(req.user, 'userId')
         const nextCursor: string | undefined = req.query['next']
 
-        return await this.userFollowsService.getAllFollowersForUser(
+        return await this.userFollowsService.getPaginatedFollowersByUserId(
             userId,
             currentUserId,
             nextCursor,

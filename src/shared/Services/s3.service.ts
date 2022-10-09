@@ -45,19 +45,50 @@ export class S3Service {
         objectKey: string,
         bucket: string,
         /* eslint-disable */
-        disableCache? : boolean,
-        cacheForSeconds? : number,
+        disableCache?: boolean,
+        cacheForSeconds?: number,
         /* eslint-enable */
-    ) {
-        const params = { Key: objectKey, Bucket: bucket, Expires: 12 * 60 * 60 }
-        return this.s3().getSignedUrl('getObject', params)
+    ): Promise<string | undefined> {
+        const params = {
+            Key: objectKey,
+            Bucket: bucket,
+            Expires: 12 * 60 * 60,
+        }
+
+        try {
+            return this.s3().getSignedUrl('getObject', params)
+        } catch (error) {
+            this.logger.error({ message: 'get signed url', error, params })
+        }
+
+        return undefined
     }
 
-    async getSignedUrls(objectKeys: string[], bucket: string) {
-        return Promise.all(
-            _.map(objectKeys, (objectKey) =>
-                this.getSignedUrl(objectKey, bucket),
-            ),
-        )
+    async getSignedUrls(
+        objectKeys: string[],
+        bucket: string,
+        /* eslint-disable */
+        disableCache?: boolean,
+        cacheForSeconds?: number,
+    ): Promise<Record<string, string | undefined>> {
+        const ret: { objectKey: string; signedUrl: string | undefined }[] =
+            await Promise.all(
+                _.map(objectKeys, async (objectKey: string) => {
+                    const signedUrl: string | undefined =
+                        await this.getSignedUrl(
+                            objectKey,
+                            bucket,
+                            disableCache,
+                            cacheForSeconds,
+                        )
+
+                    return {
+                        objectKey,
+                        signedUrl,
+                    }
+                }),
+            )
+
+        return _.mapValues(_.keyBy(ret, 'objectKey'), 'signedUrl')
     }
 }
