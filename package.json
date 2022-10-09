@@ -23,6 +23,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "file-type": "16.5.1",
     "@aws-sdk/client-cloudwatch-logs": "^3.171.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",

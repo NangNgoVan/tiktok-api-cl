@@ -14,6 +14,7 @@ import {
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common'
+import { fromBuffer } from 'file-type'
 
 import {
     ApiBearerAuth,
@@ -37,11 +38,9 @@ import { UsersService } from '../Service/users.service'
 import { User } from '../../../shared/Schemas/user.schema'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { S3Service } from 'src/shared/Services/s3.service'
-import { configService } from 'src/shared/Services/config.service'
 import { UploadMetaDataDto } from '../RequestDTO/upload-metadata.dto'
 import moment from 'moment'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
-import { FeedsService } from 'src/ui/Feeds/Service/feeds.service'
 import { v4 as uuidv4 } from 'uuid'
 
 @Controller('ui/users')
@@ -159,7 +158,7 @@ export class UsersController {
         @UploadedFile(
             new ParseFilePipeBuilder()
                 .addFileTypeValidator({
-                    fileType: /(jpg|jpeg|png|gif)$/,
+                    fileType: /(jpg|jpeg|png)$/,
                 })
                 .addMaxSizeValidator({
                     maxSize: 5 * 1024 * 1024,
@@ -172,26 +171,37 @@ export class UsersController {
         @Req() req,
     ): Promise<UploadMetaDataDto> {
         const { userId } = req.user
+
         const user = await this.userService.findById(userId)
+
         if (!user) throw new UserNotFoundException()
 
-        const { originalname, /*encoding,*/ mimetype, buffer, size } = file
+        const { buffer, size } = file
 
-        const avatarResourcePath = 'avatars/' + moment().format('yyyy-MM-DD')
-        const originalAvatarName = file.originalname
-        const avatarExt = originalAvatarName.split('.').pop()
-        const pathToSaveAvatar = `${avatarResourcePath}/${userId}/${uuidv4()}.${avatarExt}`
+        const { ext, mime: mimetype } = await fromBuffer(buffer)
+
+        if (!['image/jpeg', 'image/jpg', 'image/png'].includes(mimetype)) {
+            throw new BadRequestException(
+                `mime type ${mimetype} is not supported`,
+            )
+        }
+
+        // FIXME: save key to database than url
+        // FIXME: delete old avatar before update new one
+        const avatarObjectKey = `avatars/${moment().format(
+            'yyyy-MM-DD',
+        )}/${userId}/${uuidv4()}.${ext}`
 
         const uploadedData =
             await this.aws3FileUploadService.uploadFileToS3Bucket(
-                pathToSaveAvatar,
+                avatarObjectKey,
                 mimetype,
                 buffer,
             )
 
         if (!uploadedData) throw new FileUploadFailException()
 
-        const { /*ETag,*/ Location /*, Key, Bucket*/ } = uploadedData
+        const { Location } = uploadedData
 
         const avatarUrl = await this.userService.updateAvatar(userId, Location)
 
