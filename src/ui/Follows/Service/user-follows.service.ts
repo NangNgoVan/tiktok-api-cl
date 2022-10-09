@@ -70,26 +70,21 @@ export class UserFollowsService {
     }
 
     async getAllFollowersForUser(
-        currentUserId: string,
         userId: string,
-        next?: string,
-        rowsPerpage?: number,
+        currentUserId?: string,
+        nextCursor?: string,
+        perPage = 6,
     ): Promise<PaginateUserFollowsDto> {
         try {
-            if (!rowsPerpage) rowsPerpage = 5
-            let followers = undefined
-            if (!next) {
-                followers = await this.userFollowModel.paginate({
+            const options = {
+                limit: perPage,
+                next: nextCursor,
+                query: {
                     query: { user_id: userId },
-                    limit: rowsPerpage,
-                })
-            } else {
-                followers = await this.userFollowModel.paginate({
-                    query: { user_id: userId },
-                    limit: rowsPerpage,
-                    next: next,
-                })
+                },
             }
+
+            const followers = await this.userFollowModel.paginate(options)
 
             const followerIds = followers.results.map(
                 (follower) => follower.created_by,
@@ -107,12 +102,15 @@ export class UserFollowsService {
                     dto.nick_name = data.nick_name
                     dto.full_name = data.full_name
                     dto.avatar = data.avatar
-                    dto.current_user = {
-                        is_followed: await this.checkFollowRelationshipBetween(
-                            currentUserId,
-                            data._id,
-                        ),
-                    }
+                    dto.current_user = currentUserId
+                        ? {
+                              is_followed:
+                                  await this.checkFollowRelationshipBetween(
+                                      currentUserId,
+                                      data._id,
+                                  ),
+                          }
+                        : null
                     return dto
                 }),
             )
@@ -126,26 +124,20 @@ export class UserFollowsService {
     }
 
     async getAllFollowingsForUser(
-        currentUserId: string,
         userId: string,
-        next?: string,
-        rowsPerpage?: number,
+        currentUserId?: string,
+        nextCursor?: string,
+        perPage = 5,
     ): Promise<PaginateUserFollowsDto> {
         try {
-            if (!rowsPerpage) rowsPerpage = 5
-            let followings = undefined
-            if (!next) {
-                followings = await this.userFollowModel.paginate({
+            const options = {
+                limit: perPage,
+                next: nextCursor,
+                query: {
                     query: { created_by: userId },
-                    limit: rowsPerpage,
-                })
-            } else {
-                followings = await this.userFollowModel.paginate({
-                    query: { created_by: userId },
-                    limit: rowsPerpage,
-                    next: next,
-                })
+                },
             }
+            const followings = await this.userFollowModel.paginate(options)
 
             const followingIds = followings.results.map(
                 (following) => following.user_id,
@@ -163,12 +155,15 @@ export class UserFollowsService {
                     dto.nick_name = data.nick_name
                     dto.full_name = data.full_name
                     dto.avatar = data.avatar
-                    dto.current_user = {
-                        is_followed: await this.checkFollowRelationshipBetween(
-                            currentUserId,
-                            data._id,
-                        ),
-                    }
+                    dto.current_user = currentUserId
+                        ? {
+                              is_followed:
+                                  await this.checkFollowRelationshipBetween(
+                                      currentUserId,
+                                      data._id,
+                                  ),
+                          }
+                        : null
                     return dto
                 }),
             )

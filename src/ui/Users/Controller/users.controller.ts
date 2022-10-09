@@ -42,6 +42,8 @@ import { UploadMetaDataDto } from '../RequestDTO/upload-metadata.dto'
 import moment from 'moment'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { v4 as uuidv4 } from 'uuid'
+import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
+import _ from 'lodash'
 
 @Controller('ui/users')
 @ApiTags('User APIs')
@@ -94,7 +96,7 @@ export class UsersController {
 
     //Get user by Id
     @Get('/:userId')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Get user by user id' })
     @ApiOkResponse({
@@ -103,8 +105,8 @@ export class UsersController {
     })
     @ApiNotFoundResponse()
     async getUserById(@Param() params, @Req() req): Promise<any> {
-        const id = params.userId
-        const { userId } = req.user
+        const id = _.get(params, 'userId')
+        const userId = _.get(req.user, 'userId')
         const user = await this.userService.findById(id)
         if (!user) throw new UserNotFoundException()
 

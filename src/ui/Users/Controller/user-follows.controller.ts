@@ -11,22 +11,21 @@ import {
 
 import {
     ApiBearerAuth,
+    ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
     ApiTags,
 } from '@nestjs/swagger'
-import {
-    DatabaseUpdateFailException,
-    UserNotFoundException,
-} from 'src/shared/Exceptions/http.exceptions'
+import { DatabaseUpdateFailException } from 'src/shared/Exceptions/http.exceptions'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
 import { HttpStatusResult } from 'src/shared/Types/types'
-import { UpdateUserDto } from '../RequestDTO/update-user.dto'
 import { UsersService } from '../Service/users.service'
 import { S3Service } from 'src/shared/Services/s3.service'
 import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 import { PaginateUserFollowsDto } from 'src/ui/Follows/Dto/paginate-user-follows.dto'
+import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
+import _ from 'lodash'
 
 @Controller('ui/users')
 @ApiTags('User Follow APIs')
@@ -122,12 +121,12 @@ export class UserFollowsController {
         type: PaginateUserFollowsDto,
     })
     async getFollowings(@Req() req): Promise<PaginateUserFollowsDto> {
-        const { userId } = req.user
+        const currentUserId = _.get(req.user, 'userId')
         let next = undefined
         if (req.query) next = req.query['next']
         return await this.userFollowsService.getAllFollowingsForUser(
-            userId,
-            userId,
+            currentUserId,
+            currentUserId,
             next,
         )
     }
@@ -147,18 +146,18 @@ export class UserFollowsController {
         type: PaginateUserFollowsDto,
     })
     async getFollowersByUserId(@Req() req): Promise<PaginateUserFollowsDto> {
-        const { userId } = req.user
+        const currentUserId = _.get(req.user, 'userId')
         let next = undefined
         if (req.query) next = req.query['next']
         return await this.userFollowsService.getAllFollowersForUser(
-            userId,
-            userId,
+            currentUserId,
+            currentUserId,
             next,
         )
     }
 
     @Get('/:userId/followings')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousGuard)
     @ApiBearerAuth()
     @ApiOperation({
         summary: 'Get followings by user id',
@@ -171,20 +170,21 @@ export class UserFollowsController {
     @ApiOkResponse({
         type: PaginateUserFollowsDto,
     })
+    @ApiNotFoundResponse()
     async getFollowingsByUserId(@Req() req): Promise<PaginateUserFollowsDto> {
-        const userId = req.params.userId
-        const currentUserId = req.user.userId
-        let next = undefined
-        if (req.query) next = req.query['next']
+        const userId = _.get(req.params, 'userId')
+        const currentUserId = _.get(req.user, 'userId')
+        const nextCursor: string | undefined = req.query['next']
+
         return await this.userFollowsService.getAllFollowingsForUser(
-            currentUserId,
             userId,
-            next,
+            currentUserId,
+            nextCursor,
         )
     }
 
     @Get('/:userId/followers')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AnonymousGuard)
     @ApiBearerAuth()
     @ApiOperation({
         summary: 'Get followers by user id',
@@ -198,14 +198,14 @@ export class UserFollowsController {
         type: PaginateUserFollowsDto,
     })
     async getFollowers(@Req() req): Promise<PaginateUserFollowsDto> {
-        const userId = req.params.userId
-        const currentUserId = req.user.userId
-        let next = undefined
-        if (req.query) next = req.query['next']
+        const userId = _.get(req.params, 'userId')
+        const currentUserId = _.get(req.user, 'userId')
+        const nextCursor: string | undefined = req.query['next']
+
         return await this.userFollowsService.getAllFollowersForUser(
-            currentUserId,
             userId,
-            next,
+            currentUserId,
+            nextCursor,
         )
     }
 }
