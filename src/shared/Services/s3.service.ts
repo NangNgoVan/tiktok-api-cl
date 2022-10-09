@@ -49,6 +49,10 @@ export class S3Service {
         cacheForSeconds?: number,
         /* eslint-enable */
     ): Promise<string | undefined> {
+        if (!objectKey) {
+            return undefined
+        }
+
         const params = {
             Key: objectKey,
             Bucket: bucket,

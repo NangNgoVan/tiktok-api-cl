@@ -14,6 +14,9 @@ import { FeedResourcesService } from 'src/ui/Resources/Service/resources.service
 import { ReactionsService } from 'src/ui/Reactions/Service/reaction.service'
 import { BookmarksService } from 'src/ui/Bookmarks/Service/bookmarks.service'
 import _ from 'lodash'
+import { S3Service } from '../../../shared/Services/s3.service'
+import { configService } from '../../../shared/Services/config.service'
+import { UserDocument } from '../../../shared/Schemas/user.schema'
 
 @Injectable()
 export class FeedsService {
@@ -27,6 +30,7 @@ export class FeedsService {
         private readonly feedResourcesService: FeedResourcesService,
         private readonly feedReactionService: ReactionsService,
         private readonly bookmarkService: BookmarksService,
+        private readonly s3Service: S3Service,
     ) {}
 
     async createFeed(
@@ -239,12 +243,22 @@ export class FeedsService {
         const promises = _.map(feeds, async (feed) => {
             const feedDetailDto = new FeedDetailDto()
 
-            const createdUser = await this.userService.findById(feed.created_by)
+            const createdUser: UserDocument | undefined =
+                await this.userService.findById(feed.created_by)
+
+            const avatarObjectKey = _.get(createdUser, 'avatar')
+
+            const avatarUrl: string | undefined =
+                await this.s3Service.getSignedUrl(
+                    avatarObjectKey,
+                    configService.getEnv('AWS_BUCKET_NAME'),
+                    false,
+                )
 
             feedDetailDto.created_user = {
                 nick_name: _.get(createdUser, 'nick_name'),
                 full_name: _.get(createdUser, 'full_name'),
-                avatar: _.get(createdUser, 'avatar'),
+                avatar: avatarUrl,
                 id: _.get(createdUser, 'id'),
                 current_user: currentUserId
                     ? {

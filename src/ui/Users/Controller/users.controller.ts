@@ -49,7 +49,7 @@ export class UsersController {
 
     constructor(
         private readonly userService: UsersService,
-        private readonly s3: S3Service,
+        private readonly s3Service: S3Service,
         private readonly userFollowsService: UserFollowsService,
     ) {}
 
@@ -66,7 +66,7 @@ export class UsersController {
 
         const user = await this.userService.findById(userId)
 
-        const avatar: string = await this.s3.getSignedUrl(
+        const avatar: string = await this.s3Service.getSignedUrl(
             user.avatar,
             configService.getEnv('AWS_BUCKET_NAME'),
             false,
@@ -115,7 +115,7 @@ export class UsersController {
         const user = await this.userService.findById(id)
         if (!user) throw new UserNotFoundException()
 
-        const avatar: string = await this.s3.getSignedUrl(
+        const avatar: string = await this.s3Service.getSignedUrl(
             user.avatar,
             configService.getEnv('AWS_BUCKET_NAME'),
             false,
@@ -206,14 +206,14 @@ export class UsersController {
             'yyyy-MM-DD',
         )}/${userId}/${uuidv4()}.${ext}`
 
-        const { Key } = await this.s3.uploadFileToS3Bucket(
+        const { Key } = await this.s3Service.uploadFileToS3Bucket(
             avatarObjectKey,
             mimetype,
             buffer,
         )
 
         const [url] = await Promise.all([
-            this.s3.getSignedUrl(
+            this.s3Service.getSignedUrl(
                 Key,
                 configService.getEnv('AWS_BUCKET_NAME'),
                 false,
