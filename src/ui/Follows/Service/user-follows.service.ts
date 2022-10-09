@@ -21,7 +21,7 @@ export class UserFollowsService {
         private readonly userFollowModel: MongoPaging<UserFollowDocument>,
         @InjectModel(User.name)
         private readonly userModel: Model<UserDocument>,
-        private readonly s3: S3Service,
+        private readonly s3Service: S3Service,
     ) {}
 
     async addFollowerForUser(userId: string, followerId: string) {
@@ -126,7 +126,7 @@ export class UserFollowsService {
 
         return Promise.all(
             _.map(createdByUsers, async (user) => {
-                const avatar = await this.s3.getSignedUrl(
+                const avatar = await this.s3Service.getSignedUrl(
                     user.avatar,
                     configService.getEnv('AWS_BUCKET_NAME'),
                     false,
