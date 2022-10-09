@@ -6,6 +6,7 @@ import {
 } from 'src/shared/Schemas/user-follow.schema'
 import { User, UserSchema } from 'src/shared/Schemas/user.schema'
 import { UserFollowsService } from './Service/user-follows.service'
+import { S3Service } from '../../shared/Services/s3.service'
 
 @Module({
     imports: [
@@ -20,7 +21,7 @@ import { UserFollowsService } from './Service/user-follows.service'
             },
         ]),
     ],
-    providers: [UserFollowsService],
+    providers: [UserFollowsService, S3Service],
     exports: [UserFollowsService],
 })
 export class FollowsModule {}

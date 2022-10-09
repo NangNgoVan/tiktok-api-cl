@@ -9,6 +9,7 @@ import { Feed, FeedSchema } from 'src/shared/Schemas/feed.schema'
 import { FeedCommentsController } from './Controller/feed-comments.controller'
 import { FeedCommentService } from './Service/feed-comments.service'
 import { ReactionsModule } from '../Reactions/reactions.module'
+import { S3Service } from '../../shared/Services/s3.service'
 
 @Module({
     imports: [
@@ -20,6 +21,6 @@ import { ReactionsModule } from '../Reactions/reactions.module'
         ReactionsModule,
     ],
     controllers: [FeedCommentsController],
-    providers: [FeedCommentService],
+    providers: [FeedCommentService, S3Service],
 })
 export class CommentsModule {}
