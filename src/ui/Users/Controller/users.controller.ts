@@ -72,7 +72,7 @@ export class UsersController {
             false,
         )
 
-        return { ...user, avatar }
+        return { ...user.toObject(), avatar }
     }
 
     //Update current user
@@ -121,7 +121,7 @@ export class UsersController {
             false,
         )
 
-        if (id === userId) return { ...user, avatar }
+        if (id === userId) return { ...user.toObject(), avatar }
 
         const followed =
             await this.userFollowsService.checkFollowRelationshipBetween(
