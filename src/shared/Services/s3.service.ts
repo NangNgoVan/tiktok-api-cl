@@ -39,7 +39,7 @@ export class S3Service {
         hashKey: 'ui:s3:',
         cacheKey: (args: any[]) => `${args[1]}:${args[0]}`,
         noop: (args: any[]) => _.defaultTo(args[2], true),
-        ttlSeconds: (args: any[]) => _.defaultTo(args[3], 2 + 60),
+        ttlSeconds: (args: any[]) => _.defaultTo(args[3], 10 * 60 * 60),
     })
     async getSignedUrl(
         objectKey: string,
@@ -49,7 +49,7 @@ export class S3Service {
         cacheForSeconds? : number,
         /* eslint-enable */
     ) {
-        const params = { Key: objectKey, Bucket: bucket, Expires: 3 * 60 }
+        const params = { Key: objectKey, Bucket: bucket, Expires: 12 * 60 * 60 }
         return this.s3().getSignedUrl('getObject', params)
     }
 
