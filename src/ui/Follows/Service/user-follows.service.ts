@@ -82,7 +82,7 @@ export class UserFollowsService {
             limit: perPage,
             next: nextCursor,
             query: {
-                query: { user_id: userId },
+                user_id: userId,
             },
         })
 
@@ -106,9 +106,7 @@ export class UserFollowsService {
         const paginatedUserFollow = await this.userFollowModel.paginate({
             limit: perPage,
             next: nextCursor,
-            query: {
-                query: { created_by: userId },
-            },
+            query: { created_by: userId },
         })
 
         const userFollows = _.get(paginatedUserFollow, 'results', [])
