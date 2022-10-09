@@ -44,6 +44,7 @@ import { UserFollowsService } from 'src/ui/Follows/Service/user-follows.service'
 import { v4 as uuidv4 } from 'uuid'
 import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
 import _ from 'lodash'
+import { configService } from '../../../shared/Services/config.service'
 
 @Controller('ui/users')
 @ApiTags('User APIs')
@@ -52,7 +53,7 @@ export class UsersController {
 
     constructor(
         private readonly userService: UsersService,
-        private readonly aws3FileUploadService: S3Service,
+        private readonly s3: S3Service,
         private readonly userFollowsService: UserFollowsService,
     ) {}
 
@@ -172,6 +173,8 @@ export class UsersController {
         file: Express.Multer.File,
         @Req() req,
     ): Promise<UploadMetaDataDto> {
+        // FIXME: move this to service
+
         const { userId } = req.user
 
         const user = await this.userService.findById(userId)
@@ -188,32 +191,29 @@ export class UsersController {
             )
         }
 
-        // FIXME: save key to database than url
         // FIXME: delete old avatar before update new one
         const avatarObjectKey = `avatars/${moment().format(
             'yyyy-MM-DD',
         )}/${userId}/${uuidv4()}.${ext}`
 
-        const uploadedData =
-            await this.aws3FileUploadService.uploadFileToS3Bucket(
-                avatarObjectKey,
-                mimetype,
-                buffer,
-            )
+        const { Key } = await this.s3.uploadFileToS3Bucket(
+            avatarObjectKey,
+            mimetype,
+            buffer,
+        )
 
-        if (!uploadedData) throw new FileUploadFailException()
+        const [url] = await Promise.all([
+            this.s3.getSignedUrl(
+                Key,
+                configService.getEnv('AWS_BUCKET_NAME'),
+                false,
+            ),
+            this.userService.updateAvatar(userId, Key),
+        ])
 
-        const { Location } = uploadedData
-
-        const avatarUrl = await this.userService.updateAvatar(userId, Location)
-
-        if (!avatarUrl) throw new DatabaseUpdateFailException()
-
-        const responseData = {
-            url: Location,
+        return {
+            url,
             size: size,
         }
-
-        return responseData
     }
 }
