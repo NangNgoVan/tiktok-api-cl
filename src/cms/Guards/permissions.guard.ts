@@ -79,14 +79,19 @@ export class PermissionsGuard implements CanActivate {
     constructor(private reflector: Reflector) {}
 
     canActivate(context: ExecutionContext): boolean {
-        const requiredPermissions = this.reflector.get<string[]>(
-            'permissions',
+        const isPublic: boolean = this.reflector.get<boolean>(
+            'is_public',
             context.getHandler(),
         )
 
-        if (_.isEmpty(requiredPermissions)) {
+        if (isPublic) {
             return true
         }
+
+        const requiredPermissions: string[] = this.reflector.get<string[]>(
+            'permissions',
+            context.getHandler(),
+        )
 
         const request = context.switchToHttp().getRequest()
 
