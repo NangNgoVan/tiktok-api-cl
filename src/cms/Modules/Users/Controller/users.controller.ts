@@ -5,6 +5,7 @@ import {
     NotImplementedException,
     Param,
     Post,
+    UseGuards,
 } from '@nestjs/common'
 import {
     ApiNotFoundResponse,
@@ -17,6 +18,8 @@ import { UsersService } from '../Service/users.service'
 import { RequirePermissions } from '../../../shared/Decorators/permission.decorator'
 import { GetUserResponseDto } from '../ResponseDTO/get-user-response.dto'
 import { CreateUserWithAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-with-authentication-method-credential-request.dto'
+import { JwtAuthGuard } from '../../../../shared/Guards/jwt-auth.guard'
+import { PermissionGuard } from '../../../shared/Guards/permission.guard'
 
 @Controller('cms/users')
 export class UsersController {
@@ -24,6 +27,7 @@ export class UsersController {
 
     @Get('current')
     @RequirePermissions(['users:read'])
+    @UseGuards(JwtAuthGuard, PermissionGuard)
     @ApiOperation({ summary: 'Get user by alias `current`' })
     @ApiOkResponse({
         type: GetUserResponseDto,
@@ -34,6 +38,7 @@ export class UsersController {
 
     @Get(':id')
     @RequirePermissions(['users:read'])
+    @UseGuards(JwtAuthGuard, PermissionGuard)
     @ApiOperation({ summary: 'Get user by alias `current`' })
     @ApiOkResponse({
         type: GetUserResponseDto,
@@ -45,6 +50,7 @@ export class UsersController {
 
     @Post()
     @RequirePermissions(['users:create'])
+    @UseGuards(JwtAuthGuard, PermissionGuard)
     @ApiOperation({
         summary: 'Create user with authentication method credential',
     })

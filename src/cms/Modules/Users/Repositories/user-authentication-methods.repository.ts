@@ -6,7 +6,6 @@ import {
     UserAuthenticationMethodDocument,
 } from 'src/shared/Schemas/user-authentication-method.schema'
 import { AuthenticationMethod } from '../../../../shared/Types/types'
-import { CreateUserAuthenticationMethodDto } from '../../../../ui/Modules/Users/RequestDTO/create-user-authentication-method.dto'
 
 @Injectable()
 export class UserAuthenticationMethodsRepository {

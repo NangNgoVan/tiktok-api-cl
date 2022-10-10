@@ -13,7 +13,7 @@ export class AuthenticationController {
     ) {}
 
     @IsPublic()
-    @Post('/authentication-methods/credential')
+    @Post('login/authentication-methods/credential')
     @ApiOperation({ summary: 'Login with credential' })
     @ApiOkResponse({
         type: RefreshAccessTokenResponseDto,
