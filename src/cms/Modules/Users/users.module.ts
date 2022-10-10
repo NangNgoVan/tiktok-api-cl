@@ -16,6 +16,7 @@ import { Subject, SubjectSchema } from '../../../shared/Schemas/subject.schema'
 import { RolesService } from './Service/roles.service'
 import { Role, RoleSchema } from '../../../shared/Schemas/role.schema'
 import { UsersService } from './Service/users.service'
+import { PermissionsService } from './Service/permissions.service'
 
 @Module({
     imports: [
@@ -52,6 +53,7 @@ import { UsersService } from './Service/users.service'
         SubjectsRepository,
         RolesService,
         UsersService,
+        PermissionsService,
     ],
     exports: [
         UserAuthenticationMethodsRepository,
@@ -60,6 +62,7 @@ import { UsersService } from './Service/users.service'
         ActionsRepository,
         SubjectsRepository,
         RolesService,
+        PermissionsService,
     ],
 })
 export class UsersModule {}

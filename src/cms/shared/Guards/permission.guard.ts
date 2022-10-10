@@ -3,54 +3,8 @@ import { Reflector } from '@nestjs/core'
 import _ from 'lodash'
 import { ActionsRepository } from '../../Modules/Users/Repositories/actions.repository'
 import { SubjectsRepository } from '../../Modules/Users/Repositories/subjects.repository'
-import { ActionDocument } from '../../../shared/Schemas/action.schema'
 import { UserData } from '../../../shared/Types/types'
-
-// [1, 2], ["x", "y"] => ["1x", "1y", "2x", "2y"]
-const cross = (subjects: string[], actions: string[]): string[] => {
-    return _.flatMap(subjects, (subject) => {
-        return _.map(actions, (action) => {
-            return `${subject}:${action}`
-        })
-    })
-}
-
-/*
-    Actions => create, update, delete, read, Subjects: users, feeds, comments
-
-    Input 1:  ['users:*']
-    Output 1: ['users:read', 'users:create', 'users:delete', 'users:update']
-
-    Input 2:  ['*:read']  
-    Output 2: ['users:read', 'feeds:read', 'comments:read']
-
-    Input 3:  ['*:*'] 
-    Output 3: ['users:read', 'users:create', 'users:delete', 'users:update',
-    'feeds:read', 'feeds:create', 'feeds:delete', 'feeds:update',
-    'comments:read', 'comments:create', 'comments:delete', 'comments:update']
-*/
-const expandPermissions = (
-    compactedPermissions: string[],
-    subjects: string[],
-    actions: string[],
-): string[] => {
-    return _.uniq(
-        _.flatMap(compactedPermissions, (compactedPermission: string) => {
-            const [compactedSubject, compactedAction] = _.split(
-                compactedPermission,
-                ':',
-            )
-
-            const expandedSubjects: string[] =
-                compactedSubject === '*' ? subjects : [compactedSubject]
-
-            const expandedActions: string[] =
-                compactedAction === '*' ? actions : [compactedAction]
-
-            return cross(expandedSubjects, expandedActions)
-        }),
-    )
-}
+import { PermissionsService } from '../../Modules/Users/Service/permissions.service'
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
@@ -58,6 +12,7 @@ export class PermissionGuard implements CanActivate {
         private readonly reflector: Reflector,
         private readonly actionsRepository: ActionsRepository,
         private readonly subjectsRepository: SubjectsRepository,
+        private readonly permissionsService: PermissionsService,
     ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -81,26 +36,13 @@ export class PermissionGuard implements CanActivate {
     }
 
     async can(user: UserData, requiredPermissions: string[]): Promise<boolean> {
-        // FIXME: memo this
-        const subjectDocuments: ActionDocument[] =
-            await this.subjectsRepository.getAllSubjects()
+        const expandedUserPermissions =
+            await this.permissionsService.expandPermissions(
+                _.get(user, 'permissions', []),
+            )
 
-        const actionDocuments: ActionDocument[] =
-            await this.actionsRepository.getAllActions()
-
-        const subjects: string[] = _.map(subjectDocuments, 'name')
-        const actions: string[] = _.map(actionDocuments, 'name')
-
-        const expandedUserPermissions = expandPermissions(
-            _.get(user, 'permissions', []),
-            subjects,
-            actions,
-        )
-        const expandedRequirePermissions = expandPermissions(
-            requiredPermissions,
-            subjects,
-            actions,
-        )
+        const expandedRequirePermissions =
+            await this.permissionsService.expandPermissions(requiredPermissions)
 
         const intersected = _.intersection(
             expandedRequirePermissions,

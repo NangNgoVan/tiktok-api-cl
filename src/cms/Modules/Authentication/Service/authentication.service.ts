@@ -63,16 +63,24 @@ export class AuthenticationService {
             throw new BadRequestException('Password do not match')
         }
 
+        console.log('user', user)
+
         const roles: string[] = _.get(user, 'roles', [])
+
+        console.log('roles', roles)
 
         const effectivePermissions: string[] =
             await this.roleService.getEffectivePermissionsByRoles(roles)
+
+        console.log('effectivePermissions', effectivePermissions)
 
         const payloadToGenerateToken = {
             userId: user.id,
             roles,
             permissions: effectivePermissions,
         }
+
+        console.log('payloadtogeneratetoken', payloadToGenerateToken)
 
         return {
             token: this.generateAccessToken(payloadToGenerateToken),
@@ -87,7 +95,7 @@ export class AuthenticationService {
     }): string {
         return this.jwtService.sign(payload, {
             secret: configService.getEnv('JWT_SECRET'),
-            expiresIn: '4h',
+            expiresIn: 5 * 60, // 5m
         })
     }
 
@@ -98,7 +106,7 @@ export class AuthenticationService {
     }): string {
         return this.jwtService.sign(payload, {
             secret: configService.getEnv('JWT_REFRESH_TOKEN_SECRET'),
-            expiresIn: '7 days',
+            expiresIn: '1h',
         })
     }
 
