@@ -53,7 +53,7 @@ const expandPermissions = (
 }
 
 @Injectable()
-export class PermissionsGuard implements CanActivate {
+export class PermissionGuard implements CanActivate {
     constructor(
         private readonly reflector: Reflector,
         private readonly actionsRepository: ActionsRepository,

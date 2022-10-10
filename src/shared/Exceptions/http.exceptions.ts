@@ -2,7 +2,7 @@ import { HttpException, HttpStatus } from '@nestjs/common'
 
 export class UserNotFoundException extends HttpException {
     constructor() {
-        super('User not found', HttpStatus.NOT_FOUND)
+        super('Users not found', HttpStatus.NOT_FOUND)
     }
 }
 
@@ -32,7 +32,7 @@ export class CommentNotFoundException extends HttpException {
 
 export class CreatedOnlyReactionException extends HttpException {
     constructor() {
-        super('User has created only reaction!', HttpStatus.BAD_REQUEST)
+        super('Users has created only reaction!', HttpStatus.BAD_REQUEST)
     }
 }
 

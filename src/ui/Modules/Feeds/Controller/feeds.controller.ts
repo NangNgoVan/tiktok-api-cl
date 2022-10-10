@@ -27,7 +27,7 @@ import {
     FileUploadFailException,
     UserNotFoundException,
 } from 'src/shared/Exceptions/http.exceptions'
-import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
+import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
 import { S3Service } from 'src/shared/Services/s3.service'
 import { UtilsService } from 'src/shared/Services/utils.service'
 import { FeedType } from 'src/shared/Types/types'

@@ -5,7 +5,7 @@ import {
     ApiOperation,
     ApiTags,
 } from '@nestjs/swagger'
-import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
+import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
 import { FeedReaction } from 'src/shared/Schemas/feed-reaction.schema'
 import { CreateFeedReactionDto } from '../Dto/create-feed-reaction.dto'
 import { ReactionsService } from '../Service/reaction.service'

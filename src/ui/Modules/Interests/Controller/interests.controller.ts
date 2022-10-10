@@ -5,7 +5,7 @@ import {
     ApiOperation,
     ApiTags,
 } from '@nestjs/swagger'
-import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
+import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
 import { Interest } from 'src/shared/Schemas/interest.schema'
 import { InterestsService } from '../Service/interests.service'
 

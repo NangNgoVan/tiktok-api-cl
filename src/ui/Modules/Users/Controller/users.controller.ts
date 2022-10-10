@@ -26,9 +26,9 @@ import {
     ApiTags,
 } from '@nestjs/swagger'
 import { UserNotFoundException } from 'src/shared/Exceptions/http.exceptions'
-import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
+import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
 import { HttpStatusResult } from 'src/shared/Types/types'
-import { UserResponseDto } from '../ResponseDTO/user-response.dto'
+import { GetUserResponseDto } from '../ResponseDTO/get-user-response.dto'
 import { UpdateUserDto } from '../RequestDTO/update-user.dto'
 import { UsersService } from '../Service/users.service'
 import { User } from '../../../../shared/Schemas/user.schema'
@@ -43,7 +43,7 @@ import _ from 'lodash'
 import { configService } from '../../../../shared/Services/config.service'
 
 @Controller('ui/users')
-@ApiTags('User APIs')
+@ApiTags('Users APIs')
 export class UsersController {
     private readonly logger: Logger = new Logger(UsersController.name)
 
@@ -59,9 +59,9 @@ export class UsersController {
     @ApiOperation({ summary: 'Get user by `current` alias' })
     @ApiOkResponse({
         description: '200',
-        type: UserResponseDto,
+        type: GetUserResponseDto,
     })
-    async getCurrentUser(@Req() req): Promise<User> {
+    async getCurrentUser(@Req() req): Promise<GetUserResponseDto> {
         const { userId } = req.user
 
         const user = await this.userService.findById(userId)
@@ -106,10 +106,13 @@ export class UsersController {
     @ApiOperation({ summary: 'Get user by user id' })
     @ApiOkResponse({
         description: '200',
-        type: UserResponseDto,
+        type: GetUserResponseDto,
     })
     @ApiNotFoundResponse()
-    async getUserById(@Param() params, @Req() req): Promise<any> {
+    async getUserById(
+        @Param() params,
+        @Req() req,
+    ): Promise<GetUserResponseDto> {
         const id = _.get(params, 'userId')
         const userId = _.get(req.user, 'userId')
         const user = await this.userService.findById(id)
@@ -129,7 +132,7 @@ export class UsersController {
                 id,
             )
 
-        const getUserDto = new UserResponseDto()
+        const getUserDto = new GetUserResponseDto()
         getUserDto._id = user.id
         getUserDto.gender = user.gender
         getUserDto.number_of_follower = user.number_of_follower

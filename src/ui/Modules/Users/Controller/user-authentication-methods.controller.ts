@@ -19,7 +19,7 @@ import {
 } from '@nestjs/swagger'
 import { UserAuthenticationMethodsService } from '../Service/user-authentication-methods.service'
 import { AuthenticationMethod } from '../../../../shared/Types/types'
-import { JwtAuthGuard } from '../../../../shared/Guards/jwt.auth.guard'
+import { JwtAuthGuard } from '../../../../shared/Guards/jwt-auth.guard'
 import bcrypt from 'bcrypt'
 import _ from 'lodash'
 import { GetUserAuthenticationMethodResponseDto } from '../ResponseDTO/get-user-authentication-method-response.dto'
@@ -30,7 +30,7 @@ import { AuthenticationService } from '../../Authentication/Service/authenticati
 import { UsersService } from '../Service/users.service'
 import { NonceResponseDto } from '../../../../shared/ResponseDTO/nonce-response.dto'
 
-@ApiTags('User Authentication Method APIs')
+@ApiTags('Users Authentication Method APIs')
 @Controller('ui/users/current/authentication-methods')
 export class UserAuthenticationMethodsController {
     constructor(

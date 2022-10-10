@@ -1,12 +1,10 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common'
+import { Body, Controller, Post, Req } from '@nestjs/common'
 import { AuthenticationService } from '../Service/authentication.service'
 import { LoginWithAuthenticationMethodCredentialRequestDto } from '../../../../shared/RequestDTO/login-with-authentication-method-credential-request.dto'
 import { ApiHeader, ApiOkResponse, ApiOperation } from '@nestjs/swagger'
 import { RefreshAccessTokenResponseDto } from '../../../../shared/ResponseDTO/refresh-token-response.dto'
 import { AuthenticateResponseDto } from '../../../../shared/ResponseDTO/authenticate-response.dto'
-import { RequirePermissions } from '../../../shared/Decorators/permissions.decorator'
-import { JwtAuthGuard } from '../../../../shared/Guards/jwt.auth.guard'
-import { PermissionsGuard } from '../../../shared/Guards/permissions.guard'
+import { IsPublic } from '../../../../shared/Decorators/is-public.decorator'
 
 @Controller('cms/authentication')
 export class AuthenticationController {
@@ -14,6 +12,7 @@ export class AuthenticationController {
         private readonly authenticationService: AuthenticationService,
     ) {}
 
+    @IsPublic()
     @Post('/authentication-methods/credential')
     @ApiOperation({ summary: 'Login with credential' })
     @ApiOkResponse({
@@ -28,6 +27,7 @@ export class AuthenticationController {
         )
     }
 
+    @IsPublic()
     @Post('/token')
     @ApiOperation({ summary: 'Refresh token' })
     @ApiOkResponse({
@@ -42,10 +42,8 @@ export class AuthenticationController {
         return this.authenticationService.refreshAccessToken(req.userId)
     }
 
+    @IsPublic()
     @Post('/logout')
-    @RequirePermissions(['authentication:read'])
-    @UseGuards(JwtAuthGuard)
-    @UseGuards(PermissionsGuard)
     @ApiHeader({
         name: 'refresh-token',
         description: 'refresh token',

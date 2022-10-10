@@ -14,6 +14,9 @@ import { UsersRepository } from './shared/Repositories/User/users.repository'
 import { SubjectsRepository } from './shared/Repositories/User/subjects.repository'
 import { ActionsRepository } from './shared/Repositories/User/actions.repository'
 import { RolesRepository } from './shared/Repositories/User/roles.repository'
+import { PermissionGuard } from './shared/Guards/permission.guard'
+import { APP_GUARD } from '@nestjs/core'
+import { JwtAuthGuard } from '../shared/Guards/jwt-auth.guard'
 
 @Module({
     imports: [
@@ -40,6 +43,14 @@ import { RolesRepository } from './shared/Repositories/User/roles.repository'
     ],
     controllers: [],
     providers: [
+        {
+            provide: APP_GUARD,
+            useClass: JwtAuthGuard,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: PermissionGuard,
+        },
         UserAuthenticationMethodsRepository,
         UsersRepository,
         SubjectsRepository,

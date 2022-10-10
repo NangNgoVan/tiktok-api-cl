@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common'
-import { UsersController } from './Controller/users.controller'
+import { AuthenticationController } from './Controller/authentication.controller'
 import { JwtService } from '@nestjs/jwt'
 import { RefreshTokenBlacklistService } from 'src/shared/Services/refresh-token-blacklist.service'
 import { CacheService } from 'src/shared/Services/cache.service'
-import { AuthenticationService } from './Service/authentication.service'
+import { AuthenticationService } from '../Authentication/Service/authentication.service'
 
 @Module({
     imports: [],
-    controllers: [UsersController],
+    controllers: [AuthenticationController],
     providers: [
         // Service
         JwtService,

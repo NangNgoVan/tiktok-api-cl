@@ -17,7 +17,7 @@ import {
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 import _ from 'lodash'
 import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
-import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
+import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
 import { FeedComment } from 'src/shared/Schemas/feed-comment.schema'
 import { CreateFeedCommentDto } from '../Dto/create-feed-comment.dto'
 import { PaginateFeedCommentResultsDto } from '../Dto/paginate-feed-commentresults.dto'

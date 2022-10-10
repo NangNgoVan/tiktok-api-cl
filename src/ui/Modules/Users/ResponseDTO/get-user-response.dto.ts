@@ -9,7 +9,7 @@ import {
 import { CurrentFollowedUser } from 'src/shared/ResponseDTO/created-user.dto'
 import { UserGenderType } from 'src/shared/Types/types'
 
-export class UserResponseDto {
+export class GetUserResponseDto {
     @ApiProperty()
     @IsString()
     _id: string

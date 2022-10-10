@@ -17,7 +17,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger'
 import { DatabaseUpdateFailException } from 'src/shared/Exceptions/http.exceptions'
-import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
+import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
 import { HttpStatusResult } from 'src/shared/Types/types'
 import { UsersService } from '../Service/users.service'
 import { S3Service } from 'src/shared/Services/s3.service'
@@ -28,7 +28,7 @@ import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
 import _ from 'lodash'
 
 @Controller('ui/users')
-@ApiTags('User Follow APIs')
+@ApiTags('Users Follow APIs')
 export class UserFollowsController {
     constructor(
         private readonly userService: UsersService,

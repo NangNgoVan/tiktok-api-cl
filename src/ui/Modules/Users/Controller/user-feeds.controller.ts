@@ -1,7 +1,7 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common'
 
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { JwtAuthGuard } from 'src/shared/Guards/jwt.auth.guard'
+import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
 import { UsersService } from '../Service/users.service'
 import { S3Service } from 'src/shared/Services/s3.service'
 import { UserFollowsService } from 'src/ui/Modules/Follows/Service/user-follows.service'
@@ -12,7 +12,7 @@ import _ from 'lodash'
 import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
 
 @Controller('ui/users')
-@ApiTags('User Feed APIs')
+@ApiTags('Users Feed APIs')
 export class UserFeedsController {
     constructor(
         private readonly userService: UsersService,

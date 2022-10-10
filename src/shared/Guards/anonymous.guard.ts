@@ -1,3 +1,4 @@
+// FIXME: remove this use is_public instead
 import { ExecutionContext, Injectable } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 
