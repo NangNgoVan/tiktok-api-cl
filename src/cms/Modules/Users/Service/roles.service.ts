@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { RolesRepository } from '../Repositories/User/roles.repository'
-import { RoleDocument } from '../../../shared/Schemas/role.schema'
+import { RolesRepository } from '../Repositories/roles.repository'
+import { RoleDocument } from '../../../../shared/Schemas/role.schema'
 import _ from 'lodash'
 
 @Injectable()

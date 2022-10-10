@@ -13,9 +13,9 @@ import {
 } from '@nestjs/swagger'
 import { UserData } from '../../../../shared/Types/types'
 import { CurrentUser } from '../../../../shared/Decorators/current-user.decorator'
-import { UsersService } from '../../Users/Service/users.service'
+import { UsersService } from '../Service/users.service'
 import { RequirePermissions } from '../../../shared/Decorators/permission.decorator'
-import { GetUserResponseDto } from '../../Users/ResponseDTO/get-user-response.dto'
+import { GetUserResponseDto } from '../ResponseDTO/get-user-response.dto'
 
 @Controller('cms/users')
 export class UsersController {

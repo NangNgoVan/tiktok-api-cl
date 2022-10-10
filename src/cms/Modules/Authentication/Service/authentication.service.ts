@@ -12,12 +12,12 @@ import { configService } from 'src/shared/Services/config.service'
 import { LoginWithAuthenticationMethodCredentialRequestDto } from '../../../../shared/RequestDTO/login-with-authentication-method-credential-request.dto'
 
 import { RefreshTokenBlacklistService } from '../../../../shared/Services/refresh-token-blacklist.service'
-import { UserAuthenticationMethodsRepository } from '../../../shared/Repositories/User/user-authentication-methods.repository'
-import { UsersRepository } from '../../../shared/Repositories/User/users.repository'
 import { RefreshAccessTokenResponseDto } from '../../../../shared/ResponseDTO/refresh-token-response.dto'
 import { AuthenticateResponseDto } from '../../../../shared/ResponseDTO/authenticate-response.dto'
-import { RolesRepository } from '../../../shared/Repositories/User/roles.repository'
-import { RolesService } from '../../../shared/Services/roles.service'
+import { RolesRepository } from '../../Users/Repositories/roles.repository'
+import { RolesService } from '../../Users/Service/roles.service'
+import { UsersRepository } from '../../Users/Repositories/users.repository'
+import { UserAuthenticationMethodsRepository } from '../../Users/Repositories/user-authentication-methods.repository'
 
 @Injectable()
 export class AuthenticationService {

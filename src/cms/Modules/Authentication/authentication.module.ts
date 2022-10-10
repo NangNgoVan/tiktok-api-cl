@@ -1,22 +1,20 @@
-import { Module } from '@nestjs/common'
-import { UsersController } from './Controller/users.controller'
+import { forwardRef, Module } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { RefreshTokenBlacklistService } from 'src/shared/Services/refresh-token-blacklist.service'
 import { CacheService } from 'src/shared/Services/cache.service'
 import { AuthenticationService } from './Service/authentication.service'
+import { AuthenticationController } from './Controller/authentication.controller'
+import { UsersModule } from '../Users/users.module'
 
 @Module({
-    imports: [],
-    controllers: [UsersController],
+    imports: [forwardRef(() => UsersModule)],
+    controllers: [AuthenticationController],
     providers: [
-        // Service
         JwtService,
         RefreshTokenBlacklistService,
         CacheService,
         AuthenticationService,
     ],
-    exports: [
-        // JwtService, RefreshTokenBlacklistService, CacheService
-    ],
+    exports: [JwtService, RefreshTokenBlacklistService],
 })
 export class AuthenticationModule {}

@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { UsersRepository } from '../../../shared/Repositories/User/users.repository'
 import { GetUserResponseDto } from '../ResponseDTO/get-user-response.dto'
 import _ from 'lodash'
-import { RolesService } from '../../../shared/Services/roles.service'
+import { RolesService } from './roles.service'
+import { UsersRepository } from '../Repositories/users.repository'
 
 @Injectable()
 export class UsersService {
