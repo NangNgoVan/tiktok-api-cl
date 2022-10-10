@@ -12,18 +12,22 @@ import { configService } from 'src/shared/Services/config.service'
 import { LoginWithAuthenticationMethodCredentialRequestDto } from '../../../../shared/RequestDTO/login-with-authentication-method-credential-request.dto'
 
 import { RefreshTokenBlacklistService } from '../../../../shared/Services/refresh-token-blacklist.service'
-import { UserAuthenticationMethodsRepository } from '../Repository/user-authentication-methods.repository'
-import { UsersRepository } from '../Repository/users.repository'
+import { UserAuthenticationMethodsRepository } from '../../../shared/Repositories/User/user-authentication-methods.repository'
+import { UsersRepository } from '../../../shared/Repositories/User/users.repository'
 import { RefreshAccessTokenResponseDto } from '../../../../shared/ResponseDTO/refresh-token-response.dto'
 import { AuthenticateResponseDto } from '../../../../shared/ResponseDTO/authenticate-response.dto'
+import { RolesRepository } from '../../../shared/Repositories/User/roles.repository'
+import { RolesService } from '../../../shared/Services/roles.service'
 
 @Injectable()
 export class AuthenticationService {
     constructor(
+        private readonly userRepository: UsersRepository,
+        private readonly roleRepository: RolesRepository,
+        private readonly userAuthenticationMethodsRepository: UserAuthenticationMethodsRepository,
         private readonly jwtService: JwtService,
-        private userRepository: UsersRepository,
-        private userAuthenticationMethodsRepository: UserAuthenticationMethodsRepository,
-        private blackListTokenService: RefreshTokenBlacklistService,
+        private readonly blackListTokenService: RefreshTokenBlacklistService,
+        private readonly roleService: RolesService,
     ) {}
 
     async logInWithCredential(
@@ -59,17 +63,20 @@ export class AuthenticationService {
             throw new BadRequestException('Password do not match')
         }
 
+        const roles: string[] = _.get(user, 'roles', [])
+
+        const effectivePermissions: string[] =
+            await this.roleService.getEffectivePermissionsByRoles(roles)
+
+        const payloadToGenerateToken = {
+            userId: user.id,
+            roles,
+            permissions: effectivePermissions,
+        }
+
         return {
-            token: this.generateAccessToken({
-                userId: user.id,
-                roles: _.get(user, 'roles', []),
-                permissions: [], // FIXME: get permissions from roles
-            }),
-            refreshToken: this.generateRefreshToken({
-                userId: user.id,
-                roles: _.get(user, 'roles', []),
-                permissions: [], // FIXME: get permissions from roles
-            }),
+            token: this.generateAccessToken(payloadToGenerateToken),
+            refreshToken: this.generateRefreshToken(payloadToGenerateToken),
         }
     }
 
@@ -95,28 +102,21 @@ export class AuthenticationService {
         })
     }
 
-    // verifyJWTToken(token: any, secretKey: string): string {
-    //     try {
-    //         const verifyToken = this.jwtService.verify(token, {
-    //             secret: secretKey,
-    //         })
-    //
-    //         return verifyToken
-    //     } catch (error) {
-    //         return null
-    //     }
-    // }
-
     async refreshAccessToken(
         userId: string,
     ): Promise<RefreshAccessTokenResponseDto> {
         const user = await this.userRepository.findById(userId)
 
+        const roles: string[] = _.get(user, 'roles', [])
+
+        const effectivePermissions: string[] =
+            await this.roleService.getEffectivePermissionsByRoles(roles)
+
         return {
             token: this.generateAccessToken({
                 userId,
-                roles: _.get(user, 'roles', []),
-                permissions: [], // FIXME: get permissions from roles
+                roles,
+                permissions: effectivePermissions,
             }),
         }
     }

@@ -37,3 +37,8 @@ export enum FeedFilterType {
     BOOKMARKED = 'bookmarked',
     REACTED = 'reacted',
 }
+export type UserData = {
+    userId: string
+    roles?: string[]
+    permissions?: string[]
+}

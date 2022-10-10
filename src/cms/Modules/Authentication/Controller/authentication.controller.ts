@@ -4,9 +4,9 @@ import { LoginWithAuthenticationMethodCredentialRequestDto } from '../../../../s
 import { ApiHeader, ApiOkResponse, ApiOperation } from '@nestjs/swagger'
 import { RefreshAccessTokenResponseDto } from '../../../../shared/ResponseDTO/refresh-token-response.dto'
 import { AuthenticateResponseDto } from '../../../../shared/ResponseDTO/authenticate-response.dto'
-import { RequirePermissions } from '../../../Decorators/permissions.decorator'
+import { RequirePermissions } from '../../../shared/Decorators/permissions.decorator'
 import { JwtAuthGuard } from '../../../../shared/Guards/jwt.auth.guard'
-import { PermissionsGuard } from '../../../Guards/permissions.guard'
+import { PermissionsGuard } from '../../../shared/Guards/permissions.guard'
 
 @Controller('cms/authentication')
 export class AuthenticationController {
@@ -29,9 +29,6 @@ export class AuthenticationController {
     }
 
     @Post('/token')
-    @RequirePermissions(['authentication:read'])
-    @UseGuards(JwtAuthGuard)
-    @UseGuards(PermissionsGuard)
     @ApiOperation({ summary: 'Refresh token' })
     @ApiOkResponse({
         type: RefreshAccessTokenResponseDto,
