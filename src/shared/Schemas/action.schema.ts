@@ -15,4 +15,4 @@ export class Action {
     name: string
 }
 
-export const InterestSchema = SchemaFactory.createForClass(Action)
+export const ActionSchema = SchemaFactory.createForClass(Action)

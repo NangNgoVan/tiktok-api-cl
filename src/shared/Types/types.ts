@@ -1,4 +1,4 @@
-// User gender
+// Users gender
 export enum UserGenderType {
     MALE = 'male',
     FEMALE = 'female',
@@ -36,4 +36,9 @@ export enum FeedFilterType {
     POSTED_BY = 'posted_by',
     BOOKMARKED = 'bookmarked',
     REACTED = 'reacted',
+}
+export type UserData = {
+    userId: string
+    roles?: string[]
+    permissions?: string[]
 }

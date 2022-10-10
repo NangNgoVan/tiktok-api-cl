@@ -1,12 +1,12 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common'
-import { AuthenticationModule } from './Authentication/authentication.module'
-import { UsersModule } from './Users/users.module'
-import { InterestsModule } from './Interests/interests.module'
-import { FeedsModule } from './Feeds/feeds.module'
-import { CommentsModule } from './Comments/comments.module'
+import { AuthenticationModule } from './Modules/Authentication/authentication.module'
+import { UsersModule } from './Modules/Users/users.module'
+import { InterestsModule } from './Modules/Interests/interests.module'
+import { FeedsModule } from './Modules/Feeds/feeds.module'
+import { CommentsModule } from './Modules/Comments/comments.module'
 import { RefreshTokenBlacklistMiddleware } from 'src/shared/Middlewares/refresh-token-blacklist-middleware.service'
-import { ReactionsModule } from './Reactions/reactions.module'
-import { BookmarksModule } from './Bookmarks/bookmarks.module'
+import { ReactionsModule } from './Modules/Reactions/reactions.module'
+import { BookmarksModule } from './Modules/Bookmarks/bookmarks.module'
 @Module({
     imports: [
         AuthenticationModule,
