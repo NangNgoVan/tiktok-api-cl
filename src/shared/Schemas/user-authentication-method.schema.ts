@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 import * as mongoose from 'mongoose'
-import { AuthenticationMethod, UserReactionType } from '../Types/types'
+import { AuthenticationMethod } from '../Types/types'
 import { IsEnum, IsOptional } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 

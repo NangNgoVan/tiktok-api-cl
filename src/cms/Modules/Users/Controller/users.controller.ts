@@ -16,6 +16,7 @@ import { CurrentUser } from '../../../../shared/Decorators/current-user.decorato
 import { UsersService } from '../Service/users.service'
 import { RequirePermissions } from '../../../shared/Decorators/permission.decorator'
 import { GetUserResponseDto } from '../ResponseDTO/get-user-response.dto'
+import { CreateUserWithAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-with-authentication-method-credential-request.dto'
 
 @Controller('cms/users')
 export class UsersController {
@@ -28,7 +29,7 @@ export class UsersController {
         type: GetUserResponseDto,
     })
     async getCurrentUser(@CurrentUser() currentUser: UserData): Promise<any> {
-        return this.usersService.getById(currentUser.userId)
+        return this.usersService.findById(currentUser.userId)
     }
 
     @Get(':id')
@@ -39,14 +40,21 @@ export class UsersController {
     })
     @ApiNotFoundResponse()
     async getUserById(@Param('id') id: string): Promise<GetUserResponseDto> {
-        return this.usersService.getById(id)
+        return this.usersService.findById(id)
     }
 
     @Post()
     @RequirePermissions(['users:create'])
-    @ApiOperation({ summary: '....' })
-    @ApiOkResponse({})
-    async create(@Body() dto: any): Promise<any> {
-        throw new NotImplementedException(dto)
+    @ApiOperation({
+        summary: 'Create user with authentication method credential',
+    })
+    @ApiOkResponse({ type: GetUserResponseDto })
+    async createUserWithAuthenticationMethodCredential(
+        @Body()
+        createUserWithAuthenticationMethodCredentialRequestDto: CreateUserWithAuthenticationMethodCredentialRequestDto,
+    ): Promise<any> {
+        return this.usersService.createWithAuthenticationMethodCredential(
+            createUserWithAuthenticationMethodCredentialRequestDto,
+        )
     }
 }

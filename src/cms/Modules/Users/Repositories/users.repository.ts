@@ -9,7 +9,11 @@ export class UsersRepository {
         @InjectModel(User.name) private userModel: Model<UserDocument>,
     ) {}
 
-    async getById(id: string): Promise<UserDocument> {
+    async findByById(id: string): Promise<UserDocument> {
         return this.userModel.findById(id)
+    }
+
+    async create(doc: Partial<UserDocument>) {
+        return this.userModel.create(doc)
     }
 }

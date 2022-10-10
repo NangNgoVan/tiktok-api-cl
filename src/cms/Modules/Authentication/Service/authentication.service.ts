@@ -42,7 +42,7 @@ export class AuthenticationService {
             throw new NotFoundException(`Username ${dto.username} not found`)
         }
 
-        const user = await this.userRepository.getById(
+        const user = await this.userRepository.findByById(
             userAuthenticationMethod.user_id,
         )
 
@@ -105,7 +105,7 @@ export class AuthenticationService {
     async refreshAccessToken(
         userId: string,
     ): Promise<RefreshAccessTokenResponseDto> {
-        const user = await this.userRepository.getById(userId)
+        const user = await this.userRepository.findByById(userId)
 
         const roles: string[] = _.get(user, 'roles', [])
 

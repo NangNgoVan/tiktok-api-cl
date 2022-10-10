@@ -44,8 +44,6 @@ import { configService } from '../../../../shared/Services/config.service'
 @Controller('ui/users')
 @ApiTags('Users APIs')
 export class UsersController {
-    private readonly logger: Logger = new Logger(UsersController.name)
-
     constructor(
         private readonly userService: UsersService,
         private readonly s3Service: S3Service,
@@ -57,7 +55,6 @@ export class UsersController {
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Get user by `current` alias' })
     @ApiOkResponse({
-        description: '200',
         type: GetUserResponseDto,
     })
     async getCurrentUser(@Req() req): Promise<GetUserResponseDto> {
@@ -79,9 +76,7 @@ export class UsersController {
     @Patch('/current')
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Update user by `current` alias' })
-    @ApiOkResponse({
-        description: '200',
-    })
+    @ApiOkResponse()
     @ApiNotFoundResponse()
     async updateCurrentUser(
         @Req() req,
@@ -104,7 +99,6 @@ export class UsersController {
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Get user by user id' })
     @ApiOkResponse({
-        description: '200',
         type: GetUserResponseDto,
     })
     @ApiNotFoundResponse()

@@ -6,6 +6,7 @@ import {
     UserAuthenticationMethodDocument,
 } from 'src/shared/Schemas/user-authentication-method.schema'
 import { AuthenticationMethod } from '../../../../shared/Types/types'
+import { CreateUserAuthenticationMethodDto } from '../../../../ui/Modules/Users/RequestDTO/create-user-authentication-method.dto'
 
 @Injectable()
 export class UserAuthenticationMethodsRepository {
@@ -21,5 +22,11 @@ export class UserAuthenticationMethodsRepository {
             authentication_method: AuthenticationMethod.CREDENTIAL,
             'data.username': username,
         })
+    }
+
+    async createAuthenticationMethod(
+        doc: Partial<UserAuthenticationMethodDocument>,
+    ) {
+        return this.userAuthenticationMethodModel.create(doc)
     }
 }
