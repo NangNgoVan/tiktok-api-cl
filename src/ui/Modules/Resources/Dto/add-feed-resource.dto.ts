@@ -1,4 +1,3 @@
-import { IsString } from 'class-validator'
 import { FeedType } from 'src/shared/Types/types'
 
 export class AddFeedResourceDto {

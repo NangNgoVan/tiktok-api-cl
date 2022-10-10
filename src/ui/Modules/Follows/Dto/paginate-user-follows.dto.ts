@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { String } from 'aws-sdk/clients/acm'
-import { IsArray, IsBoolean, IsString } from 'class-validator'
+import { IsBoolean, IsString } from 'class-validator'
 import { GetUserFollowDto } from './get-user-follow.dto'
 
 export class PaginateUserFollowsDto {

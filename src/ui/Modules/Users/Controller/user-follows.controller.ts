@@ -3,7 +3,6 @@ import {
     Delete,
     Get,
     HttpStatus,
-    Logger,
     Post,
     Req,
     UseGuards,

@@ -6,7 +6,6 @@ import {
     IsEnum,
     IsOptional,
     IsString,
-    Matches,
 } from 'class-validator'
 import { UserGenderType } from 'src/shared/Types/types'
 
