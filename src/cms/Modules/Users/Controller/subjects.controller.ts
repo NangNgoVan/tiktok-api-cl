@@ -21,6 +21,9 @@ import { CreateSubjectRequestDto } from '../RequestDTO/create-subject-request.dt
 export class SubjectsController {
     constructor(private readonly subjectService: SubjectsService) {}
 
+    /*
+     * Required permissions: `subjects:read`
+     */
     @Get('all')
     @RequirePermissions(['subjects:read'])
     @UseGuards(JwtAuthGuard, PermissionGuard)
