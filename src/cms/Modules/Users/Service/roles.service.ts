@@ -65,4 +65,19 @@ export class RolesService {
     async deleteByName(name: string) {
         await this.roleRepository.deleteByName(name)
     }
+
+    async cleanupRoles(roles: string[]): Promise<string[]> {
+        const roleDocuments: RoleDocument[] =
+            await this.roleRepository.getAllRoles()
+
+        const availableRoles: string[] = _.map(roleDocuments, 'name')
+
+        return _.uniq(
+            _.compact(
+                _.filter(roles, (role: string) =>
+                    _.includes(availableRoles, role),
+                ),
+            ),
+        )
+    }
 }

@@ -18,6 +18,7 @@ import { RolesRepository } from '../../Users/Repository/roles.repository'
 import { RolesService } from '../../Users/Service/roles.service'
 import { UsersRepository } from '../../Users/Repository/users.repository'
 import { UserAuthenticationMethodsRepository } from '../../Users/Repository/user-authentication-methods.repository'
+import { UserRolesService } from '../../Users/Service/user-roles.service'
 
 @Injectable()
 export class AuthenticationService {
@@ -28,6 +29,7 @@ export class AuthenticationService {
         private readonly jwtService: JwtService,
         private readonly blackListTokenService: RefreshTokenBlacklistService,
         private readonly roleService: RolesService,
+        private readonly userRolesService: UserRolesService,
     ) {}
 
     async logInWithCredential(
@@ -65,8 +67,10 @@ export class AuthenticationService {
 
         const roles: string[] = _.get(user, 'roles', [])
 
-        const effectivePermissions: string[] =
-            await this.roleService.getEffectivePermissionsByRoles(roles)
+        const [effectivePermissions] = await Promise.all([
+            this.roleService.getEffectivePermissionsByRoles(roles),
+            this.userRolesService.reconcileRolesForUser(user.id),
+        ])
 
         const payloadToGenerateToken = {
             userId: user.id,
