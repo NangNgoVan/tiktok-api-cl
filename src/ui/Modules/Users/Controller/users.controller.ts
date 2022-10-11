@@ -33,13 +33,13 @@ import { UpdateUserDto } from '../RequestDTO/update-user.dto'
 import { UsersService } from '../Service/users.service'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { S3Service } from 'src/shared/Services/s3.service'
-import { UploadMetaDataDto } from '../RequestDTO/upload-metadata.dto'
 import moment from 'moment'
 import { UserFollowsService } from 'src/ui/Modules/Follows/Service/user-follows.service'
 import { v4 as uuidv4 } from 'uuid'
 import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
 import _ from 'lodash'
 import { configService } from '../../../../shared/Services/config.service'
+import { UploadMetaDataResponseDto } from 'src/shared/ResponseDTO/upload-metadata-response.dto'
 
 @Controller('ui/users')
 @ApiTags('Users APIs')
@@ -161,7 +161,7 @@ export class UsersController {
     @UseInterceptors(FileInterceptor('file'))
     @ApiOkResponse({
         description: 'Info about avatar',
-        type: UploadMetaDataDto,
+        type: UploadMetaDataResponseDto,
     })
     async uploadAvatarToAWS3(
         @UploadedFile(
@@ -178,7 +178,7 @@ export class UsersController {
         )
         file: Express.Multer.File,
         @Req() req,
-    ): Promise<UploadMetaDataDto> {
+    ): Promise<UploadMetaDataResponseDto> {
         // FIXME: move this to service
 
         const { userId } = req.user

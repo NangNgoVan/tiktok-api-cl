@@ -8,4 +8,18 @@ export class UtilsService {
         const regexp = /\B\#\w+\b/g
         return _.uniq(content.match(regexp)).map((h) => h.substring(1))
     }
+
+    checkImageMimeTypeIsValid(mimetype) {
+        return ['image/jpeg', 'image/jpg', 'image/png'].includes(mimetype)
+    }
+
+    checkAudioMimeTypeIsValid(mimetype) {
+        return [
+            'audio/aac',
+            'audio/mpeg',
+            'audio/ogg',
+            'audio/wav',
+            'audio/webm',
+        ].includes(mimetype)
+    }
 }

@@ -133,7 +133,7 @@ export class FeedsController {
             dto,
             FeedType.IMAGE,
         )
-        if (!createdFeed) return DatabaseUpdateFailException
+        if (!createdFeed) throw new DatabaseUpdateFailException()
 
         const objectKeyPrefix = 'feed-images/' + moment().format('yyyy-MM-DD')
 

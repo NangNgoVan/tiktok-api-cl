@@ -16,10 +16,26 @@ export class Song {
     })
     display_order: number
 
+    @Prop()
+    thumbnail: string
+
     @Prop({
         default: 0,
     })
     number_of_use: number
+
+    @Prop({
+        default: 0,
+    })
+    number_of_bookmark: number
+
+    @Prop({
+        default: 0,
+    })
+    duration_in_second: number
+
+    @Prop()
+    artist: string
 
     @Prop({
         maxlength: 255,

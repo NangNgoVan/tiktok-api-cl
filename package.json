@@ -44,6 +44,7 @@
     "compression": "^1.7.4",
     "dotenv": "^16.0.2",
     "file-type": "16.5.1",
+    "get-mp3-duration": "^1.0.0",
     "ioredis": "^5.2.3",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
