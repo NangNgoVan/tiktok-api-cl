@@ -29,7 +29,7 @@ export class UsersController {
     async getCurrentUser(
         @CurrentUser() currentUser: UserData,
     ): Promise<GetUserResponseDto> {
-        return this.usersService.findById(currentUser.userId)
+        return this.usersService.getById(currentUser.userId)
     }
 
     @Get(':id')
@@ -41,7 +41,7 @@ export class UsersController {
     })
     @ApiNotFoundResponse()
     async getUserById(@Param('id') id: string): Promise<GetUserResponseDto> {
-        return this.usersService.findById(id)
+        return this.usersService.getById(id)
     }
 
     @Post()
