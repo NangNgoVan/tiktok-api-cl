@@ -9,9 +9,9 @@ import { RolesService } from './roles.service'
 import { UsersRepository } from '../Repositories/users.repository'
 import bcrypt from 'bcrypt'
 import { AuthenticationMethod } from '../../../../shared/Types/types'
-import { CreateUserWithAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-with-authentication-method-credential-request.dto'
 import { UserAuthenticationMethodsRepository } from '../Repositories/user-authentication-methods.repository'
 import { v4 as uuidv4 } from 'uuid'
+import { CreateUserWithAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-with-authentication-method-credential-request.dto'
 
 @Injectable()
 export class UsersService {

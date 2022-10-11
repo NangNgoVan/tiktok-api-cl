@@ -17,9 +17,9 @@ import { CurrentUser } from '../../../../shared/Decorators/current-user.decorato
 import { UsersService } from '../Service/users.service'
 import { RequirePermissions } from '../../../shared/Decorators/permission.decorator'
 import { GetUserResponseDto } from '../ResponseDTO/get-user-response.dto'
-import { CreateUserWithAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-with-authentication-method-credential-request.dto'
-import { JwtAuthGuard } from '../../../../shared/Guards/jwt-auth.guard'
 import { PermissionGuard } from '../../../shared/Guards/permission.guard'
+import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
+import { CreateUserWithAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-with-authentication-method-credential-request.dto'
 
 @Controller('cms/users')
 export class UsersController {
@@ -32,7 +32,7 @@ export class UsersController {
     @ApiOkResponse({
         type: GetUserResponseDto,
     })
-    async getCurrentUser(@CurrentUser() currentUser: UserData): Promise<any> {
+    async getCurrentUser(@CurrentUser() currentUser: UserData): Promise<GetUserResponseDto> {
         return this.usersService.findById(currentUser.userId)
     }
 
