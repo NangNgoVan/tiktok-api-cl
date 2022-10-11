@@ -36,7 +36,7 @@ export class RolesController {
     @UseGuards(JwtAuthGuard, PermissionGuard)
     @ApiOperation({ summary: 'Create or update role' })
     @ApiOkResponse({
-        type: CreateOrUpdateRoleRequestDto,
+        type: GetRoleResponseDto,
     })
     async createOrUpdateRole(
         @Body() createOrUpdateRoleRequestDto: CreateOrUpdateRoleRequestDto,
