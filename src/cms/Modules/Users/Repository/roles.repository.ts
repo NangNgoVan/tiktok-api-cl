@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Role, RoleDocument } from '../../../../shared/Schemas/role.schema'
 import { CreateOrUpdateRoleRequestDto } from '../RequestDTO/create-or-update-role-request.dto'
+import _ from 'lodash'
 
 @Injectable()
 export class RolesRepository {
@@ -20,15 +21,13 @@ export class RolesRepository {
         })
     }
 
-    async createOrUpdate(
-        createOrUpdateRoleRequestDto: CreateOrUpdateRoleRequestDto,
-    ) {
+    async createOrUpdate(name: string, permissions: string[]) {
         return this.roleModel.findOneAndUpdate(
             {
-                name: createOrUpdateRoleRequestDto.name,
+                name,
             },
             {
-                ...createOrUpdateRoleRequestDto,
+                permissions,
             },
             {
                 upsert: true,

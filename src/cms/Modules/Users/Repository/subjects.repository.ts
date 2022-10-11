@@ -12,7 +12,19 @@ export class SubjectsRepository {
         @InjectModel(Subject.name) private subjectModel: Model<SubjectDocument>,
     ) {}
 
-    async getAllSubjects() {
+    async getAll() {
         return this.subjectModel.find()
+    }
+
+    async deleteByName(name: string) {
+        return this.subjectModel.findOneAndDelete({
+            name,
+        })
+    }
+
+    async create(name: string) {
+        return this.subjectModel.create({
+            name,
+        })
     }
 }

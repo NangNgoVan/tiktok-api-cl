@@ -7,7 +7,7 @@ import {
     Post,
     UseGuards,
 } from '@nestjs/common'
-import { ApiOkResponse, ApiOperation } from '@nestjs/swagger'
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { RequirePermissions } from '../../../shared/Decorators/permission.decorator'
 import { GetRoleResponseDto } from '../ResponseDTO/get-role-response.dto'
 import { JwtAuthGuard } from '../../../../shared/Guards/jwt-auth.guard'
@@ -16,6 +16,7 @@ import { CreateOrUpdateRoleRequestDto } from '../RequestDTO/create-or-update-rol
 import { RolesService } from '../Service/roles.service'
 
 @Controller('cms/roles')
+@ApiTags('Authorization APIs')
 export class RolesController {
     constructor(private readonly rolesService: RolesService) {}
 

@@ -12,7 +12,19 @@ export class ActionsRepository {
         @InjectModel(Action.name) private actionModel: Model<ActionDocument>,
     ) {}
 
-    async getAllActions() {
+    async getAll() {
         return this.actionModel.find()
+    }
+
+    async deleteByName(name: string) {
+        return this.actionModel.findOneAndDelete({
+            name,
+        })
+    }
+
+    async create(name: string) {
+        return this.actionModel.create({
+            name,
+        })
     }
 }

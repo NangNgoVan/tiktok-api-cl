@@ -7,7 +7,7 @@ import { UserRolesService } from '../Service/user-roles.service'
 import { AssignRolesToUserRequestDto } from '../RequestDTO/assign-roles-to-user-request.dto'
 
 @Controller('cms/users')
-@ApiTags('User Roles APIs')
+@ApiTags('Authorization APIs')
 export class UserRolesController {
     constructor(private readonly userRolesService: UserRolesService) {}
 

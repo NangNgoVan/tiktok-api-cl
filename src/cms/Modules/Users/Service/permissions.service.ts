@@ -38,10 +38,10 @@ export class PermissionsService {
         // FIXME: memo this
         // FIXME: should cleanup before expand
         const subjectDocuments: ActionDocument[] =
-            await this.subjectsRepository.getAllSubjects()
+            await this.subjectsRepository.getAll()
 
         const actionDocuments: ActionDocument[] =
-            await this.actionsRepository.getAllActions()
+            await this.actionsRepository.getAll()
 
         const availableSubjects: string[] = _.map(subjectDocuments, 'name')
         const availableActions: string[] = _.map(actionDocuments, 'name')
@@ -74,10 +74,10 @@ export class PermissionsService {
     async cleanupPermissions(dirtyPermissions: string[]): Promise<string[]> {
         // FIXME: memo this
         const subjectDocuments: ActionDocument[] =
-            await this.subjectsRepository.getAllSubjects()
+            await this.subjectsRepository.getAll()
 
         const actionDocuments: ActionDocument[] =
-            await this.actionsRepository.getAllActions()
+            await this.actionsRepository.getAll()
 
         const availableSubjects: string[] = _.map(subjectDocuments, 'name')
         const availableActions: string[] = _.map(actionDocuments, 'name')

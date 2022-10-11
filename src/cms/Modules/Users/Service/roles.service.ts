@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { RolesRepository } from '../Repository/roles.repository'
 import { RoleDocument } from '../../../../shared/Schemas/role.schema'
 import _ from 'lodash'
@@ -8,12 +8,17 @@ import { CreateOrUpdateRoleRequestDto } from '../RequestDTO/create-or-update-rol
 
 @Injectable()
 export class RolesService {
+    private readonly logger: Logger = new Logger(RolesService.name)
+
     constructor(
         private readonly roleRepository: RolesRepository,
         private readonly permissionsService: PermissionsService,
     ) {}
 
     async getAllRoles(): Promise<GetRoleResponseDto[]> {
+        // FIXME: should reconcile for sometime
+        await this.reconcilePermissionsForAllRoles()
+
         const roles: RoleDocument[] = await this.roleRepository.getAllRoles()
 
         return Promise.all(
@@ -40,10 +45,10 @@ export class RolesService {
                 createOrUpdateRoleRequestDto.permissions,
             )
 
-        return this.roleRepository.createOrUpdate({
-            ...createOrUpdateRoleRequestDto,
-            permissions: cleanedPermissions,
-        })
+        return this.roleRepository.createOrUpdate(
+            createOrUpdateRoleRequestDto.name,
+            cleanedPermissions,
+        )
     }
 
     async getEffectivePermissionsByRoles(roles: string[]): Promise<string[]> {
@@ -78,6 +83,22 @@ export class RolesService {
                     _.includes(availableRoles, role),
                 ),
             ),
+        )
+    }
+
+    async reconcilePermissionsForAllRoles(): Promise<void> {
+        const roleDocuments: RoleDocument[] =
+            await this.roleRepository.getAllRoles()
+
+        await Promise.all(
+            _.map(roleDocuments, async (roleDocument: RoleDocument) => {
+                roleDocument.permissions =
+                    await this.permissionsService.cleanupPermissions(
+                        roleDocument.permissions,
+                    )
+
+                await roleDocument.save()
+            }),
         )
     }
 }
