@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common'
-import { RolesRepository } from '../Repositories/roles.repository'
+import { RolesRepository } from '../Repository/roles.repository'
 import { RoleDocument } from '../../../../shared/Schemas/role.schema'
 import _ from 'lodash'
 import { PermissionsService } from './permissions.service'
+import { GetRoleResponseDto } from '../ResponseDTO/get-role-response.dto'
+import { CreateOrUpdateRoleRequestDto } from '../RequestDTO/create-or-update-role-request.dto'
 
 @Injectable()
 export class RolesService {
@@ -10,6 +12,39 @@ export class RolesService {
         private readonly roleRepository: RolesRepository,
         private readonly permissionsService: PermissionsService,
     ) {}
+
+    async getAllRoles(): Promise<GetRoleResponseDto[]> {
+        const roles: RoleDocument[] = await this.roleRepository.getAllRoles()
+
+        return Promise.all(
+            _.map(roles, async (role: RoleDocument) => {
+                const expandPermissions: string[] =
+                    await this.permissionsService.expandPermissions(
+                        role.permissions,
+                    )
+
+                return {
+                    _id: role._id,
+                    name: role.name,
+                    permissions: expandPermissions,
+                }
+            }),
+        )
+    }
+
+    async createOrUpdateRole(
+        createOrUpdateRoleRequestDto: CreateOrUpdateRoleRequestDto,
+    ): Promise<GetRoleResponseDto> {
+        const cleanedPermissions: string[] =
+            await this.permissionsService.cleanupPermissions(
+                createOrUpdateRoleRequestDto.permissions,
+            )
+
+        return this.roleRepository.createOrUpdate({
+            ...createOrUpdateRoleRequestDto,
+            permissions: cleanedPermissions,
+        })
+    }
 
     async getEffectivePermissionsByRoles(roles: string[]): Promise<string[]> {
         const roleDocuments = await this.roleRepository.getAllRoles()
@@ -25,5 +60,9 @@ export class RolesService {
         )
 
         return this.permissionsService.expandPermissions(combinedPermissions)
+    }
+
+    async deleteByName(name: string) {
+        await this.roleRepository.deleteByName(name)
     }
 }

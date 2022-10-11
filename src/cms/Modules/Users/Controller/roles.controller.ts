@@ -1,29 +1,23 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
-    NotImplementedException,
     Param,
     Post,
     UseGuards,
 } from '@nestjs/common'
-import {
-    ApiNotFoundResponse,
-    ApiOkResponse,
-    ApiOperation,
-} from '@nestjs/swagger'
-import { UserData } from '../../../../shared/Types/types'
-import { CurrentUser } from '../../../../shared/Decorators/current-user.decorator'
-import { UsersService } from '../Service/users.service'
+import { ApiOkResponse, ApiOperation } from '@nestjs/swagger'
 import { RequirePermissions } from '../../../shared/Decorators/permission.decorator'
 import { GetRoleResponseDto } from '../ResponseDTO/get-role-response.dto'
 import { JwtAuthGuard } from '../../../../shared/Guards/jwt-auth.guard'
 import { PermissionGuard } from '../../../shared/Guards/permission.guard'
-import { CreateRoleRequestDto } from '../RequestDTO/create-role-request.dto'
+import { CreateOrUpdateRoleRequestDto } from '../RequestDTO/create-or-update-role-request.dto'
+import { RolesService } from '../Service/roles.service'
 
 @Controller('cms/roles')
 export class RolesController {
-    constructor(private readonly usersService: UsersService) {}
+    constructor(private readonly rolesService: RolesService) {}
 
     @Get('all')
     @RequirePermissions(['roles:read'])
@@ -32,18 +26,31 @@ export class RolesController {
     @ApiOkResponse({
         type: GetRoleResponseDto,
     })
-    async getAllRoles(): Promise<GetRoleResponseDto> {
-        throw new Error()
+    async getAllRoles(): Promise<GetRoleResponseDto[]> {
+        return this.rolesService.getAllRoles()
     }
 
     @Post()
-    @RequirePermissions(['roles:create'])
+    @RequirePermissions(['roles:create', 'roles:update'])
     @UseGuards(JwtAuthGuard, PermissionGuard)
-    @ApiOperation({ summary: 'Create role' })
+    @ApiOperation({ summary: 'Create or update role' })
     @ApiOkResponse({
-        type: CreateRoleRequestDto,
+        type: CreateOrUpdateRoleRequestDto,
     })
-    async createRole(@Body() dto: CreateRoleRequestDto): Promise<void> {
-        throw new Error()
+    async createOrUpdateRole(
+        @Body() createOrUpdateRoleRequestDto: CreateOrUpdateRoleRequestDto,
+    ): Promise<GetRoleResponseDto> {
+        return this.rolesService.createOrUpdateRole(
+            createOrUpdateRoleRequestDto,
+        )
+    }
+
+    @Delete(':name')
+    @RequirePermissions(['roles:delete'])
+    @UseGuards(JwtAuthGuard, PermissionGuard)
+    @ApiOperation({ summary: 'Delete role by id' })
+    @ApiOkResponse()
+    async deleteRoleById(@Param('name') name: string): Promise<void> {
+        await this.rolesService.deleteByName(name)
     }
 }

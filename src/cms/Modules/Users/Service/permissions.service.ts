@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import _ from 'lodash'
 import { ActionDocument } from '../../../../shared/Schemas/action.schema'
-import { ActionsRepository } from '../Repositories/actions.repository'
-import { SubjectsRepository } from '../Repositories/subjects.repository'
+import { ActionsRepository } from '../Repository/actions.repository'
+import { SubjectsRepository } from '../Repository/subjects.repository'
 
 @Injectable()
 export class PermissionsService {
@@ -36,14 +36,15 @@ export class PermissionsService {
     */
     async expandPermissions(compactedPermissions: string[]): Promise<string[]> {
         // FIXME: memo this
+        // FIXME: should cleanup before expand
         const subjectDocuments: ActionDocument[] =
             await this.subjectsRepository.getAllSubjects()
 
         const actionDocuments: ActionDocument[] =
             await this.actionsRepository.getAllActions()
 
-        const subjects: string[] = _.map(subjectDocuments, 'name')
-        const actions: string[] = _.map(actionDocuments, 'name')
+        const availableSubjects: string[] = _.map(subjectDocuments, 'name')
+        const availableActions: string[] = _.map(actionDocuments, 'name')
 
         const expandedPermissions: string[] = _.flatMap(
             compactedPermissions,
@@ -54,10 +55,14 @@ export class PermissionsService {
                 )
 
                 const expandedSubjects: string[] =
-                    compactedSubject === '*' ? subjects : [compactedSubject]
+                    compactedSubject === '*'
+                        ? availableSubjects
+                        : [compactedSubject]
 
                 const expandedActions: string[] =
-                    compactedAction === '*' ? actions : [compactedAction]
+                    compactedAction === '*'
+                        ? availableActions
+                        : [compactedAction]
 
                 return this.cross(expandedSubjects, expandedActions)
             },
@@ -66,5 +71,36 @@ export class PermissionsService {
         return _.uniq(expandedPermissions)
     }
 
-    // FIXME: compactPermissions
+    async cleanupPermissions(dirtyPermissions: string[]): Promise<string[]> {
+        // FIXME: memo this
+        const subjectDocuments: ActionDocument[] =
+            await this.subjectsRepository.getAllSubjects()
+
+        const actionDocuments: ActionDocument[] =
+            await this.actionsRepository.getAllActions()
+
+        const availableSubjects: string[] = _.map(subjectDocuments, 'name')
+        const availableActions: string[] = _.map(actionDocuments, 'name')
+
+        const validPermissions: string[] = _.filter(
+            dirtyPermissions,
+            (dirtyPermission: string) => {
+                const [subject, action] = _.split(dirtyPermission, ':')
+
+                const isSubjectValid = _.includes(
+                    [...availableSubjects, '*'],
+                    subject,
+                )
+
+                const isActionValid = _.includes(
+                    [...availableActions, '*'],
+                    action,
+                )
+
+                return isSubjectValid && isActionValid
+            },
+        )
+
+        return _.uniq(validPermissions)
+    }
 }

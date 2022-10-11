@@ -1,16 +1,9 @@
-import {
-    Body,
-    Controller,
-    Get,
-    NotImplementedException,
-    Param,
-    Post,
-    UseGuards,
-} from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
 import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
+    ApiTags,
 } from '@nestjs/swagger'
 import { UserData } from '../../../../shared/Types/types'
 import { CurrentUser } from '../../../../shared/Decorators/current-user.decorator'
@@ -22,6 +15,7 @@ import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
 import { CreateUserWithAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-with-authentication-method-credential-request.dto'
 
 @Controller('cms/users')
+@ApiTags('Users APIs')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
@@ -32,7 +26,9 @@ export class UsersController {
     @ApiOkResponse({
         type: GetUserResponseDto,
     })
-    async getCurrentUser(@CurrentUser() currentUser: UserData): Promise<GetUserResponseDto> {
+    async getCurrentUser(
+        @CurrentUser() currentUser: UserData,
+    ): Promise<GetUserResponseDto> {
         return this.usersService.findById(currentUser.userId)
     }
 

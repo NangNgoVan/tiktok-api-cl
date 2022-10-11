@@ -6,10 +6,10 @@ import {
 import { GetUserResponseDto } from '../ResponseDTO/get-user-response.dto'
 import _ from 'lodash'
 import { RolesService } from './roles.service'
-import { UsersRepository } from '../Repositories/users.repository'
+import { UsersRepository } from '../Repository/users.repository'
 import bcrypt from 'bcrypt'
 import { AuthenticationMethod } from '../../../../shared/Types/types'
-import { UserAuthenticationMethodsRepository } from '../Repositories/user-authentication-methods.repository'
+import { UserAuthenticationMethodsRepository } from '../Repository/user-authentication-methods.repository'
 import { v4 as uuidv4 } from 'uuid'
 import { CreateUserWithAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-with-authentication-method-credential-request.dto'
 
@@ -22,7 +22,7 @@ export class UsersService {
     ) {}
 
     async findById(id: string): Promise<GetUserResponseDto> {
-        const userDocument = await this.usersRepository.findByById(id)
+        const userDocument = await this.usersRepository.getById(id)
 
         if (!userDocument) {
             throw new NotFoundException(`User ${id} not found`)
@@ -32,6 +32,8 @@ export class UsersService {
 
         const effectivePermissions: string[] =
             await this.rolesService.getEffectivePermissionsByRoles(roles)
+
+        // FIXME: avatar signed url s3
 
         return { ...userDocument.toObject(), permissions: effectivePermissions }
     }

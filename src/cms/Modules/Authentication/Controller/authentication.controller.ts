@@ -1,12 +1,18 @@
 import { Body, Controller, Post, Req } from '@nestjs/common'
 import { LoginWithAuthenticationMethodCredentialRequestDto } from '../../../../shared/RequestDTO/login-with-authentication-method-credential-request.dto'
-import { ApiHeader, ApiOkResponse, ApiOperation } from '@nestjs/swagger'
+import {
+    ApiHeader,
+    ApiOkResponse,
+    ApiOperation,
+    ApiTags,
+} from '@nestjs/swagger'
 import { RefreshAccessTokenResponseDto } from '../../../../shared/ResponseDTO/refresh-token-response.dto'
 import { AuthenticateResponseDto } from '../../../../shared/ResponseDTO/authenticate-response.dto'
 import { IsPublic } from '../../../../shared/Decorators/is-public.decorator'
 import { AuthenticationService } from '../Service/authentication.service'
 
 @Controller('cms/authentication')
+@ApiTags('Authentication APIs')
 export class AuthenticationController {
     constructor(
         private readonly authenticationService: AuthenticationService,

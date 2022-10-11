@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common'
 import { UsersController } from './Controller/users.controller'
-import { UserAuthenticationMethodsRepository } from './Repositories/user-authentication-methods.repository'
-import { UsersRepository } from './Repositories/users.repository'
-import { ActionsRepository } from './Repositories/actions.repository'
-import { RolesRepository } from './Repositories/roles.repository'
-import { SubjectsRepository } from './Repositories/subjects.repository'
+import { UserAuthenticationMethodsRepository } from './Repository/user-authentication-methods.repository'
+import { UsersRepository } from './Repository/users.repository'
+import { ActionsRepository } from './Repository/actions.repository'
+import { RolesRepository } from './Repository/roles.repository'
+import { SubjectsRepository } from './Repository/subjects.repository'
 import { MongooseModule } from '@nestjs/mongoose'
 import { User, UserSchema } from '../../../shared/Schemas/user.schema'
 import {
@@ -17,6 +17,9 @@ import { RolesService } from './Service/roles.service'
 import { Role, RoleSchema } from '../../../shared/Schemas/role.schema'
 import { UsersService } from './Service/users.service'
 import { PermissionsService } from './Service/permissions.service'
+import { UserRolesService } from './Service/user-roles.service'
+import { RolesController } from './Controller/roles.controller'
+import { UserRolesController } from './Controller/user-roles.controller'
 
 @Module({
     imports: [
@@ -44,7 +47,7 @@ import { PermissionsService } from './Service/permissions.service'
             },
         ]),
     ],
-    controllers: [UsersController],
+    controllers: [UsersController, RolesController, UserRolesController],
     providers: [
         UserAuthenticationMethodsRepository,
         UsersRepository,
@@ -53,6 +56,7 @@ import { PermissionsService } from './Service/permissions.service'
         SubjectsRepository,
         RolesService,
         UsersService,
+        UserRolesService,
         PermissionsService,
     ],
     exports: [
@@ -62,6 +66,7 @@ import { PermissionsService } from './Service/permissions.service'
         ActionsRepository,
         SubjectsRepository,
         RolesService,
+        UserRolesService,
         PermissionsService,
     ],
 })

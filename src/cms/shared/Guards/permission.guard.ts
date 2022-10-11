@@ -1,8 +1,8 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import _ from 'lodash'
-import { ActionsRepository } from '../../Modules/Users/Repositories/actions.repository'
-import { SubjectsRepository } from '../../Modules/Users/Repositories/subjects.repository'
+import { ActionsRepository } from '../../Modules/Users/Repository/actions.repository'
+import { SubjectsRepository } from '../../Modules/Users/Repository/subjects.repository'
 import { UserData } from '../../../shared/Types/types'
 import { PermissionsService } from '../../Modules/Users/Service/permissions.service'
 
