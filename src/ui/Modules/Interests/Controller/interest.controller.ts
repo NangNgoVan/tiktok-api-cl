@@ -6,13 +6,13 @@ import {
     ApiTags,
 } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
-import { InterestsService } from '../Service/interests.service'
+import { InterestService } from '../Service/interest.service'
 import { GetInterestResponseDto } from '../ResponseDTO/get-interest-response.dto'
 
 @ApiTags('Interests APIs')
 @Controller('ui/configurations')
-export class InterestsController {
-    constructor(private readonly interestsService: InterestsService) {}
+export class InterestController {
+    constructor(private readonly interestsService: InterestService) {}
 
     @Get('/interests/all')
     @ApiBearerAuth()
@@ -23,7 +23,7 @@ export class InterestsController {
         type: GetInterestResponseDto,
         isArray: true,
     })
-    async getAll(): Promise<any> {
+    async getAll(): Promise<GetInterestResponseDto[]> {
         return this.interestsService.getAll()
     }
 }

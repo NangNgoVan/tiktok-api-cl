@@ -124,19 +124,11 @@ export class User {
     @ApiProperty()
     should_show_account_setup_flow: boolean
 
-    //interest
     @Prop({
         default: [],
     })
     @ApiProperty()
     roles: string[]
-
-    //interest
-    @Prop({
-        default: [],
-    })
-    @ApiProperty()
-    interests: [string]
 
     @Prop({
         default: null,

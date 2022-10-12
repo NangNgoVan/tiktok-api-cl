@@ -3,16 +3,14 @@ import { InjectModel } from '@nestjs/mongoose'
 import { User, UserDocument } from 'src/shared/Schemas/user.schema'
 import { Model } from 'mongoose'
 import { CreateUserDto } from '../RequestDTO/create-user.dto'
-import { UpdateUserDto } from '../RequestDTO/update-user.dto'
+import { UpdateUserRequestDto } from '../RequestDTO/update-user-request.dto'
 import { UserNotFoundException } from 'src/shared/Exceptions/http.exceptions'
 import _ from 'lodash'
-import { UserFollowsService } from 'src/ui/Modules/Follows/Service/user-follows.service'
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectModel(User.name) private userModel: Model<UserDocument>,
-        private readonly userFollowsService: UserFollowsService,
     ) {}
 
     async create(createUserDto: CreateUserDto) {
@@ -21,22 +19,17 @@ export class UsersService {
         return createdUser.save()
     }
 
-    async findById(id: string): Promise<UserDocument> {
-        try {
-            const foundedUser = await this.userModel.findById(id)
-            return foundedUser
-        } catch {
-            return null
-        }
+    async getById(id: string): Promise<UserDocument> {
+        return this.userModel.findById(id)
     }
 
-    async updateUser(id: string, dto: UpdateUserDto) {
+    async update(id: string, updateUserRequestDto: UpdateUserRequestDto) {
         const user = await this.userModel.findById(id)
 
         if (!user) throw new UserNotFoundException()
 
         const validUpdatedFields = _.omitBy(
-            dto,
+            updateUserRequestDto,
             (value) => _.isUndefined(value) || value === '',
         )
 
@@ -64,11 +57,11 @@ export class UsersService {
             }
         }
 
-        return user.update(validUpdatedFields)
+        await user.update(validUpdatedFields)
     }
 
-    async updateAvatar(id: string, avatar: string) {
-        const user = await this.userModel.findById(id)
+    async updateAvatar(userId: string, avatar: string) {
+        const user = await this.userModel.findById(userId)
         if (!user) throw new UserNotFoundException()
 
         // FIXME: should delete old avatar before save new avatar

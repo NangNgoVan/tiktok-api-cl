@@ -6,10 +6,11 @@ import {
     IsEnum,
     IsOptional,
     IsString,
+    MaxLength,
 } from 'class-validator'
 import { UserGenderType } from 'src/shared/Types/types'
 
-export class UpdateUserDto {
+export class UpdateUserRequestDto {
     @IsEnum(UserGenderType)
     @IsOptional()
     @ApiProperty({
@@ -18,9 +19,9 @@ export class UpdateUserDto {
     gender?: UserGenderType
 
     @IsString()
+    @MaxLength(100)
     @IsOptional()
     @ApiProperty({
-        example: 'updated@demo.com',
         required: false,
     })
     @IsEmail()
@@ -34,6 +35,7 @@ export class UpdateUserDto {
     birth_day?: string
 
     @IsString()
+    @MaxLength(30)
     @IsOptional()
     @ApiProperty({
         required: false,
@@ -41,6 +43,7 @@ export class UpdateUserDto {
     full_name?: string
 
     @IsString()
+    @MaxLength(30)
     @IsOptional()
     @ApiProperty({
         required: false,
@@ -48,6 +51,7 @@ export class UpdateUserDto {
     nick_name?: string
 
     @IsString()
+    @MaxLength(30)
     @IsOptional()
     @ApiProperty({
         required: false,
@@ -55,6 +59,7 @@ export class UpdateUserDto {
     bio?: string
 
     @IsString()
+    @MaxLength(50)
     @IsOptional()
     @ApiProperty({
         required: false,
@@ -62,6 +67,7 @@ export class UpdateUserDto {
     facebook?: string
 
     @IsString()
+    @MaxLength(50)
     @IsOptional()
     @ApiProperty({
         required: false,
@@ -69,6 +75,7 @@ export class UpdateUserDto {
     twitter?: string
 
     @IsString()
+    @MaxLength(50)
     @IsOptional()
     @ApiProperty({
         required: false,
@@ -76,6 +83,7 @@ export class UpdateUserDto {
     instagram?: string
 
     @IsString()
+    @MaxLength(50)
     @IsOptional()
     @ApiProperty({
         required: false,
@@ -95,13 +103,6 @@ export class UpdateUserDto {
         required: false,
     })
     should_show_tour_guild?: boolean
-
-    @IsArray()
-    @IsOptional()
-    @ApiProperty({
-        required: false,
-    })
-    interests?: [string]
 
     @IsBoolean()
     @IsOptional()

@@ -129,7 +129,7 @@ export class UserAuthenticationMethodsController {
                 user_id: userId,
             })
 
-        await this.userService.updateUser(userId, {
+        await this.userService.update(userId, {
             is_trial_user: false,
         })
 
@@ -202,7 +202,7 @@ export class UserAuthenticationMethodsController {
                 user_id: userId,
             })
 
-        await this.userService.updateUser(userId, {
+        await this.userService.update(userId, {
             is_trial_user: false,
         })
 

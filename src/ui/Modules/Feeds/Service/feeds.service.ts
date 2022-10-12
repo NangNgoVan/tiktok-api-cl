@@ -244,7 +244,7 @@ export class FeedsService {
             const feedDetailDto = new FeedDetailDto()
 
             const createdUser: UserDocument | undefined =
-                await this.userService.findById(feed.created_by)
+                await this.userService.getById(feed.created_by)
 
             const avatarObjectKey = _.get(createdUser, 'avatar')
 

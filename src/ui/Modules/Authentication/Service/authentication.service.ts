@@ -95,7 +95,7 @@ export class AuthenticationService {
                 },
             )
         } else {
-            user = await this.userService.findById(
+            user = await this.userService.getById(
                 userAuthenticationMethod.user_id,
             )
         }
@@ -152,7 +152,7 @@ export class AuthenticationService {
             throw new NotFoundException(`Username ${dto.username} not found`)
         }
 
-        const user = await this.userService.findById(
+        const user = await this.userService.getById(
             userAuthenticationMethod.user_id,
         )
 

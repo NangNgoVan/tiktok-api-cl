@@ -64,10 +64,6 @@ export class GetUserResponseDto {
     @ApiProperty()
     roles: string[]
 
-    @IsArray()
-    @ApiProperty()
-    interests: string[]
-
     @ApiProperty()
     @IsString()
     blocked_at?: string

@@ -112,7 +112,7 @@ export class FeedsController {
         files: { resources?: Express.Multer.File[] },
     ) {
         const { userId } = req.user
-        const user = await this.userService.findById(userId)
+        const user = await this.userService.getById(userId)
         if (!user) throw new UserNotFoundException()
 
         let dto = formData['data'] as CreateFeedImageDto
@@ -225,7 +225,7 @@ export class FeedsController {
         files: { video: Express.Multer.File; thumbnail: Express.Multer.File },
     ) {
         const { userId } = req.user
-        const user = await this.userService.findById(userId)
+        const user = await this.userService.getById(userId)
         if (!user) throw new UserNotFoundException()
 
         dto.hashtags = this.utilsService.splitHashtagFromString(dto.content)

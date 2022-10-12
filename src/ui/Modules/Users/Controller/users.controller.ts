@@ -29,7 +29,7 @@ import { UserNotFoundException } from 'src/shared/Exceptions/http.exceptions'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
 import { HttpStatusResult } from 'src/shared/Types/types'
 import { GetUserResponseDto } from '../ResponseDTO/get-user-response.dto'
-import { UpdateUserDto } from '../RequestDTO/update-user.dto'
+import { UpdateUserRequestDto } from '../RequestDTO/update-user-request.dto'
 import { UsersService } from '../Service/users.service'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { S3Service } from 'src/shared/Services/s3.service'
@@ -60,7 +60,7 @@ export class UsersController {
     async getCurrentUser(@Req() req): Promise<GetUserResponseDto> {
         const { userId } = req.user
 
-        const user = await this.userService.findById(userId)
+        const user = await this.userService.getById(userId)
 
         const avatar: string = await this.s3Service.getSignedUrl(
             user.avatar,
@@ -71,7 +71,6 @@ export class UsersController {
         return { ...user.toObject(), avatar }
     }
 
-    //Update current user
     @UseGuards(JwtAuthGuard)
     @Patch('/current')
     @ApiBearerAuth()
@@ -80,12 +79,11 @@ export class UsersController {
     @ApiNotFoundResponse()
     async updateCurrentUser(
         @Req() req,
-        @Body() dto: UpdateUserDto,
+        @Body() dto: UpdateUserRequestDto,
     ): Promise<HttpStatusResult> {
         const { userId } = req.user
-        const updatedUser = await this.userService.updateUser(userId, dto)
 
-        if (!updatedUser) throw new BadRequestException()
+        await this.userService.update(userId, dto)
 
         return {
             statusCode: 200,
@@ -93,7 +91,6 @@ export class UsersController {
         }
     }
 
-    //Get user by Id
     @Get('/:userId')
     @UseGuards(AnonymousGuard)
     @ApiBearerAuth()
@@ -108,7 +105,7 @@ export class UsersController {
     ): Promise<GetUserResponseDto> {
         const id = _.get(params, 'userId')
         const userId = _.get(req.user, 'userId')
-        const user = await this.userService.findById(id)
+        const user = await this.userService.getById(id)
         if (!user) throw new UserNotFoundException()
 
         const avatar: string = await this.s3Service.getSignedUrl(
@@ -183,7 +180,7 @@ export class UsersController {
 
         const { userId } = req.user
 
-        const user = await this.userService.findById(userId)
+        const user = await this.userService.getById(userId)
 
         if (!user) throw new UserNotFoundException()
 

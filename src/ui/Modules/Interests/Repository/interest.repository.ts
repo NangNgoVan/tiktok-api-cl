@@ -6,7 +6,7 @@ import { Cacheable } from '@type-cacheable/core'
 import _ from 'lodash'
 
 @Injectable()
-export class InterestsRepository {
+export class InterestRepository {
     constructor(
         @InjectModel(Interest.name)
         private interestModel: Model<InterestDocument>,
