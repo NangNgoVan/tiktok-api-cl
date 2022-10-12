@@ -11,6 +11,7 @@ import { UserInterestService } from './Service/user-interest.service'
 import { InterestRepository } from './Repository/interest.repository'
 import { UserInterestRepository } from './Repository/user-interest.repository'
 import { UserInterestController } from './Controller/user-interest.controller'
+import { UserInterestTransformer } from './Transformer/user-interest.transformer'
 
 @Module({
     imports: [
@@ -21,16 +22,18 @@ import { UserInterestController } from './Controller/user-interest.controller'
     ],
     controllers: [InterestController, UserInterestController],
     providers: [
+        UserInterestTransformer,
         InterestRepository,
         UserInterestRepository,
         InterestService,
         UserInterestService,
     ],
     exports: [
-        InterestService,
-        UserInterestService,
         InterestRepository,
         UserInterestRepository,
+        UserInterestTransformer,
+        InterestService,
+        UserInterestService,
     ],
 })
 export class InterestsModule {}
