@@ -10,6 +10,7 @@ import {
 import { UserInterestService } from './Service/user-interest.service'
 import { InterestRepository } from './Repository/interest.repository'
 import { UserInterestRepository } from './Repository/user-interest.repository'
+import { UserInterestController } from './Controller/user-interest.controller'
 
 @Module({
     imports: [
@@ -18,7 +19,7 @@ import { UserInterestRepository } from './Repository/user-interest.repository'
             { name: UserInterest.name, schema: UserInterestSchema },
         ]),
     ],
-    controllers: [InterestController],
+    controllers: [InterestController, UserInterestController],
     providers: [
         InterestRepository,
         UserInterestRepository,

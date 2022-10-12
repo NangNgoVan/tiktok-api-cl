@@ -14,7 +14,7 @@ import { CreateOrUpdateUserInterestRequestDto } from '../ResponseDTO/create-or-u
 
 @ApiTags('User Interests APIs')
 @Controller('users')
-export class InterestsController {
+export class UserInterestController {
     constructor(private readonly userInterestService: UserInterestService) {}
 
     @Post('/current/interests')
