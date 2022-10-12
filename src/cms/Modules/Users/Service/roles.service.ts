@@ -5,6 +5,7 @@ import _ from 'lodash'
 import { PermissionsService } from './permissions.service'
 import { GetRoleResponseDto } from '../ResponseDTO/get-role-response.dto'
 import { CreateOrUpdateRoleRequestDto } from '../RequestDTO/create-or-update-role-request.dto'
+import { Cacheable } from '@type-cacheable/core'
 
 @Injectable()
 export class RolesService {
@@ -16,8 +17,9 @@ export class RolesService {
     ) {}
 
     async getAllRoles(): Promise<GetRoleResponseDto[]> {
-        // FIXME: should reconcile for sometime
-        await this.reconcilePermissionsForAllRoles()
+        await this.reconcilePermissionsForAllRoles({
+            disableCache: false,
+        })
 
         const roles: RoleDocument[] = await this.roleRepository.getAllRoles()
 
@@ -86,7 +88,19 @@ export class RolesService {
         )
     }
 
-    async reconcilePermissionsForAllRoles(): Promise<void> {
+    @Cacheable({
+        cacheKey: 'ui:roles:permission-reconciliation',
+        noop: (args: any[]) => _.get(args, '0.disableCache', true),
+        ttlSeconds: (args: any[]) =>
+            _.get(args, '0.cacheForSeconds', 10 * 60 * 60),
+    })
+    async reconcilePermissionsForAllRoles(
+        // eslint-disable-next-line
+        cacheOptions?: {
+            disableCache?: boolean
+            cacheForSeconds?: number
+        },
+    ): Promise<void> {
         const roleDocuments: RoleDocument[] =
             await this.roleRepository.getAllRoles()
 

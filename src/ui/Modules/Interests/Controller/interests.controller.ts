@@ -6,8 +6,8 @@ import {
     ApiTags,
 } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
-import { Interest } from 'src/shared/Schemas/interest.schema'
 import { InterestsService } from '../Service/interests.service'
+import { GetInterestResponseDto } from '../ResponseDTO/get-interest-response.dto'
 
 @ApiTags('Interests APIs')
 @Controller('ui/configurations')
@@ -20,13 +20,10 @@ export class InterestsController {
     @ApiOperation({ summary: 'Get all interests by alias `all`' })
     @ApiOkResponse({
         description: 'List of Interests',
-        type: [Interest],
+        type: GetInterestResponseDto,
+        isArray: true,
     })
-    async getAllInterests(): Promise<any> {
-        const interests = await this.interestsService.getAllInterests()
-        const dataResponse = {
-            interests: interests,
-        }
-        return dataResponse
+    async getAll(): Promise<any> {
+        return this.interestsService.getAll()
     }
 }
