@@ -13,7 +13,7 @@ import { CreateOrUpdateUserInterestResponseDto } from '../ResponseDTO/create-or-
 import { CreateOrUpdateUserInterestRequestDto } from '../ResponseDTO/create-or-update-user-interest-request.dto'
 
 @ApiTags('Interests APIs')
-@Controller('users')
+@Controller('ui/users')
 export class UserInterestController {
     constructor(private readonly userInterestService: UserInterestService) {}
 
