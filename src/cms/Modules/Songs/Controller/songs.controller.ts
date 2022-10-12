@@ -114,8 +114,7 @@ export class SongsController {
         @Body() dto: CreateSongDto,
         @CurrentUser() user: UserData,
     ): Promise<GetSongResponseDto> {
-        const userId = '6331cec1f38b051f0d4220d6'
-        const createdSong = await this.songsService.createSong(userId, dto)
+        const createdSong = await this.songsService.createSong(user.userId, dto)
         if (!createdSong) throw new DatabaseUpdateFailException()
 
         const [uploadedAudio, uploadedThumbnail] = await Promise.all([
@@ -168,7 +167,7 @@ export class SongsController {
         @Param('id') id: string,
         @UploadedFiles()
         files: { audio?: Express.Multer.File; thumbnail?: Express.Multer.File },
-        @Body() dto: CreateSongDto,
+        @Body() dto: Partial<CreateSongDto>,
         @CurrentUser() user: UserData,
     ) {
         const song = this.songsService.findById(id)
