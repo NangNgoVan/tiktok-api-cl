@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Put, UseGuards } from '@nestjs/common'
 import {
     ApiBearerAuth,
     ApiOkResponse,
@@ -12,12 +12,12 @@ import { UserInterestService } from '../Service/user-interest.service'
 import { CreateOrUpdateUserInterestResponseDto } from '../ResponseDTO/create-or-update-user-interest-response.dto'
 import { CreateOrUpdateUserInterestRequestDto } from '../ResponseDTO/create-or-update-user-interest-request.dto'
 
-@ApiTags('User Interests APIs')
+@ApiTags('Interests APIs')
 @Controller('users')
 export class UserInterestController {
     constructor(private readonly userInterestService: UserInterestService) {}
 
-    @Post('/current/interests')
+    @Put('/current/interests')
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @ApiOperation({
