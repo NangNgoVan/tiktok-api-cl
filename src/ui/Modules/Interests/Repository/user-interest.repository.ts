@@ -12,7 +12,7 @@ export class UserInterestRepository {
     constructor(
         @InjectModel(UserInterest.name)
         private userInterestModel: Model<UserInterestDocument>,
-    ) {}
+    ) { }
 
     async create(userId: string, interestIds: string[]) {
         const docs = _.map(interestIds, (interestId: string) => {

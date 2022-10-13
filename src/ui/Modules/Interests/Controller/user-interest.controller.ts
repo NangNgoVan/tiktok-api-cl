@@ -1,4 +1,4 @@
-import { Body, Controller, Put, UseGuards } from '@nestjs/common'
+import { Body, Controller, Put, Get, UseGuards } from '@nestjs/common'
 import {
     ApiBearerAuth,
     ApiOkResponse,
@@ -10,12 +10,13 @@ import { CurrentUser } from '../../../../shared/Decorators/current-user.decorato
 import { UserData } from '../../../../shared/Types/types'
 import { UserInterestService } from '../Service/user-interest.service'
 import { CreateOrUpdateUserInterestResponseDto } from '../ResponseDTO/create-or-update-user-interest-response.dto'
-import { CreateOrUpdateUserInterestRequestDto } from '../ResponseDTO/create-or-update-user-interest-request.dto'
+import { CreateOrUpdateUserInterestRequestDto } from '../RequestDTO/create-or-update-user-interest-request.dto'
+import { GetUserInterestResponseDto } from '../ResponseDTO/get-user-interest-response.dto'
 
 @ApiTags('Interests APIs')
 @Controller('ui/users')
 export class UserInterestController {
-    constructor(private readonly userInterestService: UserInterestService) {}
+    constructor(private readonly userInterestService: UserInterestService) { }
 
     @Put('/current/interests')
     @ApiBearerAuth()
@@ -32,6 +33,40 @@ export class UserInterestController {
         return this.userInterestService.createOrUpdate(
             currentUser.userId,
             createOrUpdateUserInterestResponseDto.interest_ids,
+        )
+    }
+
+    @Get('/current/interests')
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({
+        summary: "Get current user's interests",
+    })
+    @ApiOkResponse({
+        type: GetUserInterestResponseDto
+    })
+    async getCurrentUserInterests(
+        @CurrentUser() currentUser: UserData,
+    ): Promise<GetUserInterestResponseDto[]> {
+        return this.userInterestService.getByUserId(
+            currentUser.userId,
+        )
+    }
+
+    @Get('/:userId/interests')
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @ApiOperation({
+        summary: "Get user's interests",
+    })
+    @ApiOkResponse({
+        type: GetUserInterestResponseDto
+    })
+    async getUserInterests(
+        @CurrentUser() currentUser: UserData,
+    ): Promise<GetUserInterestResponseDto[]> {
+        return this.userInterestService.getByUserId(
+            currentUser.userId,
         )
     }
 }
