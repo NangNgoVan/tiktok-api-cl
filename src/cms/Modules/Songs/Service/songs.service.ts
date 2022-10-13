@@ -5,16 +5,17 @@ import {
 } from '@nestjs/common'
 import moment from 'moment'
 import { SongsRepository } from '../Repositories/songs.repository'
-import { CreateSongDto } from '../RequestDTO/create-song.dto'
-import { GetSongResponseDto } from '../ResponseDTO/get-song.dto'
+import { CreateSongRequestDto } from '../RequestDTO/create-song-request.dto'
+import { GetSongResponseDto } from '../ResponseDTO/get-song-request.dto'
 import _ from 'lodash'
-import { UpdateSongDto } from '../RequestDTO/update-song.dto'
+import { UpdateSongRequestDto } from '../RequestDTO/update-song-request.dto'
 import { fromBuffer } from 'file-type'
 import { UtilsService } from 'src/shared/Services/utils.service'
 import { S3Service } from 'src/shared/Services/s3.service'
 import { v4 as uuidv4 } from 'uuid'
-import { SongDocument } from 'src/shared/Schemas/song.schema'
 import { PaginateDataByPageResponseDto } from 'src/shared/ResponseDTO/paginate-data-by-page.dto'
+import { SongModelTransformService } from '../Transformer/song-model.transform'
+import { configService } from 'src/shared/Services/config.service'
 
 @Injectable()
 export class SongsService {
@@ -22,23 +23,8 @@ export class SongsService {
         private readonly songsRepository: SongsRepository,
         private readonly utilsService: UtilsService,
         private readonly s3Service: S3Service,
+        private readonly songModelTransformService: SongModelTransformService,
     ) {}
-
-    private convertToDtoFromModel(model: SongDocument): GetSongResponseDto {
-        return {
-            id: model.id,
-            name: model.name,
-            thumbnail: model.thumbnail,
-            number_of_bookmark: model.number_of_bookmark,
-            duration_in_second: model.duration_in_second,
-            artist: model.artist,
-            path: model.path,
-            deleted_at: model.deleted_at,
-            created_by: model.created_by,
-            display_order: model.display_order,
-            number_of_use: model.number_of_use,
-        }
-    }
 
     async findById(id: string): Promise<GetSongResponseDto> {
         const songDocument = await this.songsRepository.findById(id)
@@ -47,16 +33,26 @@ export class SongsService {
             throw new NotFoundException(`Song ${id} not found`)
         }
 
-        return this.convertToDtoFromModel(songDocument)
+        return await this.songModelTransformService.transformSongModelToGetSongResponseDto(
+            songDocument,
+        )
     }
 
-    async getAllSongs(
+    async getPaginatedSongs(
         page = 1,
         perPage = 2,
     ): Promise<PaginateDataByPageResponseDto<GetSongResponseDto>> {
-        console.log(page, perPage)
-        const data = (await this.songsRepository.getPage(page, perPage)).map(
-            (song) => this.convertToDtoFromModel(song),
+        const paginatedSong = await this.songsRepository.getPaginatedSongs(
+            page,
+            perPage,
+        )
+        const data = await Promise.all(
+            paginatedSong.map(
+                async (song) =>
+                    await this.songModelTransformService.transformSongModelToGetSongResponseDto(
+                        song,
+                    ),
+            ),
         )
         const total = Math.ceil(
             (await this.songsRepository.getCount()) / perPage,
@@ -69,17 +65,19 @@ export class SongsService {
 
     async createSong(
         createdBy: string,
-        dto: CreateSongDto,
+        dto: CreateSongRequestDto,
     ): Promise<GetSongResponseDto> {
         const createdSong = await this.songsRepository.create(createdBy, dto)
 
         if (!createdSong) return null
-        return this.convertToDtoFromModel(createdSong)
+        return await this.songModelTransformService.transformSongModelToGetSongResponseDto(
+            createdSong,
+        )
     }
 
     async updateSong(
         id: string,
-        dto: UpdateSongDto,
+        dto: UpdateSongRequestDto,
     ): Promise<GetSongResponseDto> {
         const songDocument = await this.songsRepository.findById(id)
 
@@ -90,7 +88,19 @@ export class SongsService {
 
         await songDocument.updateOne(fields)
 
-        return this.convertToDtoFromModel(songDocument)
+        this.s3Service.deleteFileFromS3Bucket(
+            configService.getEnv('AWS_BUCKET_NAME'),
+            songDocument.thumbnail,
+        )
+
+        this.s3Service.deleteFileFromS3Bucket(
+            configService.getEnv('AWS_BUCKET_NAME'),
+            songDocument.path,
+        )
+
+        return await this.songModelTransformService.transformSongModelToGetSongResponseDto(
+            songDocument,
+        )
     }
 
     async softDeleteSong(id: string) {

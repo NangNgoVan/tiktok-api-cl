@@ -13,6 +13,7 @@ import { PermissionsService } from '../Users/Service/permissions.service'
 import { SongsController } from './Controller/songs.controller'
 import { SongsRepository } from './Repositories/songs.repository'
 import { SongsService } from './Service/songs.service'
+import { SongModelTransformService } from './Transformer/song-model.transform'
 
 @Module({
     imports: [
@@ -40,6 +41,7 @@ import { SongsService } from './Service/songs.service'
         PermissionsService,
         S3Service,
         UtilsService,
+        SongModelTransformService,
     ],
     exports: [SongsService, SongsRepository],
 })

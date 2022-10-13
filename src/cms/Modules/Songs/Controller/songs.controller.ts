@@ -15,10 +15,7 @@ import {
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common'
-import {
-    FileFieldsInterceptor,
-    FileInterceptor,
-} from '@nestjs/platform-express'
+import { FileFieldsInterceptor } from '@nestjs/platform-express'
 import {
     ApiBody,
     ApiConsumes,
@@ -27,17 +24,15 @@ import {
     ApiQuery,
     ApiTags,
 } from '@nestjs/swagger'
-import { fromBuffer } from 'file-type'
-import moment from 'moment'
 import { RequirePermissions } from 'src/cms/shared/Decorators/permission.decorator'
 import { PermissionGuard } from 'src/cms/shared/Guards/permission.guard'
 import { DatabaseUpdateFailException } from 'src/shared/Exceptions/http.exceptions'
 import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
-import { CreateSongDto } from '../RequestDTO/create-song.dto'
-import { GetSongResponseDto } from '../ResponseDTO/get-song.dto'
+import { CreateSongRequestDto } from '../RequestDTO/create-song-request.dto'
+import { GetSongResponseDto } from '../ResponseDTO/get-song-request.dto'
 import { SongsService } from '../Service/songs.service'
 
-import { UpdateSongDto } from '../RequestDTO/update-song.dto'
+import { UpdateSongRequestDto } from '../RequestDTO/update-song-request.dto'
 
 import getMp3Duration from 'get-mp3-duration'
 import { CurrentUser } from 'src/shared/Decorators/current-user.decorator'
@@ -58,7 +53,7 @@ export class SongsController {
         summary: 'Get all songs',
     })
     async getSongs(@Query('page') page?: number) {
-        return this.songsService.getAllSongs(page)
+        return this.songsService.getPaginatedSongs(page)
     }
 
     @Get(':id')
@@ -111,7 +106,7 @@ export class SongsController {
     async createSong(
         @UploadedFiles()
         files: { audio: Express.Multer.File; thumbnail: Express.Multer.File },
-        @Body() dto: CreateSongDto,
+        @Body() dto: CreateSongRequestDto,
         @CurrentUser() user: UserData,
     ): Promise<GetSongResponseDto> {
         const createdSong = await this.songsService.createSong(user.userId, dto)
@@ -167,7 +162,7 @@ export class SongsController {
         @Param('id') id: string,
         @UploadedFiles()
         files: { audio?: Express.Multer.File; thumbnail?: Express.Multer.File },
-        @Body() dto: Partial<CreateSongDto>,
+        @Body() dto: Partial<CreateSongRequestDto>,
         @CurrentUser() user: UserData,
     ) {
         const song = this.songsService.findById(id)
@@ -175,7 +170,7 @@ export class SongsController {
             throw new BadRequestException(`Song not found!`)
         }
 
-        const updateSongDto = dto as UpdateSongDto
+        const updateSongDto = dto as UpdateSongRequestDto
 
         if (files) {
             if (files.audio) {

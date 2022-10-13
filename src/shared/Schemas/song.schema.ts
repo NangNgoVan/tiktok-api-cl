@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
+import paginateV2 from 'mongoose-paginate-v2'
 
 export type SongDocument = Song & Document
 
@@ -53,3 +54,4 @@ export class Song {
 }
 
 export const SongSchema = SchemaFactory.createForClass(Song)
+SongSchema.plugin(paginateV2)

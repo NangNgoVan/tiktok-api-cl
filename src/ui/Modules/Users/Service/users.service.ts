@@ -7,12 +7,18 @@ import { UpdateUserDto } from '../RequestDTO/update-user.dto'
 import { UserNotFoundException } from 'src/shared/Exceptions/http.exceptions'
 import _ from 'lodash'
 import { UserFollowsService } from 'src/ui/Modules/Follows/Service/user-follows.service'
+import { configService } from 'src/shared/Services/config.service'
+import { S3Service } from 'src/shared/Services/s3.service'
+import { fromBuffer } from 'file-type'
+import { v4 as uuidv4 } from 'uuid'
+import moment from 'moment'
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectModel(User.name) private userModel: Model<UserDocument>,
         private readonly userFollowsService: UserFollowsService,
+        private readonly s3Service: S3Service,
     ) {}
 
     async create(createUserDto: CreateUserDto) {
@@ -67,15 +73,47 @@ export class UsersService {
         return user.update(validUpdatedFields)
     }
 
-    async updateAvatar(id: string, avatar: string) {
+    async updateAvatar(id: string, avatar: Express.Multer.File) {
         const user = await this.userModel.findById(id)
         if (!user) throw new UserNotFoundException()
 
-        // FIXME: should delete old avatar before save new avatar
-        user.avatar = avatar
+        const { buffer, size } = avatar
 
+        const { ext, mime: mimetype } = await fromBuffer(buffer)
+
+        if (!['image/jpeg', 'image/jpg', 'image/png'].includes(mimetype)) {
+            throw new BadRequestException(
+                `mime type ${mimetype} is not supported`,
+            )
+        }
+
+        this.s3Service.deleteFileFromS3Bucket(
+            configService.getEnv('AWS_BUCKET_NAME'),
+            user.avatar,
+        )
+
+        const avatarObjectKey = `avatars/${moment().format(
+            'yyyy-MM-DD',
+        )}/${id}/${uuidv4()}.${ext}`
+
+        const { Key } = await this.s3Service.uploadFileToS3Bucket(
+            avatarObjectKey,
+            mimetype,
+            buffer,
+        )
+
+        const url = await this.s3Service.getSignedUrl(
+            Key,
+            configService.getEnv('AWS_BUCKET_NAME'),
+            false,
+        )
+
+        user.avatar = Key
         await user.save()
 
-        return user.avatar
+        return {
+            url: url,
+            size: size,
+        }
     }
 }

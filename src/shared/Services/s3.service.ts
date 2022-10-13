@@ -95,4 +95,19 @@ export class S3Service {
 
         return _.mapValues(_.keyBy(ret, 'objectKey'), 'signedUrl')
     }
+
+    async deleteFileFromS3Bucket(bucket: string, key: string) {
+        const deleteParams = {
+            Bucket: bucket,
+            Key: key,
+        }
+        try {
+            const deletedData = await this.s3()
+                .deleteObject(deleteParams)
+                .promise()
+        } catch (e) {
+            this.logger.log({ e })
+            //return null
+        }
+    }
 }

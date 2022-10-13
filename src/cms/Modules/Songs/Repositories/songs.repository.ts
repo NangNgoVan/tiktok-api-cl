@@ -1,9 +1,7 @@
 import { InjectModel } from '@nestjs/mongoose'
-import { Model } from 'mongoose'
-import { PaginateDataByPageResponseDto } from 'src/shared/ResponseDTO/paginate-data-by-page.dto'
-import { Song, SongDocument } from 'src/shared/Schemas/song.schema'
-import { CreateSongDto } from '../RequestDTO/create-song.dto'
-import { GetSongResponseDto } from '../ResponseDTO/get-song.dto'
+import mongoose, { Model } from 'mongoose'
+import { Song, SongDocument, SongSchema } from 'src/shared/Schemas/song.schema'
+import { CreateSongRequestDto } from '../RequestDTO/create-song-request.dto'
 
 export class SongsRepository {
     constructor(
@@ -19,7 +17,18 @@ export class SongsRepository {
         return this.songModel.find({})
     }
 
-    async getPage(pageNumber: number, perPage: number) {
+    async getPaginatedSongs(pageNumber: number, perPage: number) {
+        // const paginateSongModel = mongoose
+        //     .model<SongDocument,
+        //         mongoose.PaginateModel<SongDocument>
+        //     >('Songs', SongSchema, 'Songs')
+        // await paginateSongModel.paginate({}, {
+        //     page: pageNumber,
+        //     limit: perPage
+        // }, (err, result) => {
+        //     console.log(result)
+        // })
+
         return this.songModel
             .find({})
             .skip(pageNumber > 0 ? (pageNumber - 1) * perPage : 0)
@@ -30,7 +39,10 @@ export class SongsRepository {
         return this.songModel.countDocuments()
     }
 
-    async create(createdBy: string, dto: CreateSongDto): Promise<SongDocument> {
+    async create(
+        createdBy: string,
+        dto: CreateSongRequestDto,
+    ): Promise<SongDocument> {
         const newSong = new this.songModel(dto)
         newSong.created_by = createdBy
         return await newSong.save()

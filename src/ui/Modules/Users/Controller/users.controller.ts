@@ -14,7 +14,6 @@ import {
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common'
-import { fromBuffer } from 'file-type'
 
 import {
     ApiBearerAuth,
@@ -33,9 +32,7 @@ import { UpdateUserDto } from '../RequestDTO/update-user.dto'
 import { UsersService } from '../Service/users.service'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { S3Service } from 'src/shared/Services/s3.service'
-import moment from 'moment'
 import { UserFollowsService } from 'src/ui/Modules/Follows/Service/user-follows.service'
-import { v4 as uuidv4 } from 'uuid'
 import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
 import _ from 'lodash'
 import { configService } from '../../../../shared/Services/config.service'
@@ -179,47 +176,7 @@ export class UsersController {
         file: Express.Multer.File,
         @Req() req,
     ): Promise<UploadMetaDataResponseDto> {
-        // FIXME: move this to service
-
         const { userId } = req.user
-
-        const user = await this.userService.findById(userId)
-
-        if (!user) throw new UserNotFoundException()
-
-        const { buffer, size } = file
-
-        const { ext, mime: mimetype } = await fromBuffer(buffer)
-
-        if (!['image/jpeg', 'image/jpg', 'image/png'].includes(mimetype)) {
-            throw new BadRequestException(
-                `mime type ${mimetype} is not supported`,
-            )
-        }
-
-        // FIXME: delete old avatar before update new one
-        const avatarObjectKey = `avatars/${moment().format(
-            'yyyy-MM-DD',
-        )}/${userId}/${uuidv4()}.${ext}`
-
-        const { Key } = await this.s3Service.uploadFileToS3Bucket(
-            avatarObjectKey,
-            mimetype,
-            buffer,
-        )
-
-        const [url] = await Promise.all([
-            this.s3Service.getSignedUrl(
-                Key,
-                configService.getEnv('AWS_BUCKET_NAME'),
-                false,
-            ),
-            this.userService.updateAvatar(userId, Key),
-        ])
-
-        return {
-            url,
-            size: size,
-        }
+        return await this.userService.updateAvatar(userId, file)
     }
 }
