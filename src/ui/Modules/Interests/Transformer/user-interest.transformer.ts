@@ -36,32 +36,39 @@ export class UserInterestTransformer {
 
     transformUserInterestDocumentToGetUserInterestRequestDto(
         userInterestDocument: Required<UserInterestDocument>,
-        interestDocumentHashMapOrArray: Record<string, InterestDocument> | InterestDocument[]
+        interestDocumentHashMapOrArray:
+            | Record<string, InterestDocument>
+            | InterestDocument[],
     ): GetUserInterestResponseDto {
-        const interestDocumentHashMap: Record<string, InterestDocument> = _.isArray(interestDocumentHashMapOrArray) ?
-            _.keyBy(interestDocumentHashMapOrArray, '_id')
-            : interestDocumentHashMapOrArray;
+        const interestDocumentHashMap: Record<string, InterestDocument> =
+            _.isArray(interestDocumentHashMapOrArray)
+                ? _.keyBy(interestDocumentHashMapOrArray, '_id')
+                : interestDocumentHashMapOrArray
 
-        const interestDocument: InterestDocument = _.get(interestDocumentHashMap, userInterestDocument.interest_id)
+        const interestDocument: InterestDocument = _.get(
+            interestDocumentHashMap,
+            userInterestDocument.interest_id,
+        )
 
         return {
             ..._.pick(userInterestDocument, ['_id', 'user_id', 'interest_id']),
-            interest_name: _.get(interestDocument, 'name')
+            interest_name: _.get(interestDocument, 'name'),
         }
     }
 
     transformUserInterestDocumentsToGetUserInterestRequestDtos(
         userInterestDocuments: UserInterestDocument[],
-        interestDocuments: InterestDocument[]
+        interestDocuments: InterestDocument[],
     ): GetUserInterestResponseDto[] {
-        const interestDocumentHashMap: Record<string, InterestDocument> = _.keyBy(interestDocuments, '_id')
+        const interestDocumentHashMap: Record<string, InterestDocument> =
+            _.keyBy(interestDocuments, '_id')
 
         return _.map(
             userInterestDocuments,
             (userInterestDocument: Required<UserInterestDocument>) => {
                 return this.transformUserInterestDocumentToGetUserInterestRequestDto(
                     userInterestDocument,
-                    interestDocumentHashMap
+                    interestDocumentHashMap,
                 )
             },
         )

@@ -15,7 +15,7 @@ export class UserInterestService {
         private readonly interestRepository: InterestRepository,
         private readonly interestService: InterestService,
         private readonly userInterestTransformer: UserInterestTransformer,
-    ) { }
+    ) {}
 
     async createOrUpdate(
         userId: string,
@@ -35,15 +35,15 @@ export class UserInterestService {
         )
     }
 
-    async getByUserId(
-        userId: string,
-    ): Promise<GetUserInterestResponseDto[]> {
-        const userInterestDocuments: UserInterestDocument[] = await this.userInterestRepository.getByUserId(userId)
-        const interestDocuments: InterestDocument[] = await this.interestRepository.getAll()
+    async getByUserId(userId: string): Promise<GetUserInterestResponseDto[]> {
+        const userInterestDocuments: UserInterestDocument[] =
+            await this.userInterestRepository.getByUserId(userId)
+        const interestDocuments: InterestDocument[] =
+            await this.interestRepository.getAll()
 
         return this.userInterestTransformer.transformUserInterestDocumentsToGetUserInterestRequestDtos(
             userInterestDocuments,
-            interestDocuments
+            interestDocuments,
         )
     }
 }

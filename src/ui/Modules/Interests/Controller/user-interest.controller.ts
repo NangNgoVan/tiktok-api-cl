@@ -13,10 +13,10 @@ import { CreateOrUpdateUserInterestResponseDto } from '../ResponseDTO/create-or-
 import { CreateOrUpdateUserInterestRequestDto } from '../RequestDTO/create-or-update-user-interest-request.dto'
 import { GetUserInterestResponseDto } from '../ResponseDTO/get-user-interest-response.dto'
 
-@ApiTags('Interests APIs')
+@ApiTags('User Interests APIs')
 @Controller('ui/users')
 export class UserInterestController {
-    constructor(private readonly userInterestService: UserInterestService) { }
+    constructor(private readonly userInterestService: UserInterestService) {}
 
     @Put('/current/interests')
     @ApiBearerAuth()
@@ -43,14 +43,12 @@ export class UserInterestController {
         summary: "Get current user's interests",
     })
     @ApiOkResponse({
-        type: GetUserInterestResponseDto
+        type: GetUserInterestResponseDto,
     })
     async getCurrentUserInterests(
         @CurrentUser() currentUser: UserData,
     ): Promise<GetUserInterestResponseDto[]> {
-        return this.userInterestService.getByUserId(
-            currentUser.userId,
-        )
+        return this.userInterestService.getByUserId(currentUser.userId)
     }
 
     @Get('/:userId/interests')
@@ -60,13 +58,11 @@ export class UserInterestController {
         summary: "Get user's interests",
     })
     @ApiOkResponse({
-        type: GetUserInterestResponseDto
+        type: GetUserInterestResponseDto,
     })
     async getUserInterests(
         @CurrentUser() currentUser: UserData,
     ): Promise<GetUserInterestResponseDto[]> {
-        return this.userInterestService.getByUserId(
-            currentUser.userId,
-        )
+        return this.userInterestService.getByUserId(currentUser.userId)
     }
 }
