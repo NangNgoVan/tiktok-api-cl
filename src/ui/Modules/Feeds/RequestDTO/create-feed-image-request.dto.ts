@@ -1,12 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
-import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator'
+import {
+    IsBoolean,
+    IsNumber,
+    IsOptional,
+    IsString,
+    MaxLength,
+} from 'class-validator'
+import _ from 'lodash'
 
-export class CreateFeedVideoDto {
+export class CreateFeedImageRequestDto {
     @IsString()
     @IsOptional()
-    @ApiProperty()
     @MaxLength(100)
+    @ApiProperty()
     content?: string
 
     // @IsString()
@@ -14,13 +21,16 @@ export class CreateFeedVideoDto {
     // @ApiProperty()
     // song_id?: string
 
-    // @IsArray()
-    // @ApiProperty()
     hashtags?: string[]
 
-    // @ApiProperty()
-    // @IsString()
     created_by?: string
+
+    @IsNumber()
+    @ApiProperty()
+    @Transform(({ value }) => {
+        return _.parseInt(value, 10)
+    })
+    primary_image_index: number
 
     @IsBoolean()
     @ApiProperty()

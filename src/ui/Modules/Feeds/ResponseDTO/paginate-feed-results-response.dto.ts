@@ -1,10 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { String } from 'aws-sdk/clients/acm'
-import { IsArray, IsBoolean, IsString } from 'class-validator'
-import { Feed } from 'src/shared/Schemas/feed.schema'
-import { FeedDetailDto } from 'src/ui/Modules/Feeds/Dto/feed-detail.dto'
+import { IsBoolean, IsString } from 'class-validator'
+import { FeedDetailResponseDto } from 'src/ui/Modules/Feeds/ResponseDTO/feed-detail-response.dto'
 
-export class PaginateFeedResultsDto {
+export class PaginateFeedResultsResponseDto {
     constructor() {
         this.results = []
         this.previous = ''
@@ -13,7 +11,7 @@ export class PaginateFeedResultsDto {
         this.next = ''
     }
     @ApiProperty({
-        type: [FeedDetailDto],
+        type: [FeedDetailResponseDto],
     })
     results
     @ApiProperty()

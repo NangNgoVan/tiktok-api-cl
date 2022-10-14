@@ -16,6 +16,7 @@ import { HashTagsModule } from '../Hashtags/hashtags.module'
 import { FollowsModule } from '../Follows/follows.module'
 import { ReactionsModule } from '../Reactions/reactions.module'
 import { BookmarksModule } from '../Bookmarks/bookmarks.module'
+import { FeedsRepository } from './Repository/feeds.repository'
 
 @Module({
     imports: [
@@ -30,7 +31,13 @@ import { BookmarksModule } from '../Bookmarks/bookmarks.module'
         BookmarksModule,
     ],
     controllers: [FeedsController],
-    providers: [FeedsService, FeedResourcesService, S3Service, UtilsService],
+    providers: [
+        FeedsService,
+        FeedResourcesService,
+        S3Service,
+        UtilsService,
+        FeedsRepository,
+    ],
     exports: [FeedsService],
 })
 export class FeedsModule {}

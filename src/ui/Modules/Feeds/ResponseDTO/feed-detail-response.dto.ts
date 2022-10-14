@@ -4,9 +4,9 @@ import { IsEnum, IsNumber, IsObject, IsString } from 'class-validator'
 import { FeedType } from 'src/shared/Types/types'
 import { GetFeedResourceDto } from 'src/ui/Modules/Resources/Dto/get-feed-resource.dto'
 import { CreatedUserDto } from '../../../../shared/ResponseDTO/created-user.dto'
-import { FeedCurrentUserDto } from './feed-current-user.dto'
+import { FeedCurrentUserResponseDto } from '../RequestDTO/feed-current-user-response.dto'
 
-export class FeedDetailDto {
+export class FeedDetailResponseDto {
     @ApiProperty()
     @IsString()
     id: string
@@ -76,7 +76,7 @@ export class FeedDetailDto {
     })
     @ApiProperty()
     @IsObject()
-    current_user: FeedCurrentUserDto
+    current_user: FeedCurrentUserResponseDto
 
     @ApiProperty()
     @IsObject()

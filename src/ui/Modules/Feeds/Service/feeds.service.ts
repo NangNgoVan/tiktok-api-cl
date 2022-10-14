@@ -1,15 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { InjectModel } from '@nestjs/mongoose'
-import { Feed, FeedDocument } from 'src/shared/Schemas/feed.schema'
 import { FeedType } from 'src/shared/Types/types'
-import { CreateFeedImageDto } from '../Dto/create-feed-image.dto'
-import { FeedDetailDto } from '../Dto/feed-detail.dto'
-import { MongoPaging } from 'mongo-cursor-pagination'
+import { CreateFeedImageRequestDto } from '../RequestDTO/create-feed-image-request.dto'
+import { FeedDetailResponseDto } from '../ResponseDTO/feed-detail-response.dto'
 import { FeedHashTagsService } from 'src/ui/Modules/Hashtags/Service/feed-hashtags.service'
 import { HashTagService } from 'src/ui/Modules/Hashtags/Service/hashtags.service'
 import { UsersService } from 'src/ui/Modules/Users/Service/users.service'
 import { UserFollowsService } from 'src/ui/Modules/Follows/Service/user-follows.service'
-import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
+import { PaginateFeedResultsResponseDto } from '../ResponseDTO/paginate-feed-results-response.dto'
 import { FeedResourcesService } from 'src/ui/Modules/Resources/Service/resources.service'
 import { ReactionsService } from 'src/ui/Modules/Reactions/Service/reaction.service'
 import { BookmarksService } from 'src/ui/Modules/Bookmarks/Service/bookmarks.service'
@@ -17,13 +14,12 @@ import _ from 'lodash'
 import { S3Service } from '../../../../shared/Services/s3.service'
 import { configService } from '../../../../shared/Services/config.service'
 import { UserDocument } from '../../../../shared/Schemas/user.schema'
-import { CreateFeedVideoDto } from '../Dto/create-feed-video.dto'
+import { CreateFeedVideoRequestDto } from '../RequestDTO/create-feed-video-request.dto'
+import { FeedsRepository } from '../Repository/feeds.repository'
 
 @Injectable()
 export class FeedsService {
     constructor(
-        @InjectModel(Feed.name)
-        private readonly feedModel: MongoPaging<FeedDocument>,
         private readonly feedHashTagService: FeedHashTagsService,
         private readonly hashTagService: HashTagService,
         private readonly userService: UsersService,
@@ -32,14 +28,17 @@ export class FeedsService {
         private readonly feedReactionService: ReactionsService,
         private readonly bookmarkService: BookmarksService,
         private readonly s3Service: S3Service,
+        private readonly feedsRepository: FeedsRepository,
     ) {}
 
     async createFeed(
-        createFeedDto: CreateFeedImageDto | CreateFeedVideoDto,
+        createFeedDto: CreateFeedImageRequestDto | CreateFeedVideoRequestDto,
         feedType: FeedType,
         resource_ids?: string[],
     ) {
-        const createdFeed = await this.feedModel.create(createFeedDto)
+        const createdFeed = await this.feedsRepository.createNewFeed(
+            createFeedDto,
+        )
         createdFeed.resource_ids = resource_ids
         createdFeed.type = feedType
 
@@ -59,7 +58,7 @@ export class FeedsService {
         currentUserId?: string,
         nextCursor?: string,
         perPage = 6,
-    ): Promise<PaginateFeedResultsDto> {
+    ): Promise<PaginateFeedResultsResponseDto> {
         const options = {
             limit: perPage,
             paginatedField: 'created_at',
@@ -67,7 +66,7 @@ export class FeedsService {
             next: nextCursor,
         }
 
-        const feeds = await this.feedModel.paginate(options)
+        const feeds = await this.feedsRepository.getPaginatedFeeds(options)
 
         const feedIds: string[] = _.map(
             _.get(feeds, 'results', []),
@@ -82,7 +81,7 @@ export class FeedsService {
     async getFeedById(
         feedId: string,
         currentUserId?: string,
-    ): Promise<FeedDetailDto> {
+    ): Promise<FeedDetailResponseDto> {
         const transformedFeeds = await this.buildFeeds([feedId], currentUserId)
 
         if (_.isEmpty(transformedFeeds)) {
@@ -108,7 +107,7 @@ export class FeedsService {
             },
         }
 
-        const feeds = await this.feedModel.paginate(options)
+        const feeds = await this.feedsRepository.getPaginatedFeeds(options)
 
         const feedIds: string[] = _.map(
             _.get(feeds, 'results', []),
@@ -136,7 +135,7 @@ export class FeedsService {
             },
         }
 
-        const feeds = await this.feedModel.paginate(options)
+        const feeds = await this.feedsRepository.getPaginatedFeeds(options)
 
         const feedIds: string[] = _.map(
             _.get(feeds, 'results', []),
@@ -207,7 +206,7 @@ export class FeedsService {
         const followingIds =
             await this.userFollowService.getAllFollowingIdsByUserId(userId)
 
-        const feeds = await this.feedModel.paginate({
+        const options = {
             limit: perPage,
             paginatedField: 'created_at',
             sortAscending: false,
@@ -217,7 +216,9 @@ export class FeedsService {
                     $in: followingIds,
                 },
             },
-        })
+        }
+
+        const feeds = await this.feedsRepository.getPaginatedFeeds(options)
 
         const feedIds: string[] = _.map(
             _.get(feeds, 'results', []),
@@ -232,17 +233,20 @@ export class FeedsService {
     private async buildFeeds(
         feedIds: string[],
         currentUserId?: string,
-    ): Promise<FeedDetailDto[]> {
-        const feeds = await this.feedModel
-            .find({
+    ): Promise<FeedDetailResponseDto[]> {
+        const feeds = await this.feedsRepository.findBy(
+            {
                 _id: {
                     $in: feedIds,
                 },
-            })
-            .sort({ created_at: 'desc' })
+            },
+            {
+                created_at: 'desc',
+            },
+        )
 
         const promises = _.map(feeds, async (feed) => {
-            const feedDetailDto = new FeedDetailDto()
+            const feedDetailDto = new FeedDetailResponseDto()
 
             const createdUser: UserDocument | undefined =
                 await this.userService.getById(feed.created_by)

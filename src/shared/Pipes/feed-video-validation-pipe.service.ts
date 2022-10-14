@@ -4,18 +4,13 @@ import {
     ArgumentMetadata,
     UnprocessableEntityException,
 } from '@nestjs/common'
+import { ImageMimeTypes } from '../Types/types'
 
 @Injectable()
 export class FeedVideoValidationPipe implements PipeTransform {
     transform(value: any, metadata: ArgumentMetadata) {
         const maxImageSize = 5 * 1024 * 1024
         const maxVideoSize = 25 * 1024 * 1024
-        const imagesMimeTypes = [
-            'image/png',
-            'image/jpeg',
-            'image/jpg',
-            'image/gif',
-        ]
 
         if (!value.video || !value.thumbnail)
             throw new UnprocessableEntityException(
@@ -29,7 +24,7 @@ export class FeedVideoValidationPipe implements PipeTransform {
             throw new UnprocessableEntityException('Video type must be mp4')
         if (video.size > maxVideoSize)
             throw new UnprocessableEntityException('Video size too large')
-        if (!imagesMimeTypes.includes(thumbnail.mimetype))
+        if (!ImageMimeTypes.includes(thumbnail.mimetype))
             throw new UnprocessableEntityException(
                 'Thumbnail type is not valid',
             )

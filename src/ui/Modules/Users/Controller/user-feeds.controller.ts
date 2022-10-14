@@ -6,7 +6,7 @@ import { UsersService } from '../Service/users.service'
 import { S3Service } from 'src/shared/Services/s3.service'
 import { UserFollowsService } from 'src/ui/Modules/Follows/Service/user-follows.service'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
-import { PaginateFeedResultsDto } from 'src/ui/Modules/Feeds/Dto/paginate-feed-results.dto'
+import { PaginateFeedResultsResponseDto } from 'src/ui/Modules/Feeds/ResponseDTO/paginate-feed-results-response.dto'
 import { FeedsService } from 'src/ui/Modules/Feeds/Service/feeds.service'
 import _ from 'lodash'
 import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
@@ -32,11 +32,11 @@ export class UserFeedsController {
         summary: 'Get posted feeds by current user',
     })
     @ApiOkResponse({
-        type: PaginateFeedResultsDto,
+        type: PaginateFeedResultsResponseDto,
     })
     async getFeedsPostedByCurrentUser(
         @Req() req,
-    ): Promise<PaginateFeedResultsDto> {
+    ): Promise<PaginateFeedResultsResponseDto> {
         const createdBy = _.get(req.user, 'userId')
         const currentUserId = _.get(req.user, 'userId')
         const nextCursor: string | undefined = req.query['next']
@@ -59,9 +59,11 @@ export class UserFeedsController {
         summary: 'Get posted feeds by user',
     })
     @ApiOkResponse({
-        type: PaginateFeedResultsDto,
+        type: PaginateFeedResultsResponseDto,
     })
-    async getFeedsPostedByUser(@Req() req): Promise<PaginateFeedResultsDto> {
+    async getFeedsPostedByUser(
+        @Req() req,
+    ): Promise<PaginateFeedResultsResponseDto> {
         const createdBy = req.params.userId
         const currentUserId = req.user.userId
         const nextCursor: string | undefined = req.query['next']
@@ -84,11 +86,11 @@ export class UserFeedsController {
         summary: 'Get feeds bookmarked by current user',
     })
     @ApiOkResponse({
-        type: PaginateFeedResultsDto,
+        type: PaginateFeedResultsResponseDto,
     })
     async getFeedBookmarksByCurrentUser(
         @Req() req,
-    ): Promise<PaginateFeedResultsDto> {
+    ): Promise<PaginateFeedResultsResponseDto> {
         const bookmarkedBy = req.user.userId
         const currentUserId = _.get(req.user, 'userId')
         const nextCursor: string | undefined = req.query['next']
@@ -111,11 +113,11 @@ export class UserFeedsController {
         summary: 'Get feeds bookmarked by user',
     })
     @ApiOkResponse({
-        type: PaginateFeedResultsDto,
+        type: PaginateFeedResultsResponseDto,
     })
     async getBookmarkedFeedsByUser(
         @Req() req,
-    ): Promise<PaginateFeedResultsDto> {
+    ): Promise<PaginateFeedResultsResponseDto> {
         const bookmarkedBy = _.get(req.params, 'userId')
         const currentUserId = _.get(req.user, 'userId')
         const nextCursor: string | undefined = req.query['next']
@@ -138,11 +140,11 @@ export class UserFeedsController {
         summary: 'Get reacted feeds by current user',
     })
     @ApiOkResponse({
-        type: PaginateFeedResultsDto,
+        type: PaginateFeedResultsResponseDto,
     })
     async getReactedFeedsByCurrentUser(
         @Req() req,
-    ): Promise<PaginateFeedResultsDto> {
+    ): Promise<PaginateFeedResultsResponseDto> {
         const reactedBy = req.user.userId
         const currentUserId = req.user.userId
         const nextCursor: string | undefined = req.query['next']
@@ -165,9 +167,11 @@ export class UserFeedsController {
         summary: 'Get reacted feeds by user',
     })
     @ApiOkResponse({
-        type: PaginateFeedResultsDto,
+        type: PaginateFeedResultsResponseDto,
     })
-    async getReactedFeedsByUser(@Req() req): Promise<PaginateFeedResultsDto> {
+    async getReactedFeedsByUser(
+        @Req() req,
+    ): Promise<PaginateFeedResultsResponseDto> {
         const reactedBy = _.get(req.params, 'userId')
         const currentUserId = _.get(req.user, 'userId')
         const nextCursor: string | undefined = req.query['next']
@@ -190,11 +194,11 @@ export class UserFeedsController {
         summary: "Get following's feeds by `current` alias",
     })
     @ApiOkResponse({
-        type: PaginateFeedResultsDto,
+        type: PaginateFeedResultsResponseDto,
     })
     async getFollowingFeedsByCurrentUser(
         @Req() req,
-    ): Promise<PaginateFeedResultsDto> {
+    ): Promise<PaginateFeedResultsResponseDto> {
         const userId = req.user.userId
         const currentUserId = req.user.userId
         const nextCursor: string | undefined = req.query['next']

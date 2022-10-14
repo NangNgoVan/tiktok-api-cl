@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { IsBoolean, IsEnum } from 'class-validator'
 import { UserReactionType } from 'src/shared/Types/types'
 
-export class FeedCurrentUserDto {
+export class FeedCurrentUserResponseDto {
     @ApiProperty({
         default: false,
     })

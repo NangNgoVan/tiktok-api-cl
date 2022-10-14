@@ -33,17 +33,18 @@ import { UtilsService } from 'src/shared/Services/utils.service'
 import { FeedType } from 'src/shared/Types/types'
 import { UsersService } from 'src/ui/Modules/Users/Service/users.service'
 import { AddFeedResourceDto } from '../../Resources/Dto/add-feed-resource.dto'
-import { CreateFeedImageDto } from '../Dto/create-feed-image.dto'
+import { CreateFeedImageRequestDto } from '../RequestDTO/create-feed-image-request.dto'
 import { FeedResourcesService } from '../../Resources/Service/resources.service'
 import { FeedsService } from '../Service/feeds.service'
-import { FeedDetailDto } from '../Dto/feed-detail.dto'
-import { PaginateFeedResultsDto } from '../Dto/paginate-feed-results.dto'
+import { FeedDetailResponseDto } from '../ResponseDTO/feed-detail-response.dto'
+import { PaginateFeedResultsResponseDto } from '../ResponseDTO/paginate-feed-results-response.dto'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { FeedVideoValidationPipe } from 'src/shared/Pipes/feed-video-validation-pipe.service'
-import { CreateFeedVideoDto } from '../Dto/create-feed-video.dto'
+import { CreateFeedVideoRequestDto } from '../RequestDTO/create-feed-video-request.dto'
 import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
+import { FeedImageValidationPipe } from 'src/shared/Pipes/feed-image-validation-pipe.service'
 
 @Controller('ui/feeds')
 @ApiTags('Feed APIs')
@@ -57,13 +58,13 @@ export class FeedsController {
     ) {}
 
     @Post('/by-type/image')
-    @UseGuards(JwtAuthGuard)
+    //@UseGuards(JwtAuthGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Create image feed' })
     @UseInterceptors(FileFieldsInterceptor([{ name: 'resources' }]))
     @ApiOkResponse({
         description: 'OK',
-        type: FeedDetailDto,
+        type: FeedDetailResponseDto,
     })
     @ApiConsumes('multipart/form-data')
     @ApiBody({
@@ -88,21 +89,11 @@ export class FeedsController {
     })
     async uploadFeedImageType(
         @Req() req,
-        @Body() dto: CreateFeedImageDto,
-        @UploadedFiles(
-            new ParseFilePipeBuilder()
-                .addFileTypeValidator({
-                    fileType: /(jpg|jpeg|png|gif)$/,
-                })
-                .addMaxSizeValidator({
-                    maxSize: 5 * 1024 * 1024,
-                })
-                .build({
-                    errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-                }),
-        )
+        @Body() dto: CreateFeedImageRequestDto,
+        @UploadedFiles(new FeedImageValidationPipe())
         files: { resources?: Express.Multer.File[] },
     ) {
+        return null
         const { userId } = req.user
         const user = await this.userService.getById(userId)
         if (!user) throw new UserNotFoundException()
@@ -175,7 +166,7 @@ export class FeedsController {
     )
     @ApiOkResponse({
         description: 'OK',
-        type: FeedDetailDto,
+        type: FeedDetailResponseDto,
     })
     @ApiConsumes('multipart/form-data')
     @ApiBody({
@@ -201,7 +192,7 @@ export class FeedsController {
     })
     async uploadFeedVideoType(
         @Req() req,
-        @Body() dto: CreateFeedVideoDto,
+        @Body() dto: CreateFeedVideoRequestDto,
         @UploadedFiles(new FeedVideoValidationPipe())
         files: { video: Express.Multer.File; thumbnail: Express.Multer.File },
     ) {
@@ -291,7 +282,7 @@ export class FeedsController {
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Get newest feeds' })
     @ApiOkResponse({
-        type: PaginateFeedResultsDto,
+        type: PaginateFeedResultsResponseDto,
     })
     @ApiImplicitQuery({
         required: false,
@@ -314,7 +305,7 @@ export class FeedsController {
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Get trending feeds' })
     @ApiOkResponse({
-        type: PaginateFeedResultsDto,
+        type: PaginateFeedResultsResponseDto,
     })
     @ApiImplicitQuery({
         required: false,
@@ -337,7 +328,7 @@ export class FeedsController {
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Get feeds by song id' })
     @ApiOkResponse({
-        type: PaginateFeedResultsDto,
+        type: PaginateFeedResultsResponseDto,
     })
     @ApiImplicitQuery({
         required: false,
@@ -362,7 +353,7 @@ export class FeedsController {
     @ApiBearerAuth()
     @ApiOkResponse({
         description: 'OK',
-        type: FeedDetailDto,
+        type: FeedDetailResponseDto,
     })
     async getFeedById(@Req() req): Promise<any> {
         const feedId = _.get(req.params, 'id')
