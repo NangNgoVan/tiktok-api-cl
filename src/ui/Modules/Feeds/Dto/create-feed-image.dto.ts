@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
 import {
     IsBoolean,
     IsNumber,
@@ -6,6 +7,7 @@ import {
     IsString,
     MaxLength,
 } from 'class-validator'
+import _ from 'lodash'
 
 export class CreateFeedImageDto {
     @IsString()
@@ -25,9 +27,17 @@ export class CreateFeedImageDto {
 
     @IsNumber()
     @ApiProperty()
+    @Transform(({ value }) => {
+        return _.parseInt(value, 10)
+    })
     primary_image_index: number
 
     @IsBoolean()
     @ApiProperty()
+    @Transform(({ value }) => {
+        if (value === 'true') return true
+        if (value === 'false') return false
+        return value
+    })
     allowed_comment: boolean
 }
