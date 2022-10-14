@@ -9,21 +9,23 @@ import {
 
 export class CreateFeedImageDto {
     @IsString()
-    @ApiProperty()
-    @MaxLength(255)
-    content: string
-
-    @IsString()
     @IsOptional()
+    @MaxLength(100)
     @ApiProperty()
-    song_id?: string
+    content?: string
+
+    // @IsString()
+    // @IsOptional()
+    // @ApiProperty()
+    // song_id?: string
 
     hashtags?: string[]
 
     created_by?: string
+
     @IsNumber()
     @ApiProperty()
-    primary_image_index?: number
+    primary_image_index: number
 
     @IsBoolean()
     @ApiProperty()

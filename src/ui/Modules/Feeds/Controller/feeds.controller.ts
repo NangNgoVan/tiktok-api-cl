@@ -74,29 +74,21 @@ export class FeedsController {
                     type: 'string',
                     format: 'binary',
                 },
-                data: {
-                    type: 'object',
-                    properties: {
-                        content: {
-                            type: 'string',
-                        },
-                        song_id: {
-                            type: 'string',
-                        },
-                        primary_image_index: {
-                            type: 'number',
-                        },
-                        allowed_comment: {
-                            type: 'boolean',
-                        },
-                    },
+                content: {
+                    type: 'string',
+                },
+                primary_image_index: {
+                    type: 'number',
+                },
+                allowed_comment: {
+                    type: 'boolean',
                 },
             },
         },
     })
     async uploadFeedImageType(
         @Req() req,
-        @Body() formData: object,
+        @Body() dto: CreateFeedImageDto,
         @UploadedFiles(
             new ParseFilePipeBuilder()
                 .addFileTypeValidator({
@@ -114,17 +106,6 @@ export class FeedsController {
         const { userId } = req.user
         const user = await this.userService.getById(userId)
         if (!user) throw new UserNotFoundException()
-
-        let dto = formData['data'] as CreateFeedImageDto
-
-        dto = _.pick(dto, [
-            'content',
-            'song_id',
-            'hashtags',
-            'created_by',
-            'primary_image_index',
-            'allowed_comment',
-        ])
 
         dto.hashtags = this.utilsService.splitHashtagFromString(dto.content)
 
