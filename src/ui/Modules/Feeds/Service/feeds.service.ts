@@ -17,6 +17,7 @@ import _ from 'lodash'
 import { S3Service } from '../../../../shared/Services/s3.service'
 import { configService } from '../../../../shared/Services/config.service'
 import { UserDocument } from '../../../../shared/Schemas/user.schema'
+import { CreateFeedVideoDto } from '../Dto/create-feed-video.dto'
 
 @Injectable()
 export class FeedsService {
@@ -34,7 +35,7 @@ export class FeedsService {
     ) {}
 
     async createFeed(
-        createFeedDto: CreateFeedImageDto,
+        createFeedDto: CreateFeedImageDto | CreateFeedVideoDto,
         feedType: FeedType,
         resource_ids?: string[],
     ) {

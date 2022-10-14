@@ -1,27 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger'
-import {
-    IsArray,
-    IsBoolean,
-    IsEnum,
-    IsNumber,
-    IsOptional,
-    IsString,
-    MaxLength,
-} from 'class-validator'
-import { max } from 'lodash'
-import { FeedType } from 'src/shared/Types/types'
 import { Transform } from 'class-transformer'
+import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator'
 
 export class CreateFeedVideoDto {
     @IsString()
-    @ApiProperty()
-    @MaxLength(255)
-    content: string
-
-    @IsString()
     @IsOptional()
     @ApiProperty()
-    song_id?: string
+    @MaxLength(100)
+    content?: string
+
+    // @IsString()
+    // @IsOptional()
+    // @ApiProperty()
+    // song_id?: string
 
     // @IsArray()
     // @ApiProperty()
