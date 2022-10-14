@@ -19,7 +19,7 @@ export class FeedResourceService {
 
     async getFeedResourcesByFeedId(feedId: string): Promise<
         {
-            resource_id: string
+            _id: string
             path: string
             mimetype: string
         }[]
@@ -38,7 +38,7 @@ export class FeedResourceService {
                 )
 
                 return {
-                    resource_id: feedResource.id,
+                    _id: feedResource._id,
                     path,
                     mimetype: feedResource.mimetype,
                 }

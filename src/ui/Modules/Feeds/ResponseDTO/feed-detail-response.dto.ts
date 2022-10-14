@@ -9,7 +9,7 @@ import { FeedCurrentUserResponseDto } from './feed-current-user-response.dto'
 export class FeedDetailResponseDto {
     @ApiProperty()
     @IsString()
-    id: string
+    _id: string
 
     @Prop()
     @ApiProperty()
@@ -91,7 +91,7 @@ export class FeedDetailResponseDto {
     @ApiProperty({
         type: [GetFeedResourceDto],
     })
-    resource_details: GetFeedResourceDto[]
+    resources: GetFeedResourceDto[]
 
     @ApiProperty()
     @IsString()

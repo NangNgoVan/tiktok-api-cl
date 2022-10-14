@@ -238,7 +238,7 @@ export class FeedService {
                 nick_name: _.get(createdUser, 'nick_name'),
                 full_name: _.get(createdUser, 'full_name'),
                 avatar: avatarUrl,
-                id: _.get(createdUser, 'id'),
+                _id: _.get(createdUser, '_id'),
                 current_user: currentUserId
                     ? {
                           is_followed:
@@ -255,16 +255,14 @@ export class FeedService {
                 currentUserId,
             )
 
-            feedDetailDto.id = feed._id
+            feedDetailDto._id = feed._id
             feedDetailDto.allowed_comment = feed.allowed_comment
             feedDetailDto.number_of_view = feed.number_of_view
             feedDetailDto.number_of_reaction = feed.number_of_reaction
             feedDetailDto.number_of_bookmark = feed.number_of_bookmark
             feedDetailDto.number_of_comment = feed.number_of_comment
             feedDetailDto.number_of_report = feed.number_of_report
-            feedDetailDto.created_by = feed.created_by
             feedDetailDto.content = feed.content
-            feedDetailDto.song_id = feed.song_id
             feedDetailDto.hashtags = feed.hashtags
             feedDetailDto.primary_image_index = feed.primary_image_index
             feedDetailDto.created_at = feed.created_at
@@ -273,10 +271,10 @@ export class FeedService {
 
             const resources =
                 await this.feedResourcesService.getFeedResourcesByFeedId(
-                    feed.id,
+                    feed._id,
                 )
             if (resources) {
-                feedDetailDto.resource_details = resources
+                feedDetailDto.resources = resources
             }
 
             return feedDetailDto
