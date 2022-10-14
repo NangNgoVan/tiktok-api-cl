@@ -7,7 +7,7 @@ import { S3Service } from 'src/shared/Services/s3.service'
 import { UserFollowsService } from 'src/ui/Modules/Follows/Service/user-follows.service'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 import { PaginateFeedResultsResponseDto } from 'src/ui/Modules/Feeds/ResponseDTO/paginate-feed-results-response.dto'
-import { FeedsService } from 'src/ui/Modules/Feeds/Service/feeds.service'
+import { FeedService } from 'src/ui/Modules/Feeds/Service/feed.service'
 import _ from 'lodash'
 import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
 
@@ -18,7 +18,7 @@ export class UserFeedsController {
         private readonly userService: UsersService,
         private readonly aws3FileUploadService: S3Service,
         private readonly userFollowsService: UserFollowsService,
-        private readonly feedsService: FeedsService,
+        private readonly feedsService: FeedService,
     ) {}
 
     @Get('/current/feeds')

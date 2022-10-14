@@ -1,58 +1,32 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { FeedType } from 'src/shared/Types/types'
-import { CreateFeedImageRequestDto } from '../RequestDTO/create-feed-image-request.dto'
 import { FeedDetailResponseDto } from '../ResponseDTO/feed-detail-response.dto'
 import { FeedHashTagsService } from 'src/ui/Modules/Hashtags/Service/feed-hashtags.service'
 import { HashTagService } from 'src/ui/Modules/Hashtags/Service/hashtags.service'
 import { UsersService } from 'src/ui/Modules/Users/Service/users.service'
 import { UserFollowsService } from 'src/ui/Modules/Follows/Service/user-follows.service'
 import { PaginateFeedResultsResponseDto } from '../ResponseDTO/paginate-feed-results-response.dto'
-import { FeedResourcesService } from 'src/ui/Modules/Resources/Service/resources.service'
+import { FeedResourceService } from 'src/ui/Modules/Feeds/Service/feed-resource.service'
 import { ReactionsService } from 'src/ui/Modules/Reactions/Service/reaction.service'
 import { BookmarksService } from 'src/ui/Modules/Bookmarks/Service/bookmarks.service'
 import _ from 'lodash'
 import { S3Service } from '../../../../shared/Services/s3.service'
 import { configService } from '../../../../shared/Services/config.service'
 import { UserDocument } from '../../../../shared/Schemas/user.schema'
-import { CreateFeedVideoRequestDto } from '../RequestDTO/create-feed-video-request.dto'
-import { FeedsRepository } from '../Repository/feeds.repository'
+import { FeedRepository } from '../Repository/feed.repository'
 
 @Injectable()
-export class FeedsService {
+export class FeedService {
     constructor(
         private readonly feedHashTagService: FeedHashTagsService,
         private readonly hashTagService: HashTagService,
         private readonly userService: UsersService,
         private readonly userFollowService: UserFollowsService,
-        private readonly feedResourcesService: FeedResourcesService,
+        private readonly feedResourcesService: FeedResourceService,
         private readonly feedReactionService: ReactionsService,
         private readonly bookmarkService: BookmarksService,
         private readonly s3Service: S3Service,
-        private readonly feedsRepository: FeedsRepository,
+        private readonly feedsRepository: FeedRepository,
     ) {}
-
-    async createFeed(
-        createFeedDto: CreateFeedImageRequestDto | CreateFeedVideoRequestDto,
-        feedType: FeedType,
-        resource_ids?: string[],
-    ) {
-        const createdFeed = await this.feedsRepository.createNewFeed(
-            createFeedDto,
-        )
-        createdFeed.resource_ids = resource_ids
-        createdFeed.type = feedType
-
-        /**await */
-        this.feedHashTagService.addFeedHashTag(
-            createdFeed.id,
-            createdFeed.created_by,
-            createdFeed.hashtags,
-        )
-        /**await */
-        this.hashTagService.addHashTag(createdFeed.hashtags)
-
-        return createdFeed.save()
-    }
 
     async getNewestFeeds(
         currentUserId?: string,
@@ -297,9 +271,10 @@ export class FeedsService {
 
             feedDetailDto.type = feed.type
 
-            const resources = await this.feedResourcesService.getResourceByIds(
-                feed.resource_ids,
-            )
+            const resources =
+                await this.feedResourcesService.getFeedResourcesByFeedId(
+                    feed.id,
+                )
             if (resources) {
                 feedDetailDto.resource_details = resources
             }

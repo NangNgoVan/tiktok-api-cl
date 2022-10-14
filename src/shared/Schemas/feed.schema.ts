@@ -15,77 +15,80 @@ export type FeedDocument = Feed & Document
     validateBeforeSave: true,
 })
 export class Feed {
-    @Prop()
-    @ApiProperty()
-    @IsEnum({
+    @Prop({
         enum: FeedType,
     })
     type: FeedType
 
-    @ApiProperty()
-    @IsNumber()
     @Prop({
         default: 0,
+        type: Number,
+        min: 0,
     })
-    number_of_view: number
+    number_of_view?: number
 
-    @ApiProperty()
-    @IsNumber()
     @Prop({
         default: 0,
+        type: Number,
+        min: 0,
     })
-    number_of_reaction: number
+    number_of_reaction?: number
 
-    @ApiProperty()
-    @IsNumber()
     @Prop({
         default: 0,
+        type: Number,
+        min: 0,
     })
-    number_of_bookmark: number
+    number_of_bookmark?: number
 
-    @ApiProperty()
-    @IsNumber()
     @Prop({
         default: 0,
+        type: Number,
+        min: 0,
     })
-    number_of_comment: number
+    number_of_comment?: number
 
-    @ApiProperty()
-    @IsNumber()
     @Prop({
         default: 0,
+        type: Number,
+        min: 0,
     })
-    number_of_report: number
+    number_of_report?: number
 
-    @ApiProperty()
-    @Prop({})
+    @Prop({
+        required: true,
+        type: String,
+    })
     created_by: string
 
     @ApiProperty()
     @Prop({
         maxlength: 255,
+        required: false,
     })
-    content: string
+    content?: string
 
-    @ApiProperty()
-    @Prop()
-    resource_ids: string[]
+    // @ApiProperty()
+    // @Prop()
+    // resource_ids: string[]
 
-    @ApiProperty()
-    @Prop()
+    @Prop({
+        required: false,
+        type: String,
+    })
     song_id?: string
 
-    @ApiProperty()
-    @Prop()
+    @Prop({
+        type: [String],
+        default: [],
+    })
     hashtags: string[]
 
-    @ApiProperty()
     @Prop({
         default: 0,
     })
     primary_image_index?: number
 
-    @ApiProperty()
     @Prop({
         default: true,
     })

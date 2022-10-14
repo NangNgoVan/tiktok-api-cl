@@ -3,9 +3,11 @@ import _ from 'lodash'
 
 @Injectable()
 export class UtilsService {
-    splitHashtagFromString(content: string): string[] {
+    extractHashtagFromString(content: string): string[] {
         if (!content) return []
         const regexp = /\B\#\w+\b/g
-        return _.uniq(content.match(regexp)).map((h) => h.substring(1))
+        return _.compact(
+            _.uniq(content.match(regexp)).map((h) => h.substring(1)),
+        )
     }
 }

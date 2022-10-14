@@ -42,10 +42,3 @@ export type UserData = {
     roles?: string[]
     permissions?: string[]
 }
-
-export const ImageMimeTypes = [
-    'image/png',
-    'image/jpeg',
-    'image/jpg',
-    'image/gif',
-]

@@ -1,19 +1,19 @@
 import {
     PipeTransform,
     Injectable,
-    ArgumentMetadata,
     UnprocessableEntityException,
 } from '@nestjs/common'
 import { fromBuffer } from 'file-type'
-import { ImageMimeTypes } from '../Types/types'
+import { ALLOWED_FEED_IMAGE_MIMETYPE } from '../Types/constants'
+import _ from 'lodash'
 
 @Injectable()
 export class FeedImageValidationPipe implements PipeTransform {
-    async transform(value: any, metadata: ArgumentMetadata) {
-        const maxImageSize = 5 * 1024 * 1024
+    async transform(value: any) {
+        const MAX_IMAGE_SIZE = 5 * 1024 * 1024
 
-        if (!value.resources) {
-            throw new UnprocessableEntityException('Images is not exists!')
+        if (_.isEmpty(value.resources)) {
+            throw new UnprocessableEntityException('resources is required')
         }
 
         const images = value.resources
@@ -24,17 +24,19 @@ export class FeedImageValidationPipe implements PipeTransform {
 
             const { mime } = await fromBuffer(buffer)
 
-            if (!ImageMimeTypes.includes(mime)) {
+            if (image.size > MAX_IMAGE_SIZE) {
                 throw new UnprocessableEntityException(
-                    "All images must have image's type",
+                    `Image ${image.originalname} size cannot exceed 5mb`,
                 )
             }
 
-            if (image.size > maxImageSize) {
+            if (!ALLOWED_FEED_IMAGE_MIMETYPE.includes(mime)) {
                 throw new UnprocessableEntityException(
-                    `Size of ${image.originalname} is greater than 5 MB`,
+                    `Image ${image.originalname} mimetype ${mime} is not supported`,
                 )
             }
         }
+
+        return value
     }
 }

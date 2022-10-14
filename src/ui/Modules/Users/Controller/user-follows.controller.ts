@@ -201,8 +201,6 @@ export class UserFollowsController {
         const currentUserId = _.get(req.user, 'userId')
         const nextCursor: string | undefined = req.query['next']
 
-        console.log('hello')
-
         return await this.userFollowsService.getPaginatedFollowersByUserId(
             userId,
             currentUserId,

@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import {
+    ArrayMaxSize,
+    IsArray,
     IsBoolean,
+    IsNotEmpty,
     IsNumber,
     IsOptional,
     IsString,
@@ -13,17 +16,32 @@ export class CreateFeedImageRequestDto {
     @IsString()
     @IsOptional()
     @MaxLength(100)
-    @ApiProperty()
+    @ApiProperty({
+        type: String,
+        required: false,
+        maxLength: 100,
+    })
     content?: string
 
-    // @IsString()
-    // @IsOptional()
-    // @ApiProperty()
-    // song_id?: string
+    @IsString()
+    @IsOptional()
+    @ApiProperty({
+        type: String,
+        required: false,
+    })
+    song_id?: string
 
+    @IsArray()
+    @ArrayMaxSize(15)
+    @IsString({ each: true })
+    @IsNotEmpty({ each: true })
+    @IsOptional()
+    @ApiProperty({
+        type: String,
+        isArray: true,
+        required: false,
+    })
     hashtags?: string[]
-
-    created_by?: string
 
     @IsNumber()
     @ApiProperty()

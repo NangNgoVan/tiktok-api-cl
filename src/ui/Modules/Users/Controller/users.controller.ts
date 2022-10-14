@@ -4,7 +4,6 @@ import {
     Controller,
     Get,
     HttpStatus,
-    Logger,
     Param,
     ParseFilePipeBuilder,
     Patch,

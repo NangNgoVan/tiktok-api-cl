@@ -1,26 +1,45 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
-import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator'
+import {
+    ArrayMaxSize,
+    IsArray,
+    IsBoolean,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    MaxLength,
+} from 'class-validator'
 
 export class CreateFeedVideoRequestDto {
     @IsString()
     @IsOptional()
-    @ApiProperty()
     @MaxLength(100)
+    @ApiProperty({
+        type: String,
+        required: false,
+        maxLength: 100,
+    })
     content?: string
 
-    // @IsString()
-    // @IsOptional()
-    // @ApiProperty()
-    // song_id?: string
+    @IsString()
+    @IsOptional()
+    @ApiProperty({
+        type: String,
+        required: false,
+    })
+    song_id?: string
 
-    // @IsArray()
-    // @ApiProperty()
+    @IsArray()
+    @ArrayMaxSize(15)
+    @IsString({ each: true })
+    @IsNotEmpty({ each: true })
+    @IsOptional()
+    @ApiProperty({
+        type: String,
+        isArray: true,
+        required: false,
+    })
     hashtags?: string[]
-
-    // @ApiProperty()
-    // @IsString()
-    created_by?: string
 
     @IsBoolean()
     @ApiProperty()

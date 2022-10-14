@@ -2,9 +2,9 @@ import { Prop } from '@nestjs/mongoose'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsEnum, IsNumber, IsObject, IsString } from 'class-validator'
 import { FeedType } from 'src/shared/Types/types'
-import { GetFeedResourceDto } from 'src/ui/Modules/Resources/Dto/get-feed-resource.dto'
+import { GetFeedResourceDto } from 'src/ui/Modules/Feeds/ResponseDTO/get-feed-resource.dto'
 import { CreatedUserDto } from '../../../../shared/ResponseDTO/created-user.dto'
-import { FeedCurrentUserResponseDto } from '../RequestDTO/feed-current-user-response.dto'
+import { FeedCurrentUserResponseDto } from './feed-current-user-response.dto'
 
 export class FeedDetailResponseDto {
     @ApiProperty()
