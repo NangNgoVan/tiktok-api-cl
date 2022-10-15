@@ -7,13 +7,13 @@ import { Song, SongSchema } from 'src/shared/Schemas/song.schema'
 import { SubjectSchema } from 'src/shared/Schemas/subject.schema'
 import { S3Service } from 'src/shared/Services/s3.service'
 import { UtilsService } from 'src/shared/Services/utils.service'
-import { ActionsRepository } from '../Users/Repositories/actions.repository'
-import { SubjectsRepository } from '../Users/Repositories/subjects.repository'
 import { PermissionsService } from '../Users/Service/permissions.service'
 import { SongsController } from './Controller/songs.controller'
 import { SongsRepository } from './Repositories/songs.repository'
 import { SongsService } from './Service/songs.service'
 import { SongModelTransformService } from './Transformer/song-model.transform'
+import { ActionsRepository } from '../Users/Repository/actions.repository'
+import { SubjectsRepository } from '../Users/Repository/subjects.repository'
 
 @Module({
     imports: [

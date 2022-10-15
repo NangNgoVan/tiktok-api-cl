@@ -15,6 +15,7 @@ import { UserFollowsController } from './Controller/user-follows.controller'
 import { UserFeedsController } from './Controller/user-feeds.controller'
 import { UserAuthenticationMethodsController } from './Controller/user-authentication-methods.controller'
 import { AuthenticationModule } from '../Authentication/authentication.module'
+import { UserRepository } from './Repository/user.repository'
 
 @Module({
     imports: [
@@ -35,7 +36,12 @@ import { AuthenticationModule } from '../Authentication/authentication.module'
         UserFeedsController,
         UserAuthenticationMethodsController,
     ],
-    providers: [UsersService, UserAuthenticationMethodsService, S3Service],
-    exports: [UsersService, UserAuthenticationMethodsService],
+    providers: [
+        UserRepository,
+        UsersService,
+        UserAuthenticationMethodsService,
+        S3Service,
+    ],
+    exports: [UserRepository, UsersService, UserAuthenticationMethodsService],
 })
 export class UsersModule {}

@@ -14,10 +14,11 @@ import { LoginWithAuthenticationMethodCredentialRequestDto } from '../../../../s
 import { RefreshTokenBlacklistService } from '../../../../shared/Services/refresh-token-blacklist.service'
 import { RefreshAccessTokenResponseDto } from '../../../../shared/ResponseDTO/refresh-token-response.dto'
 import { AuthenticateResponseDto } from '../../../../shared/ResponseDTO/authenticate-response.dto'
-import { RolesRepository } from '../../Users/Repositories/roles.repository'
+import { RolesRepository } from '../../Users/Repository/roles.repository'
 import { RolesService } from '../../Users/Service/roles.service'
-import { UsersRepository } from '../../Users/Repositories/users.repository'
-import { UserAuthenticationMethodsRepository } from '../../Users/Repositories/user-authentication-methods.repository'
+import { UsersRepository } from '../../Users/Repository/users.repository'
+import { UserAuthenticationMethodsRepository } from '../../Users/Repository/user-authentication-methods.repository'
+import { UserRolesService } from '../../Users/Service/user-roles.service'
 
 @Injectable()
 export class AuthenticationService {
@@ -28,6 +29,7 @@ export class AuthenticationService {
         private readonly jwtService: JwtService,
         private readonly blackListTokenService: RefreshTokenBlacklistService,
         private readonly roleService: RolesService,
+        private readonly userRolesService: UserRolesService,
     ) {}
 
     async logInWithCredential(
@@ -42,7 +44,7 @@ export class AuthenticationService {
             throw new NotFoundException(`Username ${dto.username} not found`)
         }
 
-        const user = await this.userRepository.findByById(
+        const user = await this.userRepository.getById(
             userAuthenticationMethod.user_id,
         )
 
@@ -63,24 +65,18 @@ export class AuthenticationService {
             throw new BadRequestException('Password do not match')
         }
 
-        console.log('user', user)
-
         const roles: string[] = _.get(user, 'roles', [])
 
-        console.log('roles', roles)
-
-        const effectivePermissions: string[] =
-            await this.roleService.getEffectivePermissionsByRoles(roles)
-
-        console.log('effectivePermissions', effectivePermissions)
+        const [effectivePermissions] = await Promise.all([
+            this.roleService.getEffectivePermissionsByRoles(roles),
+            this.userRolesService.reconcileRolesForUser(user.id),
+        ])
 
         const payloadToGenerateToken = {
             userId: user.id,
             roles,
             permissions: effectivePermissions,
         }
-
-        console.log('payloadtogeneratetoken', payloadToGenerateToken)
 
         return {
             token: this.generateAccessToken(payloadToGenerateToken),
@@ -113,7 +109,7 @@ export class AuthenticationService {
     async refreshAccessToken(
         userId: string,
     ): Promise<RefreshAccessTokenResponseDto> {
-        const user = await this.userRepository.findByById(userId)
+        const user = await this.userRepository.getById(userId)
 
         const roles: string[] = _.get(user, 'roles', [])
 

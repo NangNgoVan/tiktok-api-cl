@@ -14,6 +14,7 @@ export class FeedHashTagsService {
         private readonly feedHashTagModel: Model<FeedHashTagDocument>,
     ) {}
 
+    // FIXME: reconcile
     async addFeedHashTag(feedId: string, createdBy: string, tags: string[]) {
         const validTags: string[] = _.compact(_.uniq(tags))
         await Promise.all(

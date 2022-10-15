@@ -1,27 +1,21 @@
-import {
-    Body,
-    Controller,
-    Get,
-    NotImplementedException,
-    Param,
-    Post,
-    UseGuards,
-} from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
 import {
     ApiNotFoundResponse,
     ApiOkResponse,
     ApiOperation,
+    ApiTags,
 } from '@nestjs/swagger'
 import { UserData } from '../../../../shared/Types/types'
 import { CurrentUser } from '../../../../shared/Decorators/current-user.decorator'
 import { UsersService } from '../Service/users.service'
 import { RequirePermissions } from '../../../shared/Decorators/permission.decorator'
 import { GetUserResponseDto } from '../ResponseDTO/get-user-response.dto'
-import { CreateUserWithAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-with-authentication-method-credential-request.dto'
-import { JwtAuthGuard } from '../../../../shared/Guards/jwt-auth.guard'
 import { PermissionGuard } from '../../../shared/Guards/permission.guard'
+import { JwtAuthGuard } from 'src/shared/Guards/jwt-auth.guard'
+import { CreateUserWithAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-with-authentication-method-credential-request.dto'
 
 @Controller('cms/users')
+@ApiTags('Users APIs')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
@@ -32,8 +26,10 @@ export class UsersController {
     @ApiOkResponse({
         type: GetUserResponseDto,
     })
-    async getCurrentUser(@CurrentUser() currentUser: UserData): Promise<any> {
-        return this.usersService.findById(currentUser.userId)
+    async getCurrentUser(
+        @CurrentUser() currentUser: UserData,
+    ): Promise<GetUserResponseDto> {
+        return this.usersService.getById(currentUser.userId)
     }
 
     @Get(':id')
@@ -45,7 +41,7 @@ export class UsersController {
     })
     @ApiNotFoundResponse()
     async getUserById(@Param('id') id: string): Promise<GetUserResponseDto> {
-        return this.usersService.findById(id)
+        return this.usersService.getById(id)
     }
 
     @Post()

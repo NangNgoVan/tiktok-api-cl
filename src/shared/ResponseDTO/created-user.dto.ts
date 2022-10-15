@@ -10,7 +10,7 @@ export class CurrentFollowedUser {
 export class CreatedUserDto {
     @ApiProperty()
     @IsString()
-    id: string
+    _id: string
     @ApiProperty()
     @IsString()
     nick_name: string

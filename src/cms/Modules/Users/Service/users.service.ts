@@ -6,12 +6,14 @@ import {
 import { GetUserResponseDto } from '../ResponseDTO/get-user-response.dto'
 import _ from 'lodash'
 import { RolesService } from './roles.service'
-import { UsersRepository } from '../Repositories/users.repository'
+import { UsersRepository } from '../Repository/users.repository'
 import bcrypt from 'bcrypt'
 import { AuthenticationMethod } from '../../../../shared/Types/types'
-import { CreateUserWithAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-with-authentication-method-credential-request.dto'
-import { UserAuthenticationMethodsRepository } from '../Repositories/user-authentication-methods.repository'
+import { UserAuthenticationMethodsRepository } from '../Repository/user-authentication-methods.repository'
 import { v4 as uuidv4 } from 'uuid'
+import { CreateUserWithAuthenticationMethodCredentialRequestDto } from '../RequestDTO/create-user-with-authentication-method-credential-request.dto'
+import { S3Service } from '../../../../shared/Services/s3.service'
+import { configService } from '../../../../shared/Services/config.service'
 
 @Injectable()
 export class UsersService {
@@ -19,10 +21,11 @@ export class UsersService {
         private readonly usersRepository: UsersRepository,
         private readonly userAuthenticationMethodRepository: UserAuthenticationMethodsRepository,
         private readonly rolesService: RolesService,
+        private readonly s3Service: S3Service,
     ) {}
 
-    async findById(id: string): Promise<GetUserResponseDto> {
-        const userDocument = await this.usersRepository.findByById(id)
+    async getById(id: string): Promise<GetUserResponseDto> {
+        const userDocument = await this.usersRepository.getById(id)
 
         if (!userDocument) {
             throw new NotFoundException(`User ${id} not found`)
@@ -33,7 +36,17 @@ export class UsersService {
         const effectivePermissions: string[] =
             await this.rolesService.getEffectivePermissionsByRoles(roles)
 
-        return { ...userDocument.toObject(), permissions: effectivePermissions }
+        const avatar: string = await this.s3Service.getSignedUrl(
+            userDocument.avatar,
+            configService.getEnv('AWS_BUCKET_NAME'),
+            false,
+        )
+
+        return {
+            ...userDocument.toObject(),
+            permissions: effectivePermissions,
+            avatar,
+        }
     }
 
     async createWithAuthenticationMethodCredential(
@@ -79,6 +92,6 @@ export class UsersService {
             },
         )
 
-        return this.findById(user.id)
+        return this.getById(user.id)
     }
 }
