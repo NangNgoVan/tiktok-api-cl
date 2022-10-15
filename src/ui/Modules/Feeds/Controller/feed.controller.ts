@@ -27,10 +27,10 @@ import { FeedDetailResponseDto } from '../ResponseDTO/feed-detail-response.dto'
 import { PaginateFeedResultsResponseDto } from '../ResponseDTO/paginate-feed-results-response.dto'
 import { ApiImplicitQuery } from '@nestjs/swagger/dist/decorators/api-implicit-query.decorator'
 import _ from 'lodash'
-import { FeedVideoValidationPipe } from 'src/shared/Pipes/feed-video-validation-pipe.service'
+import { CreateFeedVideoValidationPipe } from 'src/ui/Modules/Feeds/Pipe/create-feed-video-validation.pipe'
 import { CreateFeedVideoRequestDto } from '../RequestDTO/create-feed-video-request.dto'
 import { AnonymousGuard } from 'src/shared/Guards/anonymous.guard'
-import { FeedImageValidationPipe } from 'src/shared/Pipes/feed-image-validation-pipe.service'
+import { CreateFeedImageValidationPipe } from 'src/ui/Modules/Feeds/Pipe/create-feed-image-validation.pipe'
 import { CurrentUser } from '../../../../shared/Decorators/current-user.decorator'
 import { FeedCreatorService } from '../Service/feed-creator.service'
 
@@ -85,7 +85,7 @@ export class FeedController {
     })
     async createFeedImages(
         @Body() dto: CreateFeedImageRequestDto,
-        @UploadedFiles(new FeedImageValidationPipe())
+        @UploadedFiles(new CreateFeedImageValidationPipe())
         files: { resources: Express.Multer.File[] },
         @CurrentUser() currentUser: UserData,
     ) {
@@ -143,7 +143,7 @@ export class FeedController {
     })
     async createFeedVideo(
         @Body() dto: CreateFeedVideoRequestDto,
-        @UploadedFiles(new FeedVideoValidationPipe())
+        @UploadedFiles(new CreateFeedVideoValidationPipe())
         files: {
             video: Express.Multer.File[]
             thumbnail: Express.Multer.File[]

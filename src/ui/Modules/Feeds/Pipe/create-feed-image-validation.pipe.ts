@@ -4,11 +4,11 @@ import {
     UnprocessableEntityException,
 } from '@nestjs/common'
 import { fromBuffer } from 'file-type'
-import { ALLOWED_FEED_IMAGE_MIMETYPE } from '../Types/constants'
+import { ALLOWED_FEED_IMAGE_MIMETYPE } from '../../../../shared/Types/constants'
 import _ from 'lodash'
 
 @Injectable()
-export class FeedImageValidationPipe implements PipeTransform {
+export class CreateFeedImageValidationPipe implements PipeTransform {
     async transform(value: any) {
         const MAX_IMAGE_SIZE = 5 * 1024 * 1024
 

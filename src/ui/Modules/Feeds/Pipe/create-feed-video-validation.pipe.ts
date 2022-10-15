@@ -6,12 +6,12 @@ import {
 import {
     ALLOWED_FEED_IMAGE_MIMETYPE,
     ALLOWED_FEED_VIDEO_MIMETYPE,
-} from '../Types/constants'
+} from '../../../../shared/Types/constants'
 import { fromBuffer } from 'file-type'
 import _ from 'lodash'
 
 @Injectable()
-export class FeedVideoValidationPipe implements PipeTransform {
+export class CreateFeedVideoValidationPipe implements PipeTransform {
     async transform(value: any) {
         const MAX_THUMBNAIL_SIZE = 5 * 1024 * 1024
         const MAX_VIDEO_SIZE = 25 * 1024 * 1024

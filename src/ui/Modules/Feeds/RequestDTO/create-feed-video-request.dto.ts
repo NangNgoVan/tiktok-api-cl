@@ -11,6 +11,14 @@ import {
 } from 'class-validator'
 
 export class CreateFeedVideoRequestDto {
+    // We are not using this field in this dto. it's just for swagger
+    @ApiProperty({
+        type: String,
+        format: 'binary',
+        required: true,
+    })
+    resources: never
+
     @IsString()
     @IsOptional()
     @MaxLength(100)
@@ -38,6 +46,10 @@ export class CreateFeedVideoRequestDto {
         type: String,
         isArray: true,
         required: false,
+        maxItems: 15,
+        items: {
+            maxLength: 50,
+        },
     })
     hashtags?: string[]
 
