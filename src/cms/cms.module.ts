@@ -2,9 +2,10 @@ import { MiddlewareConsumer, Module } from '@nestjs/common'
 import { AuthenticationModule } from './Modules/Authentication/authentication.module'
 import { RefreshTokenBlacklistMiddleware } from '../shared/Middlewares/refresh-token-blacklist-middleware.service'
 import { UsersModule } from './Modules/Users/users.module'
+import { StickersModule } from './Modules/Stickers/stickers.module'
 
 @Module({
-    imports: [AuthenticationModule, UsersModule],
+    imports: [AuthenticationModule, UsersModule, StickersModule],
     controllers: [],
     providers: [
         // FIXME: this will apply to all application which is incorrect

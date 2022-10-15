@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { IsNumber, IsString } from 'class-validator'
 import { Document } from 'mongoose'
 
 export type SongDocument = Song & Document
@@ -30,7 +31,7 @@ export class Song {
     path: string
 
     @Prop()
-    deleted_at: string
+    deleted_at: number
 
     @Prop()
     created_by: string
