@@ -10,11 +10,16 @@ export class SongsRepository {
     ) {}
 
     async findById(id: string) {
-        return this.songModel.findById(id)
+        return this.songModel.findOne({
+            _id: id,
+            deleted_at: null,
+        })
     }
 
     async getAll(page: number, perPage: number) {
-        return this.songModel.find({})
+        return this.songModel.find({
+            deleted_at: null,
+        })
     }
 
     async getPaginatedSongs(pageNumber: number, perPage: number) {

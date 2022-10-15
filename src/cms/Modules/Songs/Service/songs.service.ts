@@ -106,7 +106,7 @@ export class SongsService {
     async softDeleteSong(id: string) {
         const songDocument = await this.songsRepository.findById(id)
 
-        await songDocument.update({
+        await songDocument.updateOne({
             deleted_at: Date.now(),
         })
     }
